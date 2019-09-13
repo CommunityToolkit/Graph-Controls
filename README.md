@@ -15,7 +15,7 @@ If you need similar controls for the Web, please use the [Microsoft Graph Toolki
 ## Build Status
 | Target | Branch | Status | Recommended NuGet package |
 | ------ | ------ | ------ | ------ |
-| 6.0.0  | master | [![Build Status](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_apis/build/status/windows-toolkit.Graph-Controls?branchName=master)](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_build) | 6.0.0 |
+| 6.0.0  | master | [![Build Status](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_apis/build/status/windows-toolkit.Graph-Controls?branchName=master)](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_build?definitionId=102&branchName=master) | 6.0.0 |
 
 ## Feedback and Requests
 Please use [GitHub Issues](https://github.com/windows-toolkit/Graph-Controls/issues) for bug reports and feature requests.
