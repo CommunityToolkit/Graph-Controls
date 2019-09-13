@@ -13,7 +13,6 @@
 
     <!-- This is a temporary workaround for https://github.com/dotnet/sdk/issues/955 -->
     <DebugType>Full</DebugType>
-    <AssemblyOriginatorKeyFile>H:\code\WindowsGraphControls\toolkit.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   
   <ItemGroup>
