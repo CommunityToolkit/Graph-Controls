@@ -2,6 +2,8 @@
 
 This is a sub-repo for the [Windows Community Toolkit](https://aka.ms/wct) focused on [Microsoft Graph](https://developer.microsoft.com/en-us/graph/) providing a set of Helpers and Controls for development on Windows 10 with .NET.
 
+This new library replaces the `Microsoft.Toolkit.Uwp.UI.Controls.Graph` package; however, it is not backwards compatible nor does it provide all the same features at this time.
+
 If you need similar controls for the Web, please use the [Microsoft Graph Toolkit](https://aka.ms/mgt).
 
 ## <a name="supported"></a> Supported SDKs
