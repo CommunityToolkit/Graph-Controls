@@ -1,0 +1,23 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>Windows Community Toolkit .NET Standard Graph Helpers</Title>
+    <PackageId>Microsoft.Toolkit.Graph</PackageId>
+    <Description>
+      This package includes .NET Standard code helpers such as:
+      - GraphExtensions: Helpers for common tasks related to the Microsoft Graph used by the Microsoft.Toolkit.Graph.Controls.
+      - GlobalProvider: A shared provider instance used by the Microsoft.Toolkit.Graph.Controls.
+    </Description>
+    <PackageTags>UWP Graph Toolkit Windows Provider extensions helpers</PackageTags>
+
+    <!-- This is a temporary workaround for https://github.com/dotnet/sdk/issues/955 -->
+    <DebugType>Full</DebugType>
+    <AssemblyOriginatorKeyFile>H:\code\WindowsGraphControls\toolkit.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Graph" Version="1.17.0" />
+    <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.1" />
+  </ItemGroup>
+</Project>
