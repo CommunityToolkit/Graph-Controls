@@ -1,0 +1,54 @@
+<Project Sdk="MSBuild.Sdk.Extras">
+
+  <PropertyGroup>
+    <TargetFramework>uap10.0.16299</TargetFramework>
+    <Title>Windows Community Toolkit Graph Controls</Title>
+    <PackageId>Microsoft.Toolkit.Graph.Controls</PackageId>
+    <Description>
+      This library provides Microsoft Graph XAML controls. It is part of the Windows Community Toolkit.
+
+      Classes:
+      - LoginButton: The Login Control leverages MSAL libraries to support the sign-in processes for Microsoft Graph and beyond.
+      - PersonView: The PersonView control displays a user photo and can display their name and e-mail.
+      - PeoplePicker: The PeoplePicker Control is a simple control that allows for selection of one or more users.
+    </Description>
+    <PackageTags>UWP Toolkit Windows Controls MSAL Microsoft Graph AadLogin ProfileCard Person PeoplePicker Login</PackageTags>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\folder.svg" />
+    <Content Include="Assets\genericfile.png" />
+    <Content Include="Assets\person.png" />
+    <Content Include="Assets\photo.png" />
+  </ItemGroup> 
+
+	<ItemGroup>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="5.1.1" />
+    <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
+  </ItemGroup>
+ 
+  <ItemGroup>
+    <None Include="VisualStudioToolsManifest.xml" Pack="true" PackagePath="tools" />
+  </ItemGroup>
+ 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Graph" Version="1.17.0" />
+    <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.1" />
+  </ItemGroup>
+ 
+  <ItemGroup>
+    <Page Update="Controls\PersonView\PersonView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <!-- https://weblogs.asp.net/rweigelt/disable-warnings-in-generated-c-files-of-uwp-app -->
+  <Target Name="PragmaWarningDisablePrefixer" AfterTargets="MarkupCompilePass2" Condition="'$(TargetFramework)' == 'uap10.0' or '$(TargetFramework)' == 'uap10.0.16299'">
+    <ItemGroup>
+      <GeneratedCSFiles Include="**\*.g.cs;**\*.g.i.cs" />
+    </ItemGroup>
+    <Message Text="CSFiles: @(GeneratedCSFiles->'&quot;%(Identity)&quot;')" />
+    <Exec Command="for %%f in (@(GeneratedCSFiles->'&quot;%(Identity)&quot;')) do echo #pragma warning disable &gt; %%f.temp &amp;&amp; type %%f &gt;&gt; %%f.temp &amp;&amp; move /y %%f.temp %%f &gt; NUL" />
+  </Target>
+</Project>

@@ -1,4 +1,8 @@
-﻿using System;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -15,11 +19,6 @@ namespace Microsoft.Toolkit.Graph.Providers
     /// </summary>
     public class MsalProvider : IProvider
     {
-        /// <summary>
-        /// Gets or sets the initial scopes to request.
-        /// </summary>
-        public List<string> Scopes { get; protected set; } // TODO: Do we need this?
-
         /// <summary>
         /// Gets or sets the MSAL.NET Client used to authenticate the user.
         /// </summary>
@@ -67,9 +66,8 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// </summary>
         /// <param name="client">Existing <see cref="IPublicClientApplication"/> instance.</param>
         /// <param name="provider">Existing <see cref="IAuthenticationProvider"/> instance.</param>
-        /// <param name="scopes">Initial scopes to request.</param>
         /// <returns>A <see cref="Task"/> returning a <see cref="MsalProvider"/> instance.</returns>
-        public static async Task<MsalProvider> CreateAsync(IPublicClientApplication client, IAuthenticationProvider provider, List<string> scopes = null)
+        public static async Task<MsalProvider> CreateAsync(IPublicClientApplication client, IAuthenticationProvider provider)
         {
             //// TODO: Check all config provided
 
@@ -77,8 +75,7 @@ namespace Microsoft.Toolkit.Graph.Providers
             {
                 Client = client,
                 Provider = provider,
-                Graph = new GraphServiceClient(provider),
-                Scopes = scopes // TODO: Redundant? Can I use a dummy for the try silent below?
+                Graph = new GraphServiceClient(provider)
             };
 
             await msal.TrySilentSignInAsync();
@@ -134,7 +131,7 @@ namespace Microsoft.Toolkit.Graph.Providers
                 try
                 {
                     // Try and sign-in // TODO: can we use empty scopes?
-                    var result = await Client.AcquireTokenSilent(Scopes, account).ExecuteAsync();
+                    var result = await Client.AcquireTokenSilent(new string[] { string.Empty }, account).ExecuteAsync();
 
                     if (!string.IsNullOrWhiteSpace(result.AccessToken))
                     {
@@ -171,6 +168,8 @@ namespace Microsoft.Toolkit.Graph.Providers
             {
                 await Client.RemoveAsync(user);
             }
+
+            State = ProviderState.SignedOut;
         }
     }
 }
