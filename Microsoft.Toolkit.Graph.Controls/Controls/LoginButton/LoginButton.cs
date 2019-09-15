@@ -211,7 +211,10 @@ namespace Microsoft.Toolkit.Graph.Controls
             }
 
             // Close Menu
-            _loginButton?.Flyout?.Hide();
+            if (FlyoutBase.GetAttachedFlyout(_loginButton) is FlyoutBase flyout)
+            {
+                flyout.Hide();
+            }
         }
     }
 }
