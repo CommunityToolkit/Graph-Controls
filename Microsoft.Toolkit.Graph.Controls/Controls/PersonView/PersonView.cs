@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Graph;
-using Microsoft.Toolkit.Graph.Helpers;
+using Microsoft.Toolkit.Graph.Extensions;
 using Microsoft.Toolkit.Graph.Providers;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -155,20 +155,7 @@ namespace Microsoft.Toolkit.Graph.Controls
 
                 if (user != null)
                 {
-                    PersonDetails = new Person()
-                    {
-                        Id = user.Id,
-                        DisplayName = user.DisplayName,
-                        ScoredEmailAddresses = new ScoredEmailAddress[]
-                        {
-                            new ScoredEmailAddress()
-                            {
-                                Address = user.Mail ?? user.UserPrincipalName
-                            }
-                        },
-                        GivenName = user.GivenName,
-                        Surname = user.Surname
-                    };
+                    PersonDetails = user.ToPerson();
                 }
             }
             else if (PersonDetails == null && !string.IsNullOrWhiteSpace(PersonQuery))

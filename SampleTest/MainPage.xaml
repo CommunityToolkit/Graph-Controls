@@ -9,8 +9,8 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <StackPanel>
-        <Button Click="Button_Click">Login/Logout</Button>
+    <Grid>
+        <wgt:LoginButton VerticalAlignment="Top" HorizontalAlignment="Right"/>
         <wgt:PersonView PersonQuery="Me" ShowName="True" ShowEmail="True"/>
-    </StackPanel>
+    </Grid>
 </Page>
