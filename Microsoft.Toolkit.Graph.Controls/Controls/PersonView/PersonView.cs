@@ -203,7 +203,7 @@ namespace Microsoft.Toolkit.Graph.Controls
                     await DecodeStreamAsync(await graph.GetUserPhoto(person.UserPrincipalName));
                     _photoId = person.Id; // TODO: Only set on success for photo?
                 }
-                else if (!string.IsNullOrWhiteSpace(person.ScoredEmailAddresses.First().Address))
+                else if (!string.IsNullOrWhiteSpace(person.EmailAddresses.First().Address))
                 {
                     // TODO https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-person/mgt-person.ts#L174
                 }

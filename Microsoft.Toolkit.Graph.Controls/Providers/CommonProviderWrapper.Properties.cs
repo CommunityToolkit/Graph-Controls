@@ -57,6 +57,6 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <remarks>
         /// This list can be modified by controls which require specific scopes to function. This will aid in requesting all scopes required by controls used before login is initiated, if using the LoginButton.
         /// </remarks>
-        public ScopeSet Scopes { get; set; } = new ScopeSet { "User.ReadBasic.All" };
+        public ScopeSet Scopes { get; set; } = new ScopeSet { "User.Read", "User.ReadBasic.All" };
     }
 }

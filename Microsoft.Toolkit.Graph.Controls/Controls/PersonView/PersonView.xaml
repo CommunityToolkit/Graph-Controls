@@ -59,7 +59,7 @@
                                        Margin="4,-2,2,0"
                                        FontWeight="SemiBold"/>
                             <TextBlock Visibility="{Binding ShowEmail, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}" 
-                                       Text="{Binding PersonDetails.ScoredEmailAddresses[0].Address, RelativeSource={RelativeSource TemplatedParent}}"
+                                       Text="{Binding PersonDetails.EmailAddresses[0].Address, RelativeSource={RelativeSource TemplatedParent}}"
                                        Margin="4,0,2,0"
                                        FontSize="12"/>
                         </StackPanel>

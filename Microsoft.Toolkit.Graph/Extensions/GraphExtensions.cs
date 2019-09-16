@@ -15,7 +15,7 @@ namespace Microsoft.Toolkit.Graph.Extensions
     public static class GraphExtensions
     {
         /// <summary>
-        /// Simple method to convert a <see cref="User"/> to a <see cref="Person"/> with basic common properties like <see cref="Entity.Id"/>, <see cref="User.DisplayName"/>, <see cref="Person.ScoredEmailAddresses"/>, <see cref="User.GivenName"/>, and <see cref="User.Surname"/> intact.
+        /// Simple method to convert a <see cref="User"/> to a <see cref="Person"/> with basic common properties like <see cref="Entity.Id"/>, <see cref="User.DisplayName"/>, <see cref="Person.EmailAddresses"/>, <see cref="User.GivenName"/>, and <see cref="User.Surname"/> intact.
         /// </summary>
         /// <param name="user"><see cref="User"/> instance to convert.</param>
         /// <returns>A new basic <see cref="Person"/> representation of that user.</returns>
@@ -29,9 +29,9 @@ namespace Microsoft.Toolkit.Graph.Extensions
 
                 // Standard User Info
                 DisplayName = user.DisplayName,
-                ScoredEmailAddresses = new ScoredEmailAddress[]
+                EmailAddresses = new RankedEmailAddress[]
                         {
-                            new ScoredEmailAddress()
+                            new RankedEmailAddress()
                             {
                                 Address = user.Mail ?? user.UserPrincipalName
                             }
@@ -42,7 +42,7 @@ namespace Microsoft.Toolkit.Graph.Extensions
                 // Company Information
                 CompanyName = user.CompanyName,
                 Department = user.Department,
-                JobTitle = user.JobTitle,
+                Title = user.JobTitle,
                 OfficeLocation = user.OfficeLocation
             };
         }
