@@ -13,6 +13,7 @@
       - PeoplePicker: The PeoplePicker Control is a simple control that allows for selection of one or more users.
     </Description>
     <PackageTags>UWP Toolkit Windows Controls MSAL Microsoft Graph AadLogin ProfileCard Person PeoplePicker Login</PackageTags>
+    <SignAssembly>false</SignAssembly>
 
   </PropertyGroup>
 
