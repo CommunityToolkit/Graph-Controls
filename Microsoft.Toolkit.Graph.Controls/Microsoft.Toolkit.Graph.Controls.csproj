@@ -17,10 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Assets\folder.svg" />
-    <Content Include="Assets\genericfile.png" />
     <Content Include="Assets\person.png" />
-    <Content Include="Assets\photo.png" />
   </ItemGroup> 
 
 	<ItemGroup>
