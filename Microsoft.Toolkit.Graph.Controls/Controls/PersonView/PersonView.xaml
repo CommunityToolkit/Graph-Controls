@@ -9,13 +9,17 @@
     <converters:EmptyObjectToObjectConverter x:Key="InverseNullToVisibilityConverter" EmptyValue="Visible" NotEmptyValue="Collapsed"/>
     <converters:BoolToObjectConverter x:Key="BoolToSizeConverter" FalseValue="24" TrueValue="48"/>
 
-    <BitmapImage x:Key="PersonViewDefaultImage" UriSource="ms-appx:///Microsoft.Toolkit.Graph.Controls/Assets/person.png"/>
+    <x:String x:Key="PersonViewDefaultImageSource">ms-appx:///Microsoft.Toolkit.Graph.Controls/Assets/person.png</x:String>
 
     <Style TargetType="local:PersonView">
         <Setter Property="Padding" Value="4,4,0,4" />
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Top"/>
-        <Setter Property="UserPhoto" Value="{ThemeResource PersonViewDefaultImage}"/>
+        <Setter Property="UserPhoto">
+            <Setter.Value>
+                <BitmapImage UriSource="{StaticResource PersonViewDefaultImageSource}"/>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:PersonView">
