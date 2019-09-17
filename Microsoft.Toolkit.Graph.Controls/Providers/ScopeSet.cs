@@ -14,7 +14,25 @@ namespace Microsoft.Toolkit.Graph.Providers
     [Windows.Foundation.Metadata.CreateFromString(MethodName = "Microsoft.Toolkit.Graph.Providers.ScopeSet.ConvertToScopeArray")]
     public class ScopeSet : Collection<string>
     {
+        /// <summary>
+        /// Empty ScopeSet helper.
+        /// </summary>
         public static readonly ScopeSet Empty = new ScopeSet(new string[] { });
+
+        /// <summary>
+        /// Helper to convert a string of scopes to a list of strings.
+        /// </summary>
+        /// <param name="rawString">Comma separated scope list.</param>
+        /// <returns>New List of strings, i.e. ScopeSet</returns>
+        public static ScopeSet ConvertToScopeArray(string rawString)
+        {
+            if (rawString != null)
+            {
+                return new ScopeSet(rawString.Split(","));
+            }
+
+            return ScopeSet.Empty;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScopeSet"/> class.
@@ -51,21 +69,6 @@ namespace Microsoft.Toolkit.Graph.Providers
             {
                 this.Add(item);
             }
-        }
-
-        /// <summary>
-        /// Helper to convert a string of scopes to a list of strings.
-        /// </summary>
-        /// <param name="rawString">Comma separated scope list.</param>
-        /// <returns>New List of strings, i.e. ScopeSet</returns>
-        public static ScopeSet ConvertToScopeArray(string rawString)
-        {
-            if (rawString != null)
-            {
-                return new ScopeSet(rawString.Split(","));
-            }
-
-            return ScopeSet.Empty;
         }
     }
 }
