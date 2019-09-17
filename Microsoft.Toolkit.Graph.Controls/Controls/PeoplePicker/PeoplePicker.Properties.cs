@@ -31,6 +31,5 @@ namespace Microsoft.Toolkit.Graph.Controls
         /// </returns>
         public static readonly DependencyProperty SuggestedPeopleProperty =
             DependencyProperty.Register(nameof(SuggestedPeople), typeof(ObservableCollection<Person>), typeof(PeoplePicker), new PropertyMetadata(new ObservableCollection<Person>()));
-
     }
 }

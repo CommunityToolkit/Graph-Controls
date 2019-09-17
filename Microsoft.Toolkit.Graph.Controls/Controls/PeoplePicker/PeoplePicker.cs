@@ -39,20 +39,20 @@ namespace Microsoft.Toolkit.Graph.Controls
 
             if (_tokenBox != null)
             {
-                _tokenBox.QueryTextChanged -= _tokenBox_QueryTextChanged;
+                _tokenBox.QueryTextChanged -= TokenBox_QueryTextChanged;
             }
 
             _tokenBox = GetTemplateChild(PeoplePickerTokenizingTextBoxName) as TokenizingTextBox;
 
             if (_tokenBox != null)
             {
-                _tokenBox.QueryTextChanged += _tokenBox_QueryTextChanged;
+                _tokenBox.QueryTextChanged += TokenBox_QueryTextChanged;
             }
         }
 
         private string _previousQuery;
 
-        private void _tokenBox_QueryTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private void TokenBox_QueryTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (!args.CheckCurrent())
             {
