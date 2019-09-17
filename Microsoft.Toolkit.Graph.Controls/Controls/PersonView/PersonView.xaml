@@ -9,10 +9,17 @@
     <converters:EmptyObjectToObjectConverter x:Key="InverseNullToVisibilityConverter" EmptyValue="Visible" NotEmptyValue="Collapsed"/>
     <converters:BoolToObjectConverter x:Key="BoolToSizeConverter" FalseValue="24" TrueValue="48"/>
 
+    <x:String x:Key="PersonViewDefaultImageSource">ms-appx:///Microsoft.Toolkit.Graph.Controls/Assets/person.png</x:String>
+
     <Style TargetType="local:PersonView">
         <Setter Property="Padding" Value="4,4,0,4" />
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="UserPhoto">
+            <Setter.Value>
+                <BitmapImage UriSource="{StaticResource PersonViewDefaultImageSource}"/>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:PersonView">
@@ -52,7 +59,7 @@
                                        Margin="4,-2,2,0"
                                        FontWeight="SemiBold"/>
                             <TextBlock Visibility="{Binding ShowEmail, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}" 
-                                       Text="{Binding PersonDetails.ScoredEmailAddresses[0].Address, RelativeSource={RelativeSource TemplatedParent}}"
+                                       Text="{Binding PersonDetails.EmailAddresses[0].Address, RelativeSource={RelativeSource TemplatedParent}}"
                                        Margin="4,0,2,0"
                                        FontSize="12"/>
                         </StackPanel>

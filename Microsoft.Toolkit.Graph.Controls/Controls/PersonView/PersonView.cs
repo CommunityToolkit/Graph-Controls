@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Graph;
-using Microsoft.Toolkit.Graph.Helpers;
+using Microsoft.Toolkit.Graph.Extensions;
 using Microsoft.Toolkit.Graph.Providers;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -20,6 +20,8 @@ namespace Microsoft.Toolkit.Graph.Controls
     /// </summary>
     public partial class PersonView : Control
     {
+        private const string PersonViewDefaultImageSourceResourceName = "PersonViewDefaultImageSource";
+
         /// <summary>
         /// <see cref="PersonQuery"/> value used to retrieve the signed-in user's info.
         /// </summary>
@@ -29,32 +31,36 @@ namespace Microsoft.Toolkit.Graph.Controls
 
         private string _photoId = null;
 
+        private string _defaultImageSource = "ms-appx:///Microsoft.Toolkit.Graph.Controls/Assets/person.png";
+
+        private BitmapImage _defaultImage;
+
         private static async void PersonDetailsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is PersonView pv)
             {
                 if (pv.PersonDetails != null)
                 {
-                    if (pv.PersonDetails.GivenName?.Length > 0 && pv.PersonDetails.Surname?.Length > 0)
+                    if (pv?.PersonDetails?.GivenName?.Length > 0 && pv?.PersonDetails?.Surname?.Length > 0)
                     {
                         pv.Initials = string.Empty + pv.PersonDetails.GivenName[0] + pv.PersonDetails.Surname[0];
                     }
-                    else if (pv.PersonDetails.DisplayName?.Length > 0)
+                    else if (pv?.PersonDetails?.DisplayName?.Length > 0)
                     {
                         // Grab first two initials in name
                         var initials = pv.PersonDetails.DisplayName.ToUpper().Split(' ').Select(i => i.First());
                         pv.Initials = string.Join(string.Empty, initials.Where(i => char.IsLetter(i)).Take(2));
                     }
 
-                    if (pv.UserPhoto == null || pv.PersonDetails.Id != pv._photoId)
+                    if (pv?.UserPhoto?.UriSource?.AbsoluteUri == pv._defaultImageSource || pv?.PersonDetails?.Id != pv._photoId)
                     {
                         // Reload Image
-                        pv.UserPhoto = null;
+                        pv.UserPhoto = pv._defaultImage;
                         await pv.LoadImageAsync(pv.PersonDetails);
                     }
-                    else if (pv.PersonDetails.Id != pv._photoId)
+                    else if (pv?.PersonDetails?.Id != pv._photoId)
                     {
-                        pv.UserPhoto = null;
+                        pv.UserPhoto = pv._defaultImage;
                         pv._photoId = null;
                     }
                 }
@@ -85,6 +91,8 @@ namespace Microsoft.Toolkit.Graph.Controls
         {
             this.DefaultStyleKey = typeof(PersonView);
 
+            _defaultImage = new BitmapImage(new Uri(_defaultImageSource));
+
             ProviderManager.Instance.ProviderUpdated += (sender, args) => LoadData();
         }
 
@@ -92,6 +100,13 @@ namespace Microsoft.Toolkit.Graph.Controls
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
+            if (Resources.TryGetValue(PersonViewDefaultImageSourceResourceName, out object value) && value is string uri)
+            {
+                _defaultImageSource = uri;
+                _defaultImage = new BitmapImage(new Uri(_defaultImageSource)); // TODO: Couldn't load image from app package, only remote or in our assembly?
+                UserPhoto = _defaultImage;
+            }
 
             LoadData();
         }
@@ -102,6 +117,12 @@ namespace Microsoft.Toolkit.Graph.Controls
 
             if (provider == null || provider.State != ProviderState.SignedIn)
             {
+                // Set back to Default if not signed-in
+                if (provider != null)
+                {
+                    UserPhoto = _defaultImage;
+                }
+
                 return;
             }
 
@@ -155,20 +176,7 @@ namespace Microsoft.Toolkit.Graph.Controls
 
                 if (user != null)
                 {
-                    PersonDetails = new Person()
-                    {
-                        Id = user.Id,
-                        DisplayName = user.DisplayName,
-                        ScoredEmailAddresses = new ScoredEmailAddress[]
-                        {
-                            new ScoredEmailAddress()
-                            {
-                                Address = user.Mail ?? user.UserPrincipalName
-                            }
-                        },
-                        GivenName = user.GivenName,
-                        Surname = user.Surname
-                    };
+                    PersonDetails = user.ToPerson();
                 }
             }
             else if (PersonDetails == null && !string.IsNullOrWhiteSpace(PersonQuery))
@@ -195,7 +203,7 @@ namespace Microsoft.Toolkit.Graph.Controls
                     await DecodeStreamAsync(await graph.GetUserPhoto(person.UserPrincipalName));
                     _photoId = person.Id; // TODO: Only set on success for photo?
                 }
-                else if (!string.IsNullOrWhiteSpace(person.ScoredEmailAddresses.First().Address))
+                else if (!string.IsNullOrWhiteSpace(person.EmailAddresses.First().Address))
                 {
                     // TODO https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-person/mgt-person.ts#L174
                 }

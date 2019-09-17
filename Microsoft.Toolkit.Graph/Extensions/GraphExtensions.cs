@@ -7,13 +7,46 @@ using System.Threading.Tasks;
 using Microsoft.Graph;
 using Microsoft.Graph.Auth;
 
-namespace Microsoft.Toolkit.Graph.Helpers
+namespace Microsoft.Toolkit.Graph.Extensions
 {
     /// <summary>
     /// Extension methods to the Graph SDK used by the Microsoft.Toolkit.Graph.Controls.
     /// </summary>
     public static class GraphExtensions
     {
+        /// <summary>
+        /// Simple method to convert a <see cref="User"/> to a <see cref="Person"/> with basic common properties like <see cref="Entity.Id"/>, <see cref="User.DisplayName"/>, <see cref="Person.EmailAddresses"/>, <see cref="User.GivenName"/>, and <see cref="User.Surname"/> intact.
+        /// </summary>
+        /// <param name="user"><see cref="User"/> instance to convert.</param>
+        /// <returns>A new basic <see cref="Person"/> representation of that user.</returns>
+        public static Person ToPerson(this User user)
+        {
+            return new Person()
+            {
+                // Primary Id
+                Id = user.Id,
+                UserPrincipalName = user.UserPrincipalName,
+
+                // Standard User Info
+                DisplayName = user.DisplayName,
+                EmailAddresses = new RankedEmailAddress[]
+                        {
+                            new RankedEmailAddress()
+                            {
+                                Address = user.Mail ?? user.UserPrincipalName
+                            }
+                        },
+                GivenName = user.GivenName,
+                Surname = user.Surname,
+
+                // Company Information
+                CompanyName = user.CompanyName,
+                Department = user.Department,
+                Title = user.JobTitle,
+                OfficeLocation = user.OfficeLocation
+            };
+        }
+
         /// <summary>
         /// Shortcut to perform a person query.
         /// </summary>

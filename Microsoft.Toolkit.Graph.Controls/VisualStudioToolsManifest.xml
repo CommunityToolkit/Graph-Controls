@@ -1,6 +1,7 @@
 <FileList>
   <File Reference="Microsoft.Toolkit.Graph.Controls.dll">
     <ToolboxItems VSCategory="Windows Community Toolkit Graph Controls" BlendCategory="Windows Community Toolkit Graph Controls">
+      <Item Type="Microsoft.Toolkit.Graph.Controls.LoginButton" />
       <Item Type="Microsoft.Toolkit.Graph.Controls.PersonView" />
     </ToolboxItems>
   </File>
