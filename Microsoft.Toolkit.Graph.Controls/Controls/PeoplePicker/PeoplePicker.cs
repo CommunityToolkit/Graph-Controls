@@ -1,41 +1,38 @@
-﻿using Microsoft.Graph;
-using Microsoft.Toolkit.Graph;
-using Microsoft.Toolkit.Graph.Helpers;
-using Microsoft.Toolkit.Uwp.UI.Controls.Graph.Helpers;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System;
-using System.Collections.ObjectModel;
-using TokenListBoxSample.Controls;
+using Microsoft.Toolkit.Graph.Extensions;
+using Microsoft.Toolkit.Graph.Providers;
+using Microsoft.Toolkit.Uwp.UI.Controls;
+using Microsoft.Toolkit.Uwp.UI.Extensions;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-// The Templated Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234235
-
-namespace Microsoft.Toolkit.Uwp.UI.Controls.Graph
+namespace Microsoft.Toolkit.Graph.Controls
 {
-    [TemplatePart(Name = PeoplePickerTokenListBoxName, Type = typeof(TokenListBox))]
+    /// <summary>
+    /// Control which allows user to search for a person or contact within Microsoft Graph. Built on top of <see cref="TokenizingTextBox"/>.
+    /// </summary>
+    [TemplatePart(Name = PeoplePickerTokenizingTextBoxName, Type = typeof(TokenizingTextBox))]
     public partial class PeoplePicker : Control
     {
-        private const string PeoplePickerTokenListBoxName = "PART_TokenListBox";
+        private const string PeoplePickerTokenizingTextBoxName = "PART_TokenizingTextBox";
 
-        private TokenListBox _tokenBox;
+        private TokenizingTextBox _tokenBox;
 
         private DispatcherTimer _typeTimer = new DispatcherTimer();
 
-        public ObservableCollection<Person> SuggestedPeople
-        {
-            get { return (ObservableCollection<Person>)GetValue(SuggestedPeopleProperty); }
-            set { SetValue(SuggestedPeopleProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for SuggestedPeople.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty SuggestedPeopleProperty =
-            DependencyProperty.Register(nameof(SuggestedPeople), typeof(ObservableCollection<Person>), typeof(PeoplePicker), new PropertyMetadata(new ObservableCollection<Person>()));
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PeoplePicker"/> class.
+        /// </summary>
         public PeoplePicker()
         {
             this.DefaultStyleKey = typeof(PeoplePicker);
         }
 
+        /// <inheritdoc/>
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -45,7 +42,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls.Graph
                 _tokenBox.QueryTextChanged -= _tokenBox_QueryTextChanged;
             }
 
-            _tokenBox = GetTemplateChild(PeoplePickerTokenListBoxName) as TokenListBox;
+            _tokenBox = GetTemplateChild(PeoplePickerTokenizingTextBoxName) as TokenizingTextBox;
 
             if (_tokenBox != null)
             {
@@ -65,9 +62,10 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls.Graph
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
                 var text = sender.Text;
-                _typeTimer.Debounce(async () =>
+                _typeTimer.Debounce(
+                    async () =>
                 {
-                    var graph = GlobalProvider.Instance.Graph;
+                    var graph = ProviderManager.Instance.GlobalProvider.Graph;
                     if (graph != null)
                     {
                         // If empty, clear out
@@ -75,20 +73,6 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls.Graph
                         {
                             SuggestedPeople.Clear();
                         }
-                        // If we are typing, continue to reduce the set from current list
-                        //else if (!string.IsNullOrWhiteSpace(_previousQuery) && text.StartsWith(_previousQuery))
-                        //{
-                        //    int count = SuggestedPeople.Count;
-                        //    for (var i = count - 1; i >= 0; i--)
-                        //    {
-                        //        var contact = SuggestedPeople[i];
-                        //        if (!contact.DisplayName.Contains(text, StringComparison.InvariantCultureIgnoreCase))
-                        //        {
-                        //            SuggestedPeople.Remove(contact);
-                        //        }
-                        //    }
-                        //}
-                        // Else, filter all contacts
                         else
                         {
                             SuggestedPeople.Clear();

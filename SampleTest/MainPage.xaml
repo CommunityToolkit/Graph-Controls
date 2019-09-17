@@ -11,6 +11,9 @@
 
     <Grid>
         <wgt:LoginButton VerticalAlignment="Top" HorizontalAlignment="Right"/>
-        <wgt:PersonView PersonQuery="Me" ShowName="True" ShowEmail="True"/>
+        <StackPanel>
+            <wgt:PersonView PersonQuery="Me" ShowName="True" ShowEmail="True"/>
+            <wgt:PeoplePicker />
+        </StackPanel>
     </Grid>
 </Page>

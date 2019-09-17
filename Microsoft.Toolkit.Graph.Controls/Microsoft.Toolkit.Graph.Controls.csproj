@@ -1,4 +1,4 @@
-<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
     <TargetFramework>uap10.0.16299</TargetFramework>
@@ -22,7 +22,8 @@
   </ItemGroup> 
 
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="6.0.0-build.14" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="6.0.0-build.19" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="6.0.0-build.19" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
   </ItemGroup>
  
