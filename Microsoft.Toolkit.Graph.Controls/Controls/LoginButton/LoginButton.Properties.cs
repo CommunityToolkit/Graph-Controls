@@ -28,7 +28,7 @@ namespace Microsoft.Toolkit.Graph.Controls
         /// The identifier for the <see cref="UserDetails"/> dependency property.
         /// </returns>
         public static readonly DependencyProperty UserDetailsProperty =
-            DependencyProperty.Register(nameof(UserDetails), typeof(User), typeof(LoginButton), new PropertyMetadata(null, UserDetailsPropertyChanged));
+            DependencyProperty.Register(nameof(UserDetails), typeof(User), typeof(LoginButton), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets or sets a value indicating whether the control is loading and has not established a sign-in state.

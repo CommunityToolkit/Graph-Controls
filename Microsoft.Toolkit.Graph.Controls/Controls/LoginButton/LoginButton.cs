@@ -25,17 +25,6 @@ namespace Microsoft.Toolkit.Graph.Controls
         private Button _loginButton;
         private ButtonBase _signOutButton;
 
-        private static void UserDetailsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is LoginButton pv)
-            {
-                if (pv.UserDetails != null)
-                {
-                    // TODO??? Nothing?
-                }
-            }
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginButton"/> class.
         /// </summary>
