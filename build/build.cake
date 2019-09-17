@@ -221,8 +221,8 @@ Task("Package")
     }
     .SetConfiguration("Native");
 
-    buildSettings.SetPlatformTarget(PlatformTarget.ARM);
-    MSBuild(Solution, buildSettings);
+    //buildSettings.SetPlatformTarget(PlatformTarget.ARM);
+    //MSBuild(Solution, buildSettings);
 
     buildSettings.SetPlatformTarget(PlatformTarget.x64);
     MSBuild(Solution, buildSettings);
