@@ -1,4 +1,4 @@
-<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
     <TargetFrameworks>$(TargetFrameworksOverride)</TargetFrameworks>
@@ -15,7 +15,7 @@
     <PackageTags>UWP Toolkit Windows Controls MSAL Microsoft Graph AadLogin ProfileCard Person PeoplePicker Login</PackageTags>
     <SignAssembly>false</SignAssembly>
     <GenerateLibraryLayout>true</GenerateLibraryLayout>
-    <NoWarn>$(NoWarn);Uno0001;NU1701</NoWarn>
+    <NoWarn>CS1701;1702;Uno0001;NU1701</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'uap10.0' or '$(TargetFramework)' == 'uap10.0.16299' ">
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="6.0.0-build.12"/>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="6.0.0-build.12" />
   </ItemGroup>
  
   <ItemGroup>
