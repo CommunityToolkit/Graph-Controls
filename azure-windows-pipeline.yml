@@ -1,3 +1,8 @@
+trigger:
+- master
+- rel/*
+
+
 jobs:
 
 - job: Windows
@@ -7,8 +12,10 @@ jobs:
       vmImage: windows-2019
   
   variables: 
-      BuildConfiguration: Release
-  
+    BuildConfiguration: Release
+    ANDROID_NDK_HOME: C:\Microsoft\AndroidNDK64\android-ndk-r16b
+    ANDROID_NDK_PATH: C:\Microsoft\AndroidNDK64\android-ndk-r16b
+    AndroidNdkDirectory: C:\Microsoft\AndroidNDK64\android-ndk-r16b   
   steps:
   # Setup Environment Variables
   - task: BatchScript@1
