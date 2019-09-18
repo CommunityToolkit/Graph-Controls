@@ -1,7 +1,7 @@
 <Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
-    <TargetFramework>uap10.0.16299</TargetFramework>
+    <TargetFrameworks>$(TargetFrameworksOverride)</TargetFrameworks>
     <Title>Windows Community Toolkit Graph Controls</Title>
     <PackageId>Microsoft.Toolkit.Graph.Controls</PackageId>
     <Description>
@@ -22,8 +22,11 @@
   </ItemGroup> 
 
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="6.0.0-build.14" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == 'MonoAndroid' or '$(TargetFrameworkIdentifier)' == 'Xamarin.iOS' or '$(TargetFrameworkIdentifier)' == '.NETStandard'">
+    <PackageReference Include="Uno.UI" Version="1.46.0-dev.1991" />
   </ItemGroup>
  
   <ItemGroup>
@@ -33,6 +36,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Graph.Beta" Version="0.7.0-preview" />
     <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.1" />
+    <PackageReference Include="Uno.Microsoft.Toolkit.Uwp.UI" Version="5.1.0-build.200.gf9c311b069" />
   </ItemGroup>
  
   <ItemGroup>

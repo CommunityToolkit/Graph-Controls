@@ -6,7 +6,8 @@
     xmlns:graphconverters="using:Microsoft.Toolkit.Graph.Converters">
 
     <converters:BoolNegationConverter x:Key="InverseBoolConverter"/>
-    <converters:EmptyObjectToObjectConverter x:Key="InverseNullToVisibilityConverter" EmptyValue="Visible" NotEmptyValue="Collapsed"/>
+    <!-- Uno TODO same named resource restriction -->
+    <converters:EmptyObjectToObjectConverter x:Key="InverseNullToVisibilityConverter2" EmptyValue="Visible" NotEmptyValue="Collapsed"/>
     <graphconverters:UserToPersonConverter x:Key="UserToPersonConverter"/>
 
     <Style TargetType="local:LoginButton">
@@ -25,7 +26,7 @@
                             IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}, RelativeSource={RelativeSource TemplatedParent}}">
                         <StackPanel Orientation="Horizontal">
                             <local:PersonView PersonDetails="{Binding UserDetails, Converter={StaticResource UserToPersonConverter}, RelativeSource={RelativeSource TemplatedParent}}" ShowName="True"/>
-                            <TextBlock Visibility="{Binding UserDetails, Converter={StaticResource InverseNullToVisibilityConverter}, RelativeSource={RelativeSource TemplatedParent}}"
+                            <TextBlock Visibility="{Binding UserDetails, Converter={StaticResource InverseNullToVisibilityConverter2}, RelativeSource={RelativeSource TemplatedParent}}"
                                        VerticalAlignment="Center">Sign In</TextBlock>
                         </StackPanel>
                         <FlyoutBase.AttachedFlyout>

@@ -1,16 +1,20 @@
 <Project>
 
   <PropertyGroup>
-    <Authors>Microsoft.Toolkit</Authors>
+    <Authors>nventive</Authors>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <NoPackageAnalysis>true</NoPackageAnalysis>
-    <PackageIconUrl>https://raw.githubusercontent.com/windows-toolkit/WindowsCommunityToolkit/master/build/nuget.png</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/windows-toolkit/WindowsCommunityToolkit</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/windows-toolkit/WindowsCommunityToolkit/blob/master/license.md</PackageLicenseUrl>
-    <PackageReleaseNotes>https://github.com/windows-toolkit/WindowsCommunityToolkit/releases</PackageReleaseNotes>
+    <PackageIconUrl>https://raw.githubusercontent.com/unoplatform/Uno.WindowsCommunityToolkit/uno/build/nuget.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/unoplatform/Uno.WindowsCommunityToolkit</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/unoplatform/Uno.WindowsCommunityToolkit/blob/uno/license.md</PackageLicenseUrl>
+    <PackageReleaseNotes>https://github.com/unoplatform/Uno.WindowsCommunityToolkit/releases</PackageReleaseNotes>
     <Copyright>(c) .NET Foundation and Contributors.  All rights reserved.</Copyright>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)Toolkit.ruleset</CodeAnalysisRuleSet>
     <DefaultLanguage>en-US</DefaultLanguage>
+		
+    <!--<TargetFrameworksOverride>xamarinios10</TargetFrameworksOverride>-->
+    <TargetFrameworksOverride>uap10.0.16299;MonoAndroid80;xamarinios10;netstandard2.0</TargetFrameworksOverride>
+
     <IsDesignProject>$(MSBuildProjectName.Contains('.Design'))</IsDesignProject>
     <IsTestProject>$(MSBuildProjectName.Contains('Test'))</IsTestProject>
     <IsUwpProject Condition="'$(IsDesignProject)' != 'true'">$(MSBuildProjectName.Contains('Uwp'))</IsUwpProject>
@@ -21,14 +25,14 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <SignAssembly Condition="'$(SignAssembly)' == '' and '$(IsUwpProject)' != 'true'" >true</SignAssembly>
+    <SignAssembly Condition="'$(SignAssembly)' == '' and '$(IsUwpProject)' != 'true' and '$(TargetFramework)'!='netstandard2.0'" >true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)toolkit.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <Choose>
     <When Condition="'$(IsTestProject)' != 'true' and '$(IsSampleProject)' != 'true' and '$(IsDesignProject)' != 'true'">
       <PropertyGroup>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
       </PropertyGroup>
     </When>
   </Choose>
@@ -62,7 +66,7 @@
     <When Condition="'$(IsTestProject)' != 'true' and '$(IsSampleProject)' != 'true' and '$(IsDesignProject)' != 'true'">
       <ItemGroup>
         <!--<PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="15.3.83" PrivateAssets="all" />-->
-        <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />
+        <!--<PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />-->
 
         <EmbeddedResource Include="**\*.rd.xml" />
         <Page Include="**\*.xaml" Exclude="**\bin\**\*.xaml;**\obj\**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
@@ -74,14 +78,23 @@
     </When>
   </Choose>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
+    <DefineConstants>$(DefineConstants);__WASM__</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'MonoAndroid80' or '$(TargetFramework)' == 'xamarinios10' ">
+    <NoWarn>$(NoWarn);CS0649;CS0067;CS1998</NoWarn>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(IsUwpProject)' == 'true'">
 
     <!-- 8002 is a strong named -> non-strong-named reference -->
     <!-- This is valid for platforms other than .NET Framework (and is needed for the UWP targets -->
-    <NoWarn>$(NoWarn);8002</NoWarn>
+    <NoWarn>$(NoWarn);8002;</NoWarn>
+    <NoWarn>$(NoWarn);CS1998</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="!$([MSBuild]::IsOsUnixLike())">
     <PackageReference Include="Nerdbank.GitVersioning" Version=" 2.1.65" PrivateAssets="all" />
   </ItemGroup>
 
@@ -90,4 +103,10 @@
       <Link>stylecop.json</Link>
     </AdditionalFiles>
   </ItemGroup>
+
+  <PropertyGroup>
+    <!-- Workaround for android build using the Uno Source Generators: https://github.com/nventive/Uno.SourceGeneration/issues/109 -->
+    <JavaSdkDirectory Condition="'$(JavaSdkDirectory)'=='' and '$(JAVA_HOME_8_X64)'!=''">$(JAVA_HOME_8_X64)</JavaSdkDirectory>
+  </PropertyGroup>
+  
 </Project>

@@ -101,12 +101,13 @@ namespace Microsoft.Toolkit.Graph.Controls
         {
             base.OnApplyTemplate();
 
-            if (Resources.TryGetValue(PersonViewDefaultImageSourceResourceName, out object value) && value is string uri)
-            {
-                _defaultImageSource = uri;
-                _defaultImage = new BitmapImage(new Uri(_defaultImageSource)); // TODO: Couldn't load image from app package, only remote or in our assembly?
-                UserPhoto = _defaultImage;
-            }
+            // TODO Uno need to figure out the cannot convert string to Uri error later, this isn't important for initial preview
+            //if (Resources.TryGetValue(PersonViewDefaultImageSourceResourceName, out object value) && value is string uri)
+            //{
+            //    _defaultImageSource = uri;
+            //    _defaultImage = new BitmapImage(new Uri(_defaultImageSource)); // TODO: Couldn't load image from app package, only remote or in our assembly?
+            //    UserPhoto = _defaultImage;
+            //}
 
             LoadData();
         }
@@ -218,7 +219,11 @@ namespace Microsoft.Toolkit.Graph.Controls
         {
             if (photoStream != null)
             {
+#if HAS_UNO
+                var ras = photoStream;
+#else
                 using (var ras = photoStream.AsRandomAccessStream())
+#endif
                 {
                     var bitmap = new BitmapImage();
                     await bitmap.SetSourceAsync(ras);
