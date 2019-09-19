@@ -2,10 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Reflection;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Graph.Auth;
-using Microsoft.Identity.Client;
 
 namespace Microsoft.Toolkit.Graph.Providers
 {
@@ -30,16 +28,8 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <inheritdoc/>
         protected override async Task InitializeAsync()
         {
-            var client = PublicClientApplicationBuilder.Create(ClientId)
-                .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
-                .WithRedirectUri(RedirectUri)
-                .WithClientName(ProviderManager.ClientName)
-                .WithClientVersion(Assembly.GetExecutingAssembly().GetName().Version.ToString())
-                .Build();
-
-            var provider = new InteractiveAuthenticationProvider(client, Scopes);
-
-            ProviderManager.Instance.GlobalProvider = await MsalProvider.CreateAsync(client, provider);
+            ProviderManager.Instance.GlobalProvider =
+                await QuickCreate.CreateMsalProviderAsync(ClientId, RedirectUri, Scopes.ToArray());
         }
     }
 }

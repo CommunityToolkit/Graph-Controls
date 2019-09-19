@@ -14,7 +14,7 @@
     </Description>
     <PackageTags>UWP Toolkit Windows Controls MSAL Microsoft Graph AadLogin ProfileCard Person PeoplePicker Login</PackageTags>
     <SignAssembly>false</SignAssembly>
-
+    <GenerateLibraryLayout>true</GenerateLibraryLayout>
   </PropertyGroup>
 
   <ItemGroup>

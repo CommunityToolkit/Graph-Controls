@@ -32,7 +32,7 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="SampleTest.App">
       <uap:VisualElements
-        DisplayName="SampleTest"
+        DisplayName="WCT Graph Controls Sample"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
         Description="SampleTest"
