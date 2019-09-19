@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using Microsoft.Graph;
 using Microsoft.Toolkit.Graph.Extensions;
 using Microsoft.Toolkit.Graph.Providers;
 using Microsoft.Toolkit.Uwp.UI.Controls;
@@ -40,6 +41,8 @@ namespace Microsoft.Toolkit.Graph.Controls
             if (_tokenBox != null)
             {
                 _tokenBox.QueryTextChanged -= TokenBox_QueryTextChanged;
+                _tokenBox.TokenItemAdded -= TokenBox_TokenItemAdded;
+                _tokenBox.TokenItemRemoved -= TokenBox_TokenItemRemoved;
             }
 
             _tokenBox = GetTemplateChild(PeoplePickerTokenizingTextBoxName) as TokenizingTextBox;
@@ -47,7 +50,22 @@ namespace Microsoft.Toolkit.Graph.Controls
             if (_tokenBox != null)
             {
                 _tokenBox.QueryTextChanged += TokenBox_QueryTextChanged;
+                _tokenBox.TokenItemAdded += TokenBox_TokenItemAdded;
+                _tokenBox.TokenItemRemoved += TokenBox_TokenItemRemoved;
             }
+        }
+
+        private void TokenBox_TokenItemAdded(TokenizingTextBox sender, TokenizingTextBoxItem args)
+        {
+            if (args?.Content is Person person)
+            {
+                PickedPeople.Add(person);
+            }
+        }
+
+        private void TokenBox_TokenItemRemoved(TokenizingTextBox sender, TokenItemRemovedEventArgs args)
+        {
+            PickedPeople.Remove(args.Item as Person);
         }
 
         private string _previousQuery;
@@ -85,6 +103,8 @@ namespace Microsoft.Toolkit.Graph.Controls
 
                         _previousQuery = text;
                     }
+
+                    // TODO: If we don't have Graph connection and just list of Person should we auto-filter here?
                 }, TimeSpan.FromSeconds(0.3));
             }
         }
