@@ -172,4 +172,6 @@
   </ItemGroup>
   <Import Project="..\SampleGraphApp.Shared\SampleGraphApp.Shared.projitems" Label="Shared" Condition="Exists('..\SampleGraphApp.Shared\SampleGraphApp.Shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+  <!-- fake target to allow the nuget pack to work solution wide -->
+  <Target Name="Pack" />
 </Project>
