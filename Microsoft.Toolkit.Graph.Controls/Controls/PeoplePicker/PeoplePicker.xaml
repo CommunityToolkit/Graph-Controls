@@ -1,0 +1,37 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Microsoft.Toolkit.Graph.Controls"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls">
+
+    <Style TargetType="local:PeoplePicker">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:PeoplePicker">
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <controls:TokenizingTextBox
+                            x:Name="PART_TokenizingTextBox"
+                            QueryIcon="Find"
+                            PlaceholderText="Start typing a name"
+                            TokenDelimiter=" "
+                            SuggestedItemsSource="{TemplateBinding SuggestedPeople}">
+                            <controls:TokenizingTextBox.SuggestedItemTemplate>
+                                <DataTemplate>
+                                    <local:PersonView PersonDetails="{Binding}" ShowName="True" ShowEmail="True"/>
+                                </DataTemplate>
+                            </controls:TokenizingTextBox.SuggestedItemTemplate>
+                            <controls:TokenizingTextBox.TokenItemTemplate>
+                                <DataTemplate>
+                                    <local:PersonView PersonDetails="{Binding}" ShowName="True"/>
+                                </DataTemplate>
+                            </controls:TokenizingTextBox.TokenItemTemplate>
+                        </controls:TokenizingTextBox>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
