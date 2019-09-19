@@ -1,9 +1,9 @@
-<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
-    <TargetFramework>uap10.0.16299</TargetFramework>
+    <TargetFrameworks>$(TargetFrameworksOverride)</TargetFrameworks>
     <Title>Windows Community Toolkit Graph Controls</Title>
-    <PackageId>Microsoft.Toolkit.Graph.Controls</PackageId>
+    <PackageId>Uno.Microsoft.Toolkit.Graph.Controls</PackageId>
     <Description>
       This library provides Microsoft Graph XAML controls. It is part of the Windows Community Toolkit.
 
@@ -14,16 +14,29 @@
     </Description>
     <PackageTags>UWP Toolkit Windows Controls MSAL Microsoft Graph AadLogin ProfileCard Person PeoplePicker Login</PackageTags>
     <SignAssembly>false</SignAssembly>
-
+    <GenerateLibraryLayout>true</GenerateLibraryLayout>
+    <NoWarn>CS1701;1702;Uno0001;NU1701</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="Assets\person.png" />
   </ItemGroup> 
+	
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <DefineConstants>$(DefineConstants);__WASM__</DefineConstants>
+  </PropertyGroup>
 
-	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="6.0.0-build.14" />
+  <ItemGroup>
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == 'MonoAndroid' or '$(TargetFrameworkIdentifier)' == 'Xamarin.iOS'  or '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Uno.UI" Version="1.46.0-dev.1991" />
+    <PackageReference Include="Uno.Microsoft.Toolkit.Uwp.UI" Version="5.1.0-build.200.gf9c311b069" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'uap10.0' or '$(TargetFramework)' == 'uap10.0.16299' ">
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="6.0.0-build.12" />
   </ItemGroup>
  
   <ItemGroup>
@@ -43,11 +56,14 @@
 
   <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
   <!-- https://weblogs.asp.net/rweigelt/disable-warnings-in-generated-c-files-of-uwp-app -->
-  <Target Name="PragmaWarningDisablePrefixer" AfterTargets="MarkupCompilePass2">
+  <Target Name="PragmaWarningDisablePrefixer" AfterTargets="MarkupCompilePass2" Condition="'$(TargetFramework)' == 'uap10.0' or '$(TargetFramework)' == 'uap10.0.16299'">
     <ItemGroup>
       <GeneratedCSFiles Include="**\*.g.cs;**\*.g.i.cs" />
     </ItemGroup>
     <Message Text="CSFiles: @(GeneratedCSFiles->'&quot;%(Identity)&quot;')" />
     <Exec Command="for %%f in (@(GeneratedCSFiles->'&quot;%(Identity)&quot;')) do echo #pragma warning disable &gt; %%f.temp &amp;&amp; type %%f &gt;&gt; %%f.temp &amp;&amp; move /y %%f.temp %%f &gt; NUL" />
   </Target>
+	
+  <Import Project="..\uno.ui.include.props" />
+
 </Project>

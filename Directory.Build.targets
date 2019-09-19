@@ -1,6 +1,6 @@
 <Project>
   <Choose>
-    <When Condition="'$(TargetFramework)' == 'uap10.0' or '$(TargetFramework)' == 'uap10.0.16299' or '$(TargetFramework)' == 'native' or '$(TargetFramework)' == 'net461'">
+    <When Condition="'$(TargetFramework)' == 'uap10.0' or '$(TargetFramework)' == 'uap10.0.16299' or '$(TargetFramework)' == 'native'">
       <!-- UAP versions for uap10.0 where TPMV isn't implied -->
       <PropertyGroup>
         <TargetPlatformVersion>10.0.$(DefaultTargetPlatformVersion).0</TargetPlatformVersion>
@@ -27,4 +27,11 @@
       </AssemblyAttribute>
     </ItemGroup>
   </Target>
+
+  <Target Name="AndroidResourceGenWorkaround_16_2"
+          AfterTargets="_UpdateAndroidResgen"
+          Condition="'$(AndroidUseIntermediateDesignerFile)'=='True' and !Exists($(_AndroidResourceDesignerFile))">
+    <WriteLinesToFile File="$(_AndroidResourceDesignerFile)" Lines="// Empty Content from uno.ui Directory.Build.targets." />
+  </Target>
+
 </Project>
