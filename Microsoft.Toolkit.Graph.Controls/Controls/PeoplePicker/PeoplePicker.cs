@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Linq;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Graph.Extensions;
 using Microsoft.Toolkit.Graph.Providers;
@@ -97,7 +98,10 @@ namespace Microsoft.Toolkit.Graph.Controls
 
                             foreach (var contact in (await graph.FindPersonAsync(text)).CurrentPage)
                             {
-                                SuggestedPeople.Add(contact);
+                                if (!PickedPeople.Any(person => person.Id == contact.Id))
+                                {
+                                    SuggestedPeople.Add(contact);
+                                }
                             }
                         }
 
