@@ -34,16 +34,17 @@ Install-Package Microsoft.Toolkit.Graph.Controls -IncludePrerelease
 
 <!-- TODO: Update instructions later to single PMC line when https://github.com/NuGet/Home/issues/7189 is fixed. -->
 
-Then open your `App.xaml` file and add the following resource:
+Then open your `MainPage.xaml` file and add the following behavior:
 
 ```xml
-<Application
+<Page
     ...
-    xmlns:wgt="using:Microsoft.Toolkit.Graph.Providers">
-    <Application.Resources>
-        <wgt:InteractiveProvider x:Key="MyProvider" ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read"/>
-    </Application.Resources>
-</Application>
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:providers="using:Microsoft.Toolkit.Graph.Providers">
+    <Interactivity:Interaction.Behaviors>
+        <providers:InteractiveProviderBehavior ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read"/>
+    </Interactivity:Interaction.Behaviors>
+</Page>
 ```
 
 You can use the `Scopes` property to preemptively request permissions from the user of your app for data your app needs to access from Microsoft Graph.

@@ -2,9 +2,6 @@
     x:Class="SampleTest.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:SampleTest"
-    xmlns:wgt="using:Microsoft.Toolkit.Graph.Providers">
-    <Application.Resources>
-        <wgt:InteractiveProvider x:Key="MyProvider" ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read"/>
-    </Application.Resources>
+    xmlns:local="using:SampleTest">
+
 </Application>

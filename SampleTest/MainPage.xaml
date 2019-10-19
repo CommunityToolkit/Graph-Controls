@@ -7,8 +7,21 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:wgt="using:Microsoft.Toolkit.Graph.Controls"
     xmlns:graph="using:Microsoft.Graph"
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:providers="using:Microsoft.Toolkit.Graph.Providers"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <!-- 
+        Initialize Graph Provider On Page Load 
+    
+        Register Client Id: https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app
+        
+        After finishing the initial registration page, you will also need to add an additional redirect URI. 
+        Click on "Add a Redirect URI" and check the https://login.microsoftonline.com/common/oauth2/nativeclient checkbox on that page. Then click "Save".
+    -->
+    <Interactivity:Interaction.Behaviors>
+        <providers:InteractiveProviderBehavior ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read,Calendars.Read"/>
+    </Interactivity:Interaction.Behaviors>
 
     <Grid>
         <wgt:LoginButton VerticalAlignment="Top" HorizontalAlignment="Right"/>

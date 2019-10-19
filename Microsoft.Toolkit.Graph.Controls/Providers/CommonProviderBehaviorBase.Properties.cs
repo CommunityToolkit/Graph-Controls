@@ -7,9 +7,9 @@ using Windows.UI.Xaml;
 namespace Microsoft.Toolkit.Graph.Providers
 {
     /// <summary>
-    /// Properties for <see cref="CommonProviderWrapper"/>.
+    /// Properties for <see cref="CommonProviderBehaviorBase"/>.
     /// </summary>
-    public partial class CommonProviderWrapper
+    public partial class CommonProviderBehaviorBase
     {
         /// <summary>
         /// Gets or sets the Client ID (the unique application (client) ID assigned to your app by Azure AD when the app was registered).
@@ -31,7 +31,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// The identifier for the <see cref="ClientId"/> dependency property.
         /// </returns>
         public static readonly DependencyProperty ClientIdProperty =
-            DependencyProperty.Register(nameof(ClientId), typeof(string), typeof(InteractiveProvider), new PropertyMetadata(string.Empty, ClientIdPropertyChanged));
+            DependencyProperty.Register(nameof(ClientId), typeof(string), typeof(CommonProviderBehaviorBase), new PropertyMetadata(string.Empty));
 
         /// <summary>
         /// Gets or sets the redirect URI (the URI the identity provider will send the security tokens back to).
@@ -49,7 +49,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// The identifier for the <see cref="RedirectUri"/> dependency property.
         /// </returns>
         public static readonly DependencyProperty RedirectUriProperty =
-            DependencyProperty.Register(nameof(RedirectUri), typeof(string), typeof(CommonProviderWrapper), new PropertyMetadata("https://login.microsoftonline.com/common/oauth2/nativeclient"));
+            DependencyProperty.Register(nameof(RedirectUri), typeof(string), typeof(CommonProviderBehaviorBase), new PropertyMetadata("https://login.microsoftonline.com/common/oauth2/nativeclient"));
 
         /// <summary>
         /// Gets or sets the list of Scopes (permissions) to request on initial login.
