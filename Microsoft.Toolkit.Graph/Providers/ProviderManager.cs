@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.ComponentModel;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using Microsoft.Toolkit.Helpers;
@@ -17,7 +18,7 @@ namespace Microsoft.Toolkit.Graph.Providers
     /// ProviderManager.Instance.GlobalProvider = await MsalProvider.CreateAsync(...);
     /// </code>
     /// </example>
-    public class ProviderManager
+    public class ProviderManager : INotifyPropertyChanged
     {
         /// <summary>
         /// Gets the name of the toolkit client to identify self in Graph calls.
@@ -33,6 +34,9 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// Event called when the <see cref="IProvider"/> changes.
         /// </summary>
         public event EventHandler<ProviderUpdatedEventArgs> ProviderUpdated;
+
+        /// <inheritdoc/>
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private IProvider _provider;
 
@@ -61,6 +65,8 @@ namespace Microsoft.Toolkit.Graph.Providers
                 }
 
                 ProviderUpdated?.Invoke(this, new ProviderUpdatedEventArgs(ProviderManagerChangedState.ProviderChanged));
+
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GlobalProvider)));
             }
         }
 

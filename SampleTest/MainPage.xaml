@@ -9,8 +9,14 @@
     xmlns:graph="using:Microsoft.Graph"
     xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:providers="using:Microsoft.Toolkit.Graph.Providers"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:converters="using:Microsoft.Toolkit.Graph.Controls.Converters"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <converters:OneDriveThumbnailConverter x:Key="OneDriveThumbnailConverter"/>
+        <converters:FileSizeConverter x:Key="FileSizeConverter"/>
+    </Page.Resources>
     <!-- 
         Initialize Graph Provider On Page Load 
     
@@ -25,17 +31,49 @@
 
     <Grid>
         <wgt:LoginButton VerticalAlignment="Top" HorizontalAlignment="Right"/>
-        <StackPanel Margin="16,48">
-            <wgt:PeoplePicker x:Name="PeopleChooser"/>
-            <TextBlock Margin="0,8,0,0" FontWeight="Bold">Picked People:</TextBlock>
-            <ItemsControl ItemsSource="{x:Bind PeopleChooser.PickedPeople}"
-                          Margin="8,0,0,0">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="graph:Person">
-                        <TextBlock Text="{x:Bind DisplayName}"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
+        <ScrollViewer Margin="16,48,16,16">
+            <StackPanel>
+                <wgt:PeoplePicker x:Name="PeopleChooser"/>
+                <TextBlock Margin="0,8,0,0" FontWeight="Bold">Picked People:</TextBlock>
+                <ItemsControl ItemsSource="{x:Bind PeopleChooser.PickedPeople}"
+                              Margin="8,0,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="graph:Person">
+                            <TextBlock Text="{x:Bind DisplayName}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <!-- Use GraphPresenter to make call to OneDrive Recent Filelist -->
+                <TextBlock Margin="0,8,0,8" FontWeight="Bold">Recent Files:</TextBlock>
+                <wgt:GraphPresenter RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.Drive.Recent(), Mode=OneWay}"
+                                    ResponseType="graph:DriveItem"
+                                    IsCollection="True">
+                    <wgt:GraphPresenter.ContentTemplate>
+                        <DataTemplate>
+                            <!-- Return result is a collection of DriveItem's as we used 'IsCollection', so bind that first. -->
+                            <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="graph:DriveItem">
+                                            <StackPanel>
+                                                <Image DataContext="{x:Bind RemoteItem, Converter={StaticResource OneDriveThumbnailConverter}}"
+                                                       Source="{Binding Result.Medium.Url}" Width="176" Height="176"/>
+                                                <TextBlock Text="{Binding Name}"/>
+                                                <TextBlock Text="{Binding Size, Converter={StaticResource FileSizeConverter}}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <controls:UniformGrid Columns="2" ColumnSpacing="8"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </DataTemplate>
+                    </wgt:GraphPresenter.ContentTemplate>
+                </wgt:GraphPresenter>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>
