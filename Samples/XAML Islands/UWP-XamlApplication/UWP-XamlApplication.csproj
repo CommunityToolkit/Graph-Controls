@@ -157,6 +157,12 @@
       <Version>6.0.0-preview9.1</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Microsoft.Toolkit.Graph.Controls\Microsoft.Toolkit.Graph.Controls.csproj">
+      <Project>{42252ee8-7e68-428f-972b-6d2dd3aa12cc}</Project>
+      <Name>Microsoft.Toolkit.Graph.Controls</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
