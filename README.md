@@ -8,10 +8,10 @@ If you need similar controls for the Web, please use the [Microsoft Graph Toolki
 
 ## <a name="supported"></a> Supported SDKs
 
-* Windows 10 18362 (🚧 TODO: Check Lower SDKs)
+* UWP Windows 10 18362 (🚧 TODO: Check Lower SDKs for UWP)
+* XAML Islands on .NET Core 3 w/ Windows 10 18362 (See Sample)
 * `LoginButton` & `PersonView` on Android via [Uno.Graph-Controls](https://aka.ms/wgt-uno) use `Uno.Microsoft.Graph.Controls` package. (🚧 `PeoplePicker` soon!)
 * 🚧 Coming Soon 🚧
-  * XAML Islands Sample
   * iOS (Waiting on [MSAL#1378](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/pull/1378) merge should be 4.4.0?)
 
 ## <a name="documentation"></a> Getting Started
@@ -48,6 +48,8 @@ Then open your `MainPage.xaml` file and add the following behavior:
 ```
 
 You can use the `Scopes` property to preemptively request permissions from the user of your app for data your app needs to access from Microsoft Graph.
+
+You only need the main/first page of your app to load use the provider behavior. This will initialize the graph provider for your entire application.
 
 **That's all you need to get started!**
 

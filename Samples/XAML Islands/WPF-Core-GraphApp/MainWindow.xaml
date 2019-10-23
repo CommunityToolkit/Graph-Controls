@@ -15,7 +15,9 @@
         Register Client Id: https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app
         
         After finishing the initial registration page, you will also need to add an additional redirect URI. 
-        Click on "Add a Redirect URI" and check the https://login.microsoftonline.com/common/oauth2/nativeclient checkbox on that page. Then click "Save".
+        Click on "Add a Redirect URI" for Public client/native for http://localhost on that page. Then click "Save".
+    
+        See MSAL docs about running on .NET Core: https://aka.ms/msal-net-os-browser
     -->
     <behaviors:Interaction.Behaviors>
         <!--<providers:InteractiveProviderBehavior ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read"/>-->

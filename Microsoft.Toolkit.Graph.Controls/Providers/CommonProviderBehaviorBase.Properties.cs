@@ -57,7 +57,11 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// The identifier for the <see cref="RedirectUri"/> dependency property.
         /// </returns>
         public static readonly DependencyProperty RedirectUriProperty =
+#if DOTNET
+            DependencyProperty.Register(nameof(RedirectUri), typeof(string), typeof(CommonProviderBehaviorBase), new PropertyMetadata("http://localhost")); //// https://aka.ms/msal-net-os-browser
+#else
             DependencyProperty.Register(nameof(RedirectUri), typeof(string), typeof(CommonProviderBehaviorBase), new PropertyMetadata("https://login.microsoftonline.com/common/oauth2/nativeclient"));
+#endif
 
         /// <summary>
         /// Gets or sets the list of Scopes (permissions) to request on initial login.
