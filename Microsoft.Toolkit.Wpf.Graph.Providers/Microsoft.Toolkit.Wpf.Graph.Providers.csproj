@@ -5,6 +5,19 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DefineConstants>DOTNET</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Microsoft.Toolkit.Graph.Controls\Providers\CommonProviderBehaviorBase.cs" Link="Providers\CommonProviderBehaviorBase.cs" />
+    <Compile Include="..\Microsoft.Toolkit.Graph.Controls\Providers\CommonProviderBehaviorBase.Properties.cs" Link="Providers\CommonProviderBehaviorBase.Properties.cs" />
+    <Compile Include="..\Microsoft.Toolkit.Graph.Controls\Providers\InteractiveProviderBehavior.cs" Link="Providers\InteractiveProviderBehavior.cs" />
+    <Compile Include="..\Microsoft.Toolkit.Graph.Controls\Providers\MockProviderBehavior.cs" Link="Providers\MockProviderBehavior.cs" />
+    <Compile Include="..\Microsoft.Toolkit.Graph.Controls\Providers\QuickCreate.cs" Link="Providers\QuickCreate.cs" />
+    <Compile Include="..\Microsoft.Toolkit.Graph.Controls\Providers\ScopeSet.cs" Link="Providers\ScopeSet.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.3" />
   </ItemGroup>
@@ -12,5 +25,4 @@
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
   </ItemGroup>
-
 </Project>

@@ -2,16 +2,32 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+#if DOTNET
+    using Microsoft.Xaml.Behaviors;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.ComponentModel;
+    using System.Linq;
+#else
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+#endif
 
+#if DOTNET
+namespace Microsoft.Toolkit.Wpf.Graph.Providers
+#else
 namespace Microsoft.Toolkit.Graph.Providers
+#endif
 {
     /// <summary>
     /// Helper Class for XAML string Scope conversion.
     /// </summary>
+#if DOTNET
+    [TypeConverter(typeof(ScopeSetTypeConverter))]
+#else
     [Windows.Foundation.Metadata.CreateFromString(MethodName = "Microsoft.Toolkit.Graph.Providers.ScopeSet.ConvertToScopeArray")]
+#endif
     public class ScopeSet : Collection<string>
     {
         /// <summary>

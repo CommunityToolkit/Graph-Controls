@@ -18,7 +18,8 @@
         Click on "Add a Redirect URI" and check the https://login.microsoftonline.com/common/oauth2/nativeclient checkbox on that page. Then click "Save".
     -->
     <behaviors:Interaction.Behaviors>
-        <providers:InteractiveProviderBehavior ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read"/>
+        <!--<providers:InteractiveProviderBehavior ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read"/>-->
+        <providers:MockProviderBehavior SignedIn="False"/>
     </behaviors:Interaction.Behaviors>
 
     <Grid>

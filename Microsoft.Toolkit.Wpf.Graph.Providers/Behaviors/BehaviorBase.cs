@@ -5,10 +5,10 @@
 using System.Windows;
 using Microsoft.Xaml.Behaviors;
 
-// TODO: Should we have this elsewhere in the toolkit?
-namespace Microsoft.Toolkit.Wpf.Graph.Providers
+namespace Microsoft.Toolkit.Wpf.UI.Behaviors
 {
     /// <summary>
+    /// INTERNAL DO NOT USE, please thumb-up this comment https://github.com/windows-toolkit/Microsoft.Toolkit.Win32/issues/93#issuecomment-545091683 if you think this would be useful to you.
     /// Base class for behaviors that solves 2 problems:
     ///   1. Prevent duplicate initialization that can happen (prevent multiple OnAttached calls);
     ///   2. Whenever <see cref="Initialize"/> initially fails, this method will subscribe to <see cref="FrameworkElement.SizeChanged"/> to allow lazy initialization.

@@ -39,7 +39,7 @@ namespace Microsoft.Toolkit.Graph.Providers
                 return _state;
             }
 
-            set
+            private set
             {
                 var current = _state;
                 _state = value;

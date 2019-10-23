@@ -8,7 +8,11 @@ using Microsoft.Graph.Auth;
 using Microsoft.Identity.Client;
 using Microsoft.Toolkit.Graph.Providers;
 
+#if DOTNET
+namespace Microsoft.Toolkit.Wpf.Graph.Providers
+#else
 namespace Microsoft.Toolkit.Graph.Providers
+#endif
 {
     //// TODO: This should probably live in .NET Standard lib; however, Uno one needs to be at UI layer for Parent Window?
     //// TODO: Need to set up XAML Islands sample to test in the new repo and make sure this works from this context.
