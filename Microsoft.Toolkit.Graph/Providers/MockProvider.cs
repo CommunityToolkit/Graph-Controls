@@ -7,10 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Graph;
+using Microsoft.Toolkit.Graph.Extensions;
 
 namespace Microsoft.Toolkit.Graph.Providers
 {
@@ -43,12 +45,8 @@ namespace Microsoft.Toolkit.Graph.Providers
             "https://proxy.apisandbox.msdn.microsoft.com/svc?url=" + HttpUtility.HtmlEncode("https://graph.microsoft.com/beta/"),
             new DelegateAuthenticationProvider((requestMessage) =>
             {
-                requestMessage
-                    .Headers
-                    .Authorization = new AuthenticationHeaderValue("Bearer", "{token:https://graph.microsoft.com/}");
-
-                return Task.FromResult(0);
-        }));
+                return this.AuthenticateRequestAsync(requestMessage);
+            }));
 
         /// <inheritdoc/>
         public event EventHandler<StateChangedEventArgs> StateChanged;
@@ -72,6 +70,10 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <inheritdoc/>
         public Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
+            request.AddSdkVersion();
+
+            request.AddMockProviderToken();
+
             return Task.FromResult(0);
         }
 
