@@ -95,4 +95,5 @@
       </_FilteredNonWapProjProjectOutput>
     </ItemGroup>
   </Target>
+  <Target Name="Pack" />
 </Project>

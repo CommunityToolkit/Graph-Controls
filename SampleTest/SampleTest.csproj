@@ -175,4 +175,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="Pack" />
 </Project>
