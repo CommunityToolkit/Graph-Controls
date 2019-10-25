@@ -12,6 +12,8 @@
 
     <!-- This is a temporary workaround for https://github.com/dotnet/sdk/issues/955 -->
     <DebugType>Full</DebugType>
+    <Configurations>Debug;Release;CI</Configurations>
+    <Platforms>AnyCPU;ARM;ARM64;x64;x86</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0.16299'">

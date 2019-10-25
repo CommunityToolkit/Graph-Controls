@@ -22,7 +22,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <summary>
         /// Gets the name of the toolkit client to identify self in Graph calls.
         /// </summary>
-        public static readonly string ClientName = "Windows Community Toolkit" + ThisAssembly.AssemblyVersion;
+        public static readonly string ClientName = "wct/" + ThisAssembly.AssemblyVersion;
 
         /// <summary>
         /// Gets the instance of the GlobalProvider

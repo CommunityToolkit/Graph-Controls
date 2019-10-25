@@ -25,7 +25,7 @@ namespace Microsoft.Toolkit.Graph.Controls
         /// <summary>
         /// The user canceled the login process or was unable to sign in.
         /// </summary>
-        public event EventHandler LoginFailed;
+        public event EventHandler<LoginFailedEventArgs> LoginFailed;
 
         /// <summary>
         /// The user started to logout - cancelable.

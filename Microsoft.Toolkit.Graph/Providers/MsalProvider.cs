@@ -6,9 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
+using Microsoft.Toolkit.Graph.Extensions;
 
 namespace Microsoft.Toolkit.Graph.Providers
 {
@@ -39,7 +41,7 @@ namespace Microsoft.Toolkit.Graph.Providers
                 return _state;
             }
 
-            set
+            private set
             {
                 var current = _state;
                 _state = value;
@@ -74,9 +76,10 @@ namespace Microsoft.Toolkit.Graph.Providers
             var msal = new MsalProvider
             {
                 Client = client,
-                Provider = provider,
-                Graph = new GraphServiceClient(provider)
+                Provider = provider
             };
+
+            msal.Graph = new GraphServiceClient(msal);
 
             await msal.TrySilentSignInAsync();
 
@@ -86,6 +89,8 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <inheritdoc/>
         public async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
+            request.AddSdkVersion();
+
             try
             {
                 await Provider.AuthenticateRequestAsync(request);

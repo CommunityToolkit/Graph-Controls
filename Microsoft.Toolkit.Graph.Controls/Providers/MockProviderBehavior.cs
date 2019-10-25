@@ -9,7 +9,7 @@ using System.Windows;
 using Microsoft.Toolkit.Graph.Providers;
 #else
 using System.Linq;
-using Windows.UI.Core;
+using Windows.UI.Xaml;
 #endif
 
 #if DOTNET
@@ -29,10 +29,28 @@ namespace Microsoft.Toolkit.Graph.Providers
     /// &lt;/Interactivity:Interaction.Behaviors&gt;
     /// </code>
     /// </example>
-    public class InteractiveProviderBehavior : CommonProviderBehaviorBase
+    public class MockProviderBehavior : CommonProviderBehaviorBase
     {
         private object lock_sync = new object();
         private bool initialized = false;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the mock provider is signed-in upon initialization.
+        /// </summary>
+        public bool SignedIn
+        {
+            get { return (bool)GetValue(SignedInProperty); }
+            set { SetValue(SignedInProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="SignedIn"/> dependency property.
+        /// </summary>
+        /// <returns>
+        /// The identifier for the <see cref="SignedIn"/> dependency property.
+        /// </returns>
+        public static readonly DependencyProperty SignedInProperty =
+            DependencyProperty.Register(nameof(SignedIn), typeof(bool), typeof(MockProviderBehavior), new PropertyMetadata(true));
 
         /// <inheritdoc/>
         protected override bool Initialize()
@@ -41,19 +59,7 @@ namespace Microsoft.Toolkit.Graph.Providers
             {
                 if (!initialized)
                 {
-#if DOTNET
-                    _ = Dispatcher.BeginInvoke(new Action(async () =>
-                    {
-                        ProviderManager.Instance.GlobalProvider =
-                            await QuickCreate.CreateMsalProviderAsync(ClientId, RedirectUri, Scopes.ToArray());
-                    }), System.Windows.Threading.DispatcherPriority.Normal);
-#else
-                    _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-                    {
-                        ProviderManager.Instance.GlobalProvider =
-                            await QuickCreate.CreateMsalProviderAsync(ClientId, RedirectUri, Scopes.ToArray());
-                    });
-#endif
+                    ProviderManager.Instance.GlobalProvider = new MockProvider(SignedIn);
                 }
             }
 

@@ -15,6 +15,7 @@
     <IsTestProject>$(MSBuildProjectName.Contains('Test'))</IsTestProject>
     <IsUwpProject Condition="'$(IsDesignProject)' != 'true'">$(MSBuildProjectName.Contains('Uwp'))</IsUwpProject>
     <IsSampleProject>$(MSBuildProjectName.Contains('Sample'))</IsSampleProject>
+    <IsWpfProject>$(MSBuildProjectName.Contains('Wpf'))</IsWpfProject>
     <DefaultTargetPlatformVersion>17763</DefaultTargetPlatformVersion>
     <DefaultTargetPlatformMinVersion>16299</DefaultTargetPlatformMinVersion>
     <PackageOutputPath>$(MSBuildThisFileDirectory)bin\nupkg</PackageOutputPath>
@@ -59,7 +60,7 @@
   </Choose>
 
   <Choose>
-    <When Condition="'$(IsTestProject)' != 'true' and '$(IsSampleProject)' != 'true' and '$(IsDesignProject)' != 'true'">
+    <When Condition="'$(IsTestProject)' != 'true' and '$(IsSampleProject)' != 'true' and '$(IsDesignProject)' != 'true' and '$(IsWpfProject)' != 'true'">
       <ItemGroup>
         <!--<PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="15.3.83" PrivateAssets="all" />-->
         <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" PrivateAssets="all" />
@@ -68,7 +69,7 @@
         <Page Include="**\*.xaml" Exclude="**\bin\**\*.xaml;**\obj\**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
         <Compile Update="**\*.xaml.cs" DependentUpon="%(Filename)" />
       </ItemGroup>
-      <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+      <PropertyGroup Condition="'$(Configuration)' == 'Release' or '$(Configuration)' == 'CI'">
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
       </PropertyGroup>
     </When>
