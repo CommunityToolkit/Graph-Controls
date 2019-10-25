@@ -150,7 +150,7 @@ Task("Build")
     {
         MaxCpuCount = 0
     }
-    .SetConfiguration("Release")
+    .SetConfiguration("CI")
     .WithTarget("Restore");
 
     MSBuild(Solution, buildSettings);
@@ -162,7 +162,7 @@ Task("Build")
     {
         MaxCpuCount = 0
     }
-    .SetConfiguration("Release")
+    .SetConfiguration("CI")
     .WithTarget("Build")
     .WithProperty("GenerateLibraryLayout", "true");
 
@@ -207,7 +207,7 @@ Task("Package")
     var buildSettings = new MSBuildSettings {
         MaxCpuCount = 0
     }
-    .SetConfiguration("Release")
+    .SetConfiguration("CI")
     .WithTarget("Pack")
     .WithProperty("GenerateLibraryLayout", "true")
 	.WithProperty("PackageOutputPath", nupkgDir);

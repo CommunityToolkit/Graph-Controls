@@ -69,7 +69,7 @@
         <Page Include="**\*.xaml" Exclude="**\bin\**\*.xaml;**\obj\**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" />
         <Compile Update="**\*.xaml.cs" DependentUpon="%(Filename)" />
       </ItemGroup>
-      <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+      <PropertyGroup Condition="'$(Configuration)' == 'Release' or '$(Configuration)' == 'CI'">
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
       </PropertyGroup>
     </When>
