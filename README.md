@@ -22,17 +22,11 @@ Before using controls that access [Microsoft Graph](https://graph.microsoft.com)
 
 ### UWP Quick Start
 
-To include the latest preview MyGet package in your Visual Studio environment, open your _Package Sources_ settings from the title-bar search, click the green '+' and change the source following :
-
-`https://dotnet.myget.org/F/uwpcommunitytoolkit/api/v3/index.json`
-
-Give it a name, and then click the `Update` button. Then use the following command on the _Package Manager Console_:
+Use the following command on the _Package Manager Console_ to install the NuGet to your project:
 
 ```powershell
 Install-Package Microsoft.Toolkit.Graph.Controls -IncludePrerelease
 ```
-
-<!-- TODO: Update instructions later to single PMC line when https://github.com/NuGet/Home/issues/7189 is fixed. -->
 
 Then open your `MainPage.xaml` file and add the following behavior:
 
@@ -46,6 +40,8 @@ Then open your `MainPage.xaml` file and add the following behavior:
     </Interactivity:Interaction.Behaviors>
 </Page>
 ```
+
+*You can also use the `<providers:MockProviderBehavior/>` instead to provide some test data, though we're currently investigating an issue with the search results returned for PeoplePicker, see [Issue #24](https://github.com/windows-toolkit/Graph-Controls/issues/24).*
 
 You can use the `Scopes` property to preemptively request permissions from the user of your app for data your app needs to access from Microsoft Graph.
 
