@@ -107,7 +107,8 @@ namespace Microsoft.Toolkit.Graph.Extensions
         public static T Search<T>(this T request, string query)
             where T : IBaseRequest
         {
-            request.QueryOptions?.Add(new QueryOption("$search", query));
+            // Need quotes around query for e-mail searches: https://docs.microsoft.com/en-us/graph/people-example#perform-a-fuzzy-search
+            request.QueryOptions?.Add(new QueryOption("$search", '"' + query + '"'));
 
             return request;
         }

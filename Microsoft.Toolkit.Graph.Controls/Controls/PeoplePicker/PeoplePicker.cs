@@ -43,6 +43,7 @@ namespace Microsoft.Toolkit.Graph.Controls
             {
                 _tokenBox.TextChanged -= TokenBox_TextChanged;
                 _tokenBox.TokenItemAdded -= TokenBox_TokenItemAdded;
+                _tokenBox.TokenItemCreating -= TokenBox_TokenItemCreating;
                 _tokenBox.TokenItemRemoved -= TokenBox_TokenItemRemoved;
             }
 
@@ -52,7 +53,29 @@ namespace Microsoft.Toolkit.Graph.Controls
             {
                 _tokenBox.TextChanged += TokenBox_TextChanged;
                 _tokenBox.TokenItemAdded += TokenBox_TokenItemAdded;
+                _tokenBox.TokenItemCreating += TokenBox_TokenItemCreating;
                 _tokenBox.TokenItemRemoved += TokenBox_TokenItemRemoved;
+            }
+        }
+
+        private async void TokenBox_TokenItemCreating(TokenizingTextBox sender, TokenItemCreatingEventArgs args)
+        {
+            using (args.GetDeferral())
+            {
+                // Try and convert typed text to people
+                var graph = ProviderManager.Instance.GlobalProvider.Graph;
+                if (graph != null)
+                {
+                    args.Item = (await graph.FindPersonAsync(args.TokenText)).CurrentPage.FirstOrDefault();
+                }
+
+                // If we didn't find anyone, then don't add anyone.
+                if (args.Item == null)
+                {
+                    args.Cancel = true;
+
+                    // TODO: We should raise a 'person not found' type event or automatically display some feedback?
+                }
             }
         }
 
