@@ -16,6 +16,7 @@
                             x:Name="PART_TokenizingTextBox"
                             QueryIcon="Find"
                             PlaceholderText="Start typing a name"
+                            TextMemberPath="DisplayName"
                             TokenDelimiter=","
                             SuggestedItemsSource="{TemplateBinding SuggestedPeople}">
                             <controls:TokenizingTextBox.SuggestedItemTemplate>

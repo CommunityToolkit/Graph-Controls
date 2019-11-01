@@ -41,8 +41,9 @@ namespace Microsoft.Toolkit.Graph.Controls
 
             if (_tokenBox != null)
             {
-                _tokenBox.QueryTextChanged -= TokenBox_QueryTextChanged;
+                _tokenBox.TextChanged -= TokenBox_TextChanged;
                 _tokenBox.TokenItemAdded -= TokenBox_TokenItemAdded;
+                _tokenBox.TokenItemCreating -= TokenBox_TokenItemCreating;
                 _tokenBox.TokenItemRemoved -= TokenBox_TokenItemRemoved;
             }
 
@@ -50,9 +51,31 @@ namespace Microsoft.Toolkit.Graph.Controls
 
             if (_tokenBox != null)
             {
-                _tokenBox.QueryTextChanged += TokenBox_QueryTextChanged;
+                _tokenBox.TextChanged += TokenBox_TextChanged;
                 _tokenBox.TokenItemAdded += TokenBox_TokenItemAdded;
+                _tokenBox.TokenItemCreating += TokenBox_TokenItemCreating;
                 _tokenBox.TokenItemRemoved += TokenBox_TokenItemRemoved;
+            }
+        }
+
+        private async void TokenBox_TokenItemCreating(TokenizingTextBox sender, TokenItemCreatingEventArgs args)
+        {
+            using (args.GetDeferral())
+            {
+                // Try and convert typed text to people
+                var graph = ProviderManager.Instance.GlobalProvider.Graph;
+                if (graph != null)
+                {
+                    args.Item = (await graph.FindPersonAsync(args.TokenText)).CurrentPage.FirstOrDefault();
+                }
+
+                // If we didn't find anyone, then don't add anyone.
+                if (args.Item == null)
+                {
+                    args.Cancel = true;
+
+                    // TODO: We should raise a 'person not found' type event or automatically display some feedback?
+                }
             }
         }
 
@@ -69,9 +92,7 @@ namespace Microsoft.Toolkit.Graph.Controls
             PickedPeople.Remove(args.Item as Person);
         }
 
-        private string _previousQuery;
-
-        private void TokenBox_QueryTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private void TokenBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (!args.CheckCurrent())
             {
@@ -104,8 +125,6 @@ namespace Microsoft.Toolkit.Graph.Controls
                                 }
                             }
                         }
-
-                        _previousQuery = text;
                     }
 
                     // TODO: If we don't have Graph connection and just list of Person should we auto-filter here?
