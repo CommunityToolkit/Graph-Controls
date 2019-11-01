@@ -41,7 +41,7 @@ namespace Microsoft.Toolkit.Graph.Controls
 
             if (_tokenBox != null)
             {
-                _tokenBox.QueryTextChanged -= TokenBox_QueryTextChanged;
+                _tokenBox.TextChanged -= TokenBox_TextChanged;
                 _tokenBox.TokenItemAdded -= TokenBox_TokenItemAdded;
                 _tokenBox.TokenItemRemoved -= TokenBox_TokenItemRemoved;
             }
@@ -50,7 +50,7 @@ namespace Microsoft.Toolkit.Graph.Controls
 
             if (_tokenBox != null)
             {
-                _tokenBox.QueryTextChanged += TokenBox_QueryTextChanged;
+                _tokenBox.TextChanged += TokenBox_TextChanged;
                 _tokenBox.TokenItemAdded += TokenBox_TokenItemAdded;
                 _tokenBox.TokenItemRemoved += TokenBox_TokenItemRemoved;
             }
@@ -69,9 +69,7 @@ namespace Microsoft.Toolkit.Graph.Controls
             PickedPeople.Remove(args.Item as Person);
         }
 
-        private string _previousQuery;
-
-        private void TokenBox_QueryTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private void TokenBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (!args.CheckCurrent())
             {
@@ -104,8 +102,6 @@ namespace Microsoft.Toolkit.Graph.Controls
                                 }
                             }
                         }
-
-                        _previousQuery = text;
                     }
 
                     // TODO: If we don't have Graph connection and just list of Person should we auto-filter here?
