@@ -45,6 +45,17 @@ namespace Microsoft.Toolkit.Graph.Providers
             "https://proxy.apisandbox.msdn.microsoft.com/svc?url=" + HttpUtility.HtmlEncode("https://graph.microsoft.com/beta/"),
             new DelegateAuthenticationProvider((requestMessage) =>
             {
+                //// Temporary Workaround for https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/59
+                //// ------------------------
+                var requestUri = requestMessage.RequestUri.ToString();
+                var index = requestUri.IndexOf("&");
+                if (index >= 0)
+                {
+                    requestMessage.RequestUri = new Uri(requestUri.Remove(index, 1).Insert(index, "?"));
+                }
+
+                //// End Workaround
+
                 return this.AuthenticateRequestAsync(requestMessage);
             }));
 
