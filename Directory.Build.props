@@ -13,16 +13,15 @@
     <DefaultLanguage>en-US</DefaultLanguage>
     <IsDesignProject>$(MSBuildProjectName.Contains('.Design'))</IsDesignProject>
     <IsTestProject>$(MSBuildProjectName.Contains('Test'))</IsTestProject>
-    <IsUwpProject Condition="'$(IsDesignProject)' != 'true'">$(MSBuildProjectName.Contains('Uwp'))</IsUwpProject>
     <IsSampleProject>$(MSBuildProjectName.Contains('Sample'))</IsSampleProject>
     <IsWpfProject>$(MSBuildProjectName.Contains('Wpf'))</IsWpfProject>
-    <DefaultTargetPlatformVersion>17763</DefaultTargetPlatformVersion>
-    <DefaultTargetPlatformMinVersion>16299</DefaultTargetPlatformMinVersion>
+    <DefaultTargetPlatformVersion>18362</DefaultTargetPlatformVersion>
+    <DefaultTargetPlatformMinVersion>17134</DefaultTargetPlatformMinVersion>
     <PackageOutputPath>$(MSBuildThisFileDirectory)bin\nupkg</PackageOutputPath>
   </PropertyGroup>
 
   <PropertyGroup>
-    <SignAssembly Condition="'$(SignAssembly)' == '' and '$(IsUwpProject)' != 'true'" >true</SignAssembly>
+    <SignAssembly Condition="'$(SignAssembly)' == ''" >true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)toolkit.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
@@ -30,14 +29,6 @@
     <When Condition="'$(IsTestProject)' != 'true' and '$(IsSampleProject)' != 'true' and '$(IsDesignProject)' != 'true'">
       <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-      </PropertyGroup>
-    </When>
-  </Choose>
-
-  <Choose>
-    <When Condition="('$(IsUwpProject)' == 'true') and '$(IsSampleProject)' != 'true' and '$(IsDesignProject)' != 'true'">
-      <PropertyGroup>
-        <GenerateLibraryLayout>true</GenerateLibraryLayout>
       </PropertyGroup>
     </When>
   </Choose>
@@ -74,13 +65,6 @@
       </PropertyGroup>
     </When>
   </Choose>
-
-  <PropertyGroup Condition="'$(IsUwpProject)' == 'true'">
-
-    <!-- 8002 is a strong named -> non-strong-named reference -->
-    <!-- This is valid for platforms other than .NET Framework (and is needed for the UWP targets -->
-    <NoWarn>$(NoWarn);8002</NoWarn>
-  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version=" 2.1.65" PrivateAssets="all" />

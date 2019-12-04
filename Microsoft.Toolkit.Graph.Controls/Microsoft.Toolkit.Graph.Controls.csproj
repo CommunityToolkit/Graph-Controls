@@ -1,7 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
-    <TargetFramework>uap10.0.16299</TargetFramework>
+    <TargetFramework>uap10.0.17134</TargetFramework>
     <Title>Windows Community Toolkit Graph Controls</Title>
     <PackageId>Microsoft.Toolkit.Graph.Controls</PackageId>
     <Description>
@@ -17,6 +17,9 @@
     <GenerateLibraryLayout>true</GenerateLibraryLayout>
     <Configurations>Debug;Release;CI</Configurations>
     <Platforms>AnyCPU;ARM;ARM64;x64;x86</Platforms>
+    <NoWarn>$(NoWarn);CS8002;CS8305</NoWarn> <!-- Temporary since WinUI3 is not stable yet -->
+    <IsWinUIAlpha Condition="'$(IsWinUIAlpha)' == ''">true</IsWinUIAlpha>
+    <WindowsKitsPath Condition="'$(IsWinUIAlpha)' == 'true'">WinUI-Alpha-Projects-Don-t-Use-SDK-Xaml-Tools</WindowsKitsPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,9 +27,12 @@
   </ItemGroup> 
 
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="6.0.0-rc1.2" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="6.0.0-rc1.2" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="7.0.0-*" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="7.0.0-*" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
+    <PackageReference Include="Microsoft.WinUI">
+      <Version>3.0.0-alpha.191101.0</Version>
+    </PackageReference>
   </ItemGroup>
  
   <ItemGroup>

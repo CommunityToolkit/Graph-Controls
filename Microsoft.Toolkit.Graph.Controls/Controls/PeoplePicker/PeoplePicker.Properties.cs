@@ -5,7 +5,7 @@
 using System.Collections.ObjectModel;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp.UI.Controls;
-using Windows.UI.Xaml;
+using Microsoft.UI.Xaml;
 
 namespace Microsoft.Toolkit.Graph.Controls
 {
