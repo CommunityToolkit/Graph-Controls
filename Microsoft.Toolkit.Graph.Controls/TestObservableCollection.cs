@@ -1,4 +1,8 @@
-﻿using System;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -111,7 +115,7 @@ namespace Microsoft.Toolkit.Graph.Controls
             TestBindableVector<T> newItem = new TestBindableVector<T>(oldItem);
 
             T item = this[oldIndex];
-            base.RemoveAt(oldIndex);
+            RemoveAt(oldIndex);
             base.InsertItem(newIndex, item);
             OnCollectionChanged(
                 global::System.Collections.Specialized.NotifyCollectionChangedAction.Move,
@@ -173,7 +177,9 @@ namespace Microsoft.Toolkit.Graph.Controls
             }
         }
 
+#pragma warning disable CS0067
         public event PropertyChangedEventHandler PropertyChanged;
+#pragma warning restore CS0067
     }
 
 #pragma warning disable SA1402 // File may only contain a single class
