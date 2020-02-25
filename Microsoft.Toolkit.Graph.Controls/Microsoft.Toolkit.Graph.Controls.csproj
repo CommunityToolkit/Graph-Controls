@@ -31,7 +31,7 @@
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="7.0.0-*" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
     <PackageReference Include="Microsoft.WinUI">
-      <Version>3.0.0-alpha.191101.0</Version>
+      <Version>3.0.0-alpha.200210.0</Version>
     </PackageReference>
   </ItemGroup>
  
