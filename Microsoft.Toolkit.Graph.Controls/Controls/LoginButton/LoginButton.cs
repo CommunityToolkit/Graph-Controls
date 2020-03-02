@@ -5,7 +5,6 @@
 using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using Microsoft.Graph.Auth;
 using Microsoft.Toolkit.Graph.Providers;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -181,6 +180,12 @@ namespace Microsoft.Toolkit.Graph.Controls
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task LogoutAsync()
         {
+            // Close Menu
+            if (FlyoutBase.GetAttachedFlyout(_loginButton) is FlyoutBase flyout)
+            {
+                flyout.Hide();
+            }
+
             var cargs = new CancelEventArgs();
             LogoutInitiated?.Invoke(this, cargs);
 
@@ -205,12 +210,6 @@ namespace Microsoft.Toolkit.Graph.Controls
                 await provider.LogoutAsync();
 
                 LogoutCompleted?.Invoke(this, new EventArgs());
-            }
-
-            // Close Menu
-            if (FlyoutBase.GetAttachedFlyout(_loginButton) is FlyoutBase flyout)
-            {
-                flyout.Hide();
             }
         }
     }
