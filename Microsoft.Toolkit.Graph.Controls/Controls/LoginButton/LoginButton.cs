@@ -4,6 +4,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Graph.Providers;
 using Windows.UI.Xaml;
@@ -32,15 +33,7 @@ namespace Microsoft.Toolkit.Graph.Controls
         {
             this.DefaultStyleKey = typeof(LoginButton);
 
-            ProviderManager.Instance.ProviderUpdated += (sender, args) =>
-            {
-                if (!IsLoading && ProviderManager.Instance?.GlobalProvider?.State == ProviderState.Loading)
-                {
-                    IsLoading = true;
-                }
-
-                LoadData();
-            };
+            ProviderManager.Instance.ProviderUpdated += (sender, args) => LoadData();
         }
 
         /// <inheritdoc/>
@@ -48,6 +41,7 @@ namespace Microsoft.Toolkit.Graph.Controls
         {
             base.OnApplyTemplate();
 
+            IsLoading = true;
             LoadData();
 
             if (_loginButton != null)
@@ -110,7 +104,11 @@ namespace Microsoft.Toolkit.Graph.Controls
                 return;
             }
 
-            if (provider.State == ProviderState.SignedIn)
+            if (provider.State == ProviderState.Loading)
+            {
+                IsLoading = true;
+            }
+            else if (provider.State == ProviderState.SignedIn)
             {
                 try
                 {
@@ -122,18 +120,20 @@ namespace Microsoft.Toolkit.Graph.Controls
                 {
                     LoginFailed?.Invoke(this, new LoginFailedEventArgs(e));
                 }
+
+                IsLoading = false;
             }
             else if (provider.State == ProviderState.SignedOut)
             {
                 UserDetails = null; // What if this was user provided? Should we not hook into these events then?
+
+                IsLoading = false;
             }
             else
             {
                 // Provider in Loading state
-                return;
+                Debug.Fail("unsupported state");
             }
-
-            IsLoading = false;
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Microsoft.Toolkit.Graph.Controls
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task LoginAsync()
         {
-            if (UserDetails != null)
+            if (UserDetails != null || IsLoading)
             {
                 return;
             }
@@ -153,6 +153,7 @@ namespace Microsoft.Toolkit.Graph.Controls
             {
                 try
                 {
+                    IsLoading = true;
                     await provider.LoginAsync();
 
                     if (provider.State == ProviderState.SignedIn)
@@ -171,6 +172,10 @@ namespace Microsoft.Toolkit.Graph.Controls
                 {
                     LoginFailed?.Invoke(this, new LoginFailedEventArgs(e));
                 }
+                finally
+                {
+                    IsLoading = false;
+                }
             }
         }
 
@@ -184,6 +189,11 @@ namespace Microsoft.Toolkit.Graph.Controls
             if (FlyoutBase.GetAttachedFlyout(_loginButton) is FlyoutBase flyout)
             {
                 flyout.Hide();
+            }
+
+            if (IsLoading)
+            {
+                return;
             }
 
             var cargs = new CancelEventArgs();
@@ -207,7 +217,9 @@ namespace Microsoft.Toolkit.Graph.Controls
 
             if (provider != null)
             {
+                IsLoading = true;
                 await provider.LogoutAsync();
+                IsLoading = false;
 
                 LogoutCompleted?.Invoke(this, new EventArgs());
             }
