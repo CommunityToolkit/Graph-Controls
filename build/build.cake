@@ -3,6 +3,8 @@
 #addin nuget:?package=Cake.FileHelpers&version=3.2.1
 #addin nuget:?package=Cake.Powershell&version=0.4.8
 
+#tool nuget:?package=vswhere&version=2.8.4
+
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -91,6 +93,19 @@ void VerifyHeaders(bool Replace)
     }
 }
 
+void UpdateToolsPath(MSBuildSettings buildSettings)
+{
+    // Workaround for https://github.com/cake-build/cake/issues/2128
+	var vsInstallation = VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild", IncludePrerelease = false });
+
+	if (vsInstallation != null)
+	{
+		buildSettings.ToolPath = vsInstallation.CombineWithFilePath(@"MSBuild\Current\Bin\MSBuild.exe");
+		if (!FileExists(buildSettings.ToolPath))
+			buildSettings.ToolPath = vsInstallation.CombineWithFilePath(@"MSBuild\15.0\Bin\MSBuild.exe");
+	}
+}
+
 //////////////////////////////////////////////////////////////////////
 // DEFAULT TASK
 //////////////////////////////////////////////////////////////////////
@@ -153,6 +168,8 @@ Task("Build")
     .SetConfiguration("CI")
     .WithTarget("Restore");
 
+    UpdateToolsPath(buildSettings);
+
     MSBuild(Solution, buildSettings);
 
     EnsureDirectoryExists(nupkgDir);
@@ -165,6 +182,8 @@ Task("Build")
     .SetConfiguration("CI")
     .WithTarget("Build")
     .WithProperty("GenerateLibraryLayout", "true");
+
+    UpdateToolsPath(buildSettings);
 
 	MSBuild(Solution, buildSettings);
 });
@@ -211,6 +230,8 @@ Task("Package")
     .WithTarget("Pack")
     .WithProperty("GenerateLibraryLayout", "true")
 	.WithProperty("PackageOutputPath", nupkgDir);
+
+    UpdateToolsPath(buildSettings);
 
     MSBuild(Solution, buildSettings);
 });

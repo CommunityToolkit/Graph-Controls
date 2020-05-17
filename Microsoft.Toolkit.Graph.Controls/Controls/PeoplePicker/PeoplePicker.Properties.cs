@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Collections.ObjectModel;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Microsoft.UI.Xaml;
@@ -16,9 +17,9 @@ namespace Microsoft.Toolkit.Graph.Controls
         /// <summary>
         /// Gets the set of <see cref="Person"/> objects chosen by the user.
         /// </summary>
-        public TestObservableCollection<Person> PickedPeople
+        public ObservableCollection<Person> PickedPeople
         {
-            get { return (TestObservableCollection<Person>)GetValue(SelectedPeopleProperty); }
+            get { return (ObservableCollection<Person>)GetValue(SelectedPeopleProperty); }
             internal set { SetValue(SelectedPeopleProperty, value); }
         }
 
@@ -29,14 +30,14 @@ namespace Microsoft.Toolkit.Graph.Controls
         /// The identifier for the <see cref="PickedPeople"/> dependency property.
         /// </returns>
         public static readonly DependencyProperty SelectedPeopleProperty =
-            DependencyProperty.Register(nameof(PickedPeople), typeof(TestObservableCollection<Person>), typeof(PeoplePicker), new PropertyMetadata(new TestObservableCollection<Person>()));
+            DependencyProperty.Register(nameof(PickedPeople), typeof(ObservableCollection<Person>), typeof(PeoplePicker), new PropertyMetadata(new ObservableCollection<Person>()));
 
         /// <summary>
         /// Gets or sets collection of people suggested by the graph from the user's query.
         /// </summary>
-        public TestObservableCollection<Person> SuggestedPeople
+        public ObservableCollection<Person> SuggestedPeople
         {
-            get { return (TestObservableCollection<Person>)GetValue(SuggestedPeopleProperty); }
+            get { return (ObservableCollection<Person>)GetValue(SuggestedPeopleProperty); }
             set { SetValue(SuggestedPeopleProperty, value); }
         }
 
@@ -47,6 +48,6 @@ namespace Microsoft.Toolkit.Graph.Controls
         /// The identifier for the <see cref="SuggestedPeople"/> dependency property.
         /// </returns>
         public static readonly DependencyProperty SuggestedPeopleProperty =
-            DependencyProperty.Register(nameof(SuggestedPeople), typeof(TestObservableCollection<Person>), typeof(PeoplePicker), new PropertyMetadata(new TestObservableCollection<Person>()));
+            DependencyProperty.Register(nameof(SuggestedPeople), typeof(ObservableCollection<Person>), typeof(PeoplePicker), new PropertyMetadata(new ObservableCollection<Person>()));
     }
 }
