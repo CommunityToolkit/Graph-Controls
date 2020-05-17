@@ -20,7 +20,7 @@ namespace Microsoft.Toolkit.Graph.Providers
 {
     /// <summary>
     /// Put in a xaml page with ClientId
-    /// https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Acquiring-tokens-interactively
+    /// https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Acquiring-tokens-interactively.
     /// </summary>
     /// <example>
     /// <code>

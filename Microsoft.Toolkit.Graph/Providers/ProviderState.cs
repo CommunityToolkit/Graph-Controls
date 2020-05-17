@@ -22,6 +22,6 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <summary>
         /// The user is signed-in.
         /// </summary>
-        SignedIn
+        SignedIn,
     }
 }
