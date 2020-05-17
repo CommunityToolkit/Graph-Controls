@@ -14,23 +14,23 @@ namespace Microsoft.Toolkit.Graph.Controls
     /// </summary>
     public partial class PeoplePicker
     {
-        /// <summary>
-        /// Gets the set of <see cref="Person"/> objects chosen by the user.
-        /// </summary>
-        public ObservableCollection<Person> PickedPeople
-        {
-            get { return (ObservableCollection<Person>)GetValue(SelectedPeopleProperty); }
-            internal set { SetValue(SelectedPeopleProperty, value); }
-        }
+        /////// <summary>
+        /////// Gets the set of <see cref="Person"/> objects chosen by the user.
+        /////// </summary>
+        ////public ObservableCollection<Person> PickedPeople
+        ////{
+        ////    get { return (ObservableCollection<Person>)GetValue(SelectedPeopleProperty); }
+        ////    internal set { SetValue(SelectedPeopleProperty, value); }
+        ////}
 
-        /// <summary>
-        /// Identifies the <see cref="PickedPeople"/> dependency property.
-        /// </summary>
-        /// <returns>
-        /// The identifier for the <see cref="PickedPeople"/> dependency property.
-        /// </returns>
-        public static readonly DependencyProperty SelectedPeopleProperty =
-            DependencyProperty.Register(nameof(PickedPeople), typeof(ObservableCollection<Person>), typeof(PeoplePicker), new PropertyMetadata(new ObservableCollection<Person>()));
+        /////// <summary>
+        /////// Identifies the <see cref="PickedPeople"/> dependency property.
+        /////// </summary>
+        /////// <returns>
+        /////// The identifier for the <see cref="PickedPeople"/> dependency property.
+        /////// </returns>
+        ////public static readonly DependencyProperty SelectedPeopleProperty =
+        ////    DependencyProperty.Register(nameof(PickedPeople), typeof(ObservableCollection<Person>), typeof(PeoplePicker), new PropertyMetadata(new ObservableCollection<Person>()));
 
         /// <summary>
         /// Gets or sets collection of people suggested by the graph from the user's query.

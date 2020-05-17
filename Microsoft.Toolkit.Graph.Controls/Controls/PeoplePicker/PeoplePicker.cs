@@ -42,9 +42,7 @@ namespace Microsoft.Toolkit.Graph.Controls
             if (_tokenBox != null)
             {
                 _tokenBox.TextChanged -= TokenBox_TextChanged;
-                _tokenBox.TokenItemAdded -= TokenBox_TokenItemAdded;
-                _tokenBox.TokenItemCreating -= TokenBox_TokenItemCreating;
-                _tokenBox.TokenItemRemoved -= TokenBox_TokenItemRemoved;
+                _tokenBox.TokenItemAdding -= TokenBox_TokenItemTokenItemAdding;
             }
 
             _tokenBox = GetTemplateChild(PeoplePickerTokenizingTextBoxName) as TokenizingTextBox;
@@ -52,13 +50,11 @@ namespace Microsoft.Toolkit.Graph.Controls
             if (_tokenBox != null)
             {
                 _tokenBox.TextChanged += TokenBox_TextChanged;
-                _tokenBox.TokenItemAdded += TokenBox_TokenItemAdded;
-                _tokenBox.TokenItemCreating += TokenBox_TokenItemCreating;
-                _tokenBox.TokenItemRemoved += TokenBox_TokenItemRemoved;
+                _tokenBox.TokenItemAdding += TokenBox_TokenItemTokenItemAdding;
             }
         }
 
-        private async void TokenBox_TokenItemCreating(TokenizingTextBox sender, TokenItemCreatingEventArgs args)
+        private async void TokenBox_TokenItemTokenItemAdding(TokenizingTextBox sender, TokenItemAddingEventArgs args)
         {
             using (args.GetDeferral())
             {
@@ -77,19 +73,6 @@ namespace Microsoft.Toolkit.Graph.Controls
                     // TODO: We should raise a 'person not found' type event or automatically display some feedback?
                 }
             }
-        }
-
-        private void TokenBox_TokenItemAdded(TokenizingTextBox sender, TokenizingTextBoxItem args)
-        {
-            if (args?.Content is Person person)
-            {
-                PickedPeople.Add(person);
-            }
-        }
-
-        private void TokenBox_TokenItemRemoved(TokenizingTextBox sender, TokenItemRemovedEventArgs args)
-        {
-            PickedPeople.Remove(args.Item as Person);
         }
 
         private void TokenBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
@@ -119,7 +102,7 @@ namespace Microsoft.Toolkit.Graph.Controls
 
                             foreach (var contact in (await graph.FindPersonAsync(text)).CurrentPage)
                             {
-                                if (!PickedPeople.Any(person => person.Id == contact.Id))
+                                if (!_tokenBox.Items.Any(person => (person as Person)?.Id == contact.Id))
                                 {
                                     SuggestedPeople.Add(contact);
                                 }
