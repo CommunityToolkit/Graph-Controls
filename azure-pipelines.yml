@@ -26,9 +26,15 @@ steps:
 
 # Install Nuget Tool Installer
 - task: NuGetToolInstaller@0
-  displayName: Use NuGet 5.0.0
+  displayName: Use NuGet 5.5.1
   inputs:
-    versionSpec: 5.0.0
+    versionSpec: 5.5.1
+
+- task: NuGetAuthenticate@0
+  displayName: 'NuGet Authenticate'
+  inputs:
+    nuGetServiceConnections: WinUI.Dependencies,VS
+    forceReinstallCredentialProvider: true
 
 # Install NBGV Tool
 - task: DotNetCoreCLI@2
@@ -45,6 +51,18 @@ steps:
 # Install Windows SDK 18362 (minimum compatible sdk)
 - powershell: .\build\Install-WindowsSdkISO.ps1 18362
   displayName: Insider SDK
+
+- powershell: |
+   Write-Host "##vso[task.setvariable variable=PATH;]${env:LocalAppData}\Microsoft\dotnet;${env:PATH}";
+   
+   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
+   
+   dotnet new globaljson --sdk-version "$($env:NET5_SDK_VERSION)" 
+   
+   &([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://dot.net/v1/dotnet-install.ps1'))) -Version "$($env:NET5_SDK_VERSION)" -Architecture "x64" -AzureFeed "$($env:NET5_SDK_FEED)"
+   
+  failOnStderr: true
+  displayName: 'Install .NET 5 SDK'
 
 # Run cake build
 - powershell: .\build.ps1 -target=Package
