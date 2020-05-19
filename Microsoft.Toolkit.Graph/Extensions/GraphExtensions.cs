@@ -33,8 +33,8 @@ namespace Microsoft.Toolkit.Graph.Extensions
                         {
                             new RankedEmailAddress()
                             {
-                                Address = user.Mail ?? user.UserPrincipalName
-                            }
+                                Address = user.Mail ?? user.UserPrincipalName,
+                            },
                         },
                 GivenName = user.GivenName,
                 Surname = user.Surname,
@@ -43,14 +43,14 @@ namespace Microsoft.Toolkit.Graph.Extensions
                 CompanyName = user.CompanyName,
                 Department = user.Department,
                 Title = user.JobTitle,
-                OfficeLocation = user.OfficeLocation
+                OfficeLocation = user.OfficeLocation,
             };
         }
 
         /// <summary>
         /// Shortcut to perform a person query.
         /// </summary>
-        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/></param>
+        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
         /// <param name="query">User to search for.</param>
         /// <returns><see cref="IUserPeopleCollectionPage"/> collection of <see cref="User"/>.</returns>
         public static async Task<IUserPeopleCollectionPage> FindPersonAsync(this GraphServiceClient graph, string query)
@@ -75,8 +75,8 @@ namespace Microsoft.Toolkit.Graph.Extensions
         /// <summary>
         /// Helper to get the photo of a particular user.
         /// </summary>
-        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/></param>
-        /// <param name="userid">UserID</param>
+        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
+        /// <param name="userid">UserID.</param>
         /// <returns>Stream with user photo or null.</returns>
         public static async Task<Stream> GetUserPhoto(this GraphServiceClient graph, string userid)
         {
@@ -98,12 +98,12 @@ namespace Microsoft.Toolkit.Graph.Extensions
         }
 
         /// <summary>
-        /// Extension to provider Searching on OData Requests
+        /// Extension to provider Searching on OData Requests.
         /// </summary>
-        /// <typeparam name="T"><see cref="IBaseRequest"/> type</typeparam>
+        /// <typeparam name="T"><see cref="IBaseRequest"/> type.</typeparam>
         /// <param name="request">Request chain.</param>
-        /// <param name="query">Query to add for searching in QueryOptions</param>
-        /// <returns>Same type</returns>
+        /// <param name="query">Query to add for searching in QueryOptions.</param>
+        /// <returns>Same type.</returns>
         public static T Search<T>(this T request, string query)
             where T : IBaseRequest
         {

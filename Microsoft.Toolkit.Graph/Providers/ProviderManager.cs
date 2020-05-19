@@ -25,7 +25,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         public static readonly string ClientName = "wct/" + ThisAssembly.AssemblyVersion;
 
         /// <summary>
-        /// Gets the instance of the GlobalProvider
+        /// Gets the instance of the GlobalProvider.
         /// </summary>
         public static ProviderManager Instance => Singleton<ProviderManager>.Instance;
 
