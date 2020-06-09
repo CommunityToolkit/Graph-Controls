@@ -24,8 +24,8 @@
   </ItemGroup> 
 
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="6.1.0-build.97" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="6.1.0-build.97" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="6.1.0-rc1" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="6.1.0-rc1" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
   </ItemGroup>
  
@@ -34,8 +34,8 @@
   </ItemGroup>
  
   <ItemGroup>
-    <PackageReference Include="Microsoft.Graph.Beta" Version="0.8.0-preview" />
-    <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.2" />
+    <PackageReference Include="Microsoft.Graph.Beta" Version="0.18.0-preview" />
+    <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.4" />
   </ItemGroup>
  
   <ItemGroup>
