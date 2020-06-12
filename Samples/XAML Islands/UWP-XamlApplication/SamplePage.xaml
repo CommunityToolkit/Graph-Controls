@@ -15,14 +15,14 @@
         <StackPanel Margin="16,48">
             <wgt:PeoplePicker x:Name="PeopleChooser"/>
             <TextBlock Margin="0,8,0,0" FontWeight="Bold">Picked People:</TextBlock>
-            <!--<ItemsControl ItemsSource="{x:Bind PeopleChooser.PickedPeople}"
+            <ItemsControl ItemsSource="{x:Bind PeopleChooser.ItemsSource}"
                           Margin="8,0,0,0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="graph:Person">
                         <TextBlock Text="{x:Bind DisplayName}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>-->
+            </ItemsControl>
         </StackPanel>
     </Grid>
 </Page>
