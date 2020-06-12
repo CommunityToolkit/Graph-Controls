@@ -82,10 +82,24 @@ namespace Microsoft.Toolkit.Graph.Controls
 
                             if (!string.IsNullOrWhiteSpace(text))
                             {
+                                foreach (var user in (await graph.FindUserAsync(text)).CurrentPage)
+                                {
+                                    // Exclude people in suggested list that we already have picked
+                                    if (!Items.Any(person => (person as Person)?.Id == user.Id))
+                                    {
+                                        list.Add(user.ToPerson());
+                                    }
+                                }
+
+                                // Grab ids of current suggestions
+                                var ids = list.Cast<object>().Select(person => (person as Person).Id);
+
                                 foreach (var contact in (await graph.FindPersonAsync(text)).CurrentPage)
                                 {
                                     // Exclude people in suggested list that we already have picked
-                                    if (!Items.Any(person => (person as Person)?.Id == contact.Id))
+                                    // Or already suggested
+                                    if (!Items.Any(person => (person as Person)?.Id == contact.Id) &&
+                                        !ids.Any(id => id == contact.Id))
                                     {
                                         list.Add(contact);
                                     }

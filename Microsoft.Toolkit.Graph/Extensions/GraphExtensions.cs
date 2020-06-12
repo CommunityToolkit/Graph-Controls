@@ -52,7 +52,7 @@ namespace Microsoft.Toolkit.Graph.Extensions
         /// </summary>
         /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
         /// <param name="query">User to search for.</param>
-        /// <returns><see cref="IUserPeopleCollectionPage"/> collection of <see cref="User"/>.</returns>
+        /// <returns><see cref="IUserPeopleCollectionPage"/> collection of <see cref="Person"/>.</returns>
         public static async Task<IUserPeopleCollectionPage> FindPersonAsync(this GraphServiceClient graph, string query)
         {
             try
@@ -70,6 +70,30 @@ namespace Microsoft.Toolkit.Graph.Extensions
             }
 
             return new UserPeopleCollectionPage();
+        }
+
+        /// <summary>
+        /// Shortcut to perform a user query.
+        /// </summary>
+        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
+        /// <param name="query">User to search for.</param>
+        /// <returns><see cref="IGraphServiceUsersCollectionPage"/> collection of <see cref="User"/>.</returns>
+        public static async Task<IGraphServiceUsersCollectionPage> FindUserAsync(this GraphServiceClient graph, string query)
+        {
+            try
+            {
+                return await graph
+                    .Users
+                    .Request()
+                    .Filter($"startswith(displayName, '{query}') or startswith(givenName, '{query}') or startswith(surname, '{query}') or startswith(mail, '{query}') or startswith(userPrincipalName, '{query}')")
+                    .WithScopes(new string[] { "user.readbasic.all" })
+                    .GetAsync();
+            }
+            catch
+            {
+            }
+
+            return new GraphServiceUsersCollectionPage();
         }
 
         /// <summary>
