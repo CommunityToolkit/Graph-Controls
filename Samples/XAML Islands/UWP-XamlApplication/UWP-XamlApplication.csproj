@@ -151,10 +151,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.9</Version>
+      <Version>6.2.10</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Win32.UI.XamlApplication">
-      <Version>6.0.0-rc1</Version>
+      <Version>6.1.0-preview1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

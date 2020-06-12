@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Microsoft.Toolkit.Graph.Extensions
 {
     /// <summary>
-    /// Helpers for Graph related HTTP Headers
+    /// Helpers for Graph related HTTP Headers.
     /// </summary>
     internal static class HttpRequestMessageExtensions
     {

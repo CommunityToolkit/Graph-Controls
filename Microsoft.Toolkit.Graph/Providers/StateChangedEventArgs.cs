@@ -14,8 +14,8 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <summary>
         /// Initializes a new instance of the <see cref="StateChangedEventArgs"/> class.
         /// </summary>
-        /// <param name="oldState">Previous <see cref="ProviderState"/></param>
-        /// <param name="newState">Current <see cref="ProviderState"/></param>
+        /// <param name="oldState">Previous <see cref="ProviderState"/>.</param>
+        /// <param name="newState">Current <see cref="ProviderState"/>.</param>
         public StateChangedEventArgs(ProviderState oldState, ProviderState newState)
         {
             OldState = oldState;

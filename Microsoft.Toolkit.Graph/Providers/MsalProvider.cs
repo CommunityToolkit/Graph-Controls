@@ -57,7 +57,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         public event EventHandler<StateChangedEventArgs> StateChanged;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MsalProvider"/> class. <see cref="CreateAsync"/>
+        /// Initializes a new instance of the <see cref="MsalProvider"/> class. <see cref="CreateAsync"/>.
         /// </summary>
         private MsalProvider()
         {
@@ -76,7 +76,7 @@ namespace Microsoft.Toolkit.Graph.Providers
             var msal = new MsalProvider
             {
                 Client = client,
-                Provider = provider
+                Provider = provider,
             };
 
             msal.Graph = new GraphServiceClient(msal);

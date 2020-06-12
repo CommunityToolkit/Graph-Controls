@@ -3,15 +3,15 @@
 // See the LICENSE file in the project root for more information.
 
 #if DOTNET
-    using Microsoft.Xaml.Behaviors;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.ComponentModel;
-    using System.Linq;
+using Microsoft.Xaml.Behaviors;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 #else
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 #endif
 
 #if DOTNET
@@ -39,7 +39,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// Helper to convert a string of scopes to a list of strings.
         /// </summary>
         /// <param name="rawString">Comma separated scope list.</param>
-        /// <returns>New List of strings, i.e. ScopeSet</returns>
+        /// <returns>New List of strings, i.e. ScopeSet.</returns>
         public static ScopeSet ConvertToScopeArray(string rawString)
         {
             if (rawString != null)

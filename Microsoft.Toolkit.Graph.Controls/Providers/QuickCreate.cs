@@ -30,7 +30,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// ProviderManager.Instance.GlobalProvider = await QuickCreate.CreateMsalProviderAsync("MyClientId");
         /// </code>
         /// </example>
-        /// <param name="clientid">Registered ClientId</param>
+        /// <param name="clientid">Registered ClientId.</param>
         /// <param name="redirectUri">RedirectUri for auth response.</param>
         /// <param name="scopes">List of Scopes to initially request.</param>
         /// <returns>New <see cref="MsalProvider"/> reference.</returns>

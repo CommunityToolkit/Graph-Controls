@@ -17,6 +17,6 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <summary>
         /// The <see cref="IProvider.State"/> changed.
         /// </summary>
-        ProviderStateChanged
+        ProviderStateChanged,
     }
 }

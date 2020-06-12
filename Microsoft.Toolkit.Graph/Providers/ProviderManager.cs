@@ -3,9 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using Microsoft.Graph;
-using Microsoft.Identity.Client;
-using Microsoft.Toolkit.Helpers;
 
 namespace Microsoft.Toolkit.Graph.Providers
 {
@@ -25,9 +22,9 @@ namespace Microsoft.Toolkit.Graph.Providers
         public static readonly string ClientName = "wct/" + ThisAssembly.AssemblyVersion;
 
         /// <summary>
-        /// Gets the instance of the GlobalProvider
+        /// Gets the instance of the GlobalProvider.
         /// </summary>
-        public static ProviderManager Instance => Singleton<ProviderManager>.Instance;
+        public static ProviderManager Instance { get; } = new ProviderManager();
 
         /// <summary>
         /// Event called when the <see cref="IProvider"/> changes.
@@ -62,6 +59,11 @@ namespace Microsoft.Toolkit.Graph.Providers
 
                 ProviderUpdated?.Invoke(this, new ProviderUpdatedEventArgs(ProviderManagerChangedState.ProviderChanged));
             }
+        }
+
+        private ProviderManager()
+        {
+            // Use Instance
         }
 
         private void ProviderStateChanged(object sender, StateChangedEventArgs e)
