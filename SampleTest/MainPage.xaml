@@ -38,6 +38,8 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+
+            <wgt:PersonView PersonQuery="Adele Vance" ShowName="True" PointerPressed="PersonView_PointerPressed"/>
         </StackPanel>
     </Grid>
 </Page>
