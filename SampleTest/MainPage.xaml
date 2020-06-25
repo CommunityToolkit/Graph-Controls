@@ -58,8 +58,9 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="graph:DriveItem">
                                             <StackPanel>
-                                                <Image DataContext="{x:Bind RemoteItem, Converter={StaticResource OneDriveThumbnailConverter}}"
-                                                       Source="{Binding Result.Medium.Url}" Width="176" Height="176"/>
+                                                <controls:ImageEx DataContext="{x:Bind RemoteItem, Converter={StaticResource OneDriveThumbnailConverter}}"
+                                                                  PlaceholderSource="/Assets/FileIcon.png"
+                                                                  Source="{Binding Result.Medium.Url}" Width="176" Height="176"/>
                                                 <TextBlock Text="{Binding Name}"/>
                                                 <TextBlock Text="{Binding Size, Converter={StaticResource FileSizeConverter}}"/>
                                             </StackPanel>
