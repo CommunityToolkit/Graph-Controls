@@ -45,7 +45,7 @@ namespace Microsoft.Toolkit.Graph.Controls
         {
             if (d is GraphPresenter presenter)
             {
-                // TODO: Should this be a Graph SDK bug? The interfaces don't match the similar class hierarchy?
+                // Use BaseRequestBuilder as some interfaces from the Graph SDK don't implement IBaseRequestBuilder properly, see https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/722
                 if (e.NewValue is BaseRequestBuilder builder)
                 {
                     var request = new BaseRequest(builder.RequestUrl, builder.Client, null);
