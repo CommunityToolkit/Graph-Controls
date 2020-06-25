@@ -12,7 +12,8 @@
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:converters="using:Microsoft.Toolkit.Graph.Controls.Converters"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    xmlns:controlsKeepThis="using:Microsoft.Toolkit.Uwp.UI.Controls"><!-- Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/1286 -->
     <Page.Resources>
         <converters:OneDriveThumbnailConverter x:Key="OneDriveThumbnailConverter"/>
         <converters:FileSizeConverter x:Key="FileSizeConverter"/>
@@ -26,7 +27,8 @@
         Click on "Add a Redirect URI" and check the https://login.microsoftonline.com/common/oauth2/nativeclient checkbox on that page. Then click "Save".
     -->
     <Interactivity:Interaction.Behaviors>
-        <providers:InteractiveProviderBehavior ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read,Calendars.Read"/>
+        <!--<providers:InteractiveProviderBehavior ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read,Calendars.Read"/>-->
+        <providers:MockProviderBehavior/>
     </Interactivity:Interaction.Behaviors>
 
     <Grid>
@@ -35,7 +37,7 @@
             <StackPanel>
                 <wgt:PeoplePicker x:Name="PeopleChooser"/>
                 <TextBlock Margin="0,8,0,0" FontWeight="Bold">Picked People:</TextBlock>
-                <ItemsControl ItemsSource="{x:Bind PeopleChooser.PickedPeople}"
+                <ItemsControl ItemsSource="{x:Bind PeopleChooser.ItemsSource}"
                               Margin="8,0,0,0">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="graph:Person">

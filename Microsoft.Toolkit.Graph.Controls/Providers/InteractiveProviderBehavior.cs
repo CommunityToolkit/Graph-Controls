@@ -2,14 +2,25 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+#if DOTNET
+using System;
+using System.Linq;
+using System.Windows;
+using Microsoft.Toolkit.Graph.Providers;
+#else
 using System.Linq;
 using Windows.UI.Core;
+#endif
 
+#if DOTNET
+namespace Microsoft.Toolkit.Wpf.Graph.Providers
+#else
 namespace Microsoft.Toolkit.Graph.Providers
+#endif
 {
     /// <summary>
     /// Put in a xaml page with ClientId
-    /// https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Acquiring-tokens-interactively
+    /// https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Acquiring-tokens-interactively.
     /// </summary>
     /// <example>
     /// <code>
@@ -30,11 +41,19 @@ namespace Microsoft.Toolkit.Graph.Providers
             {
                 if (!initialized)
                 {
+#if DOTNET
+                    _ = Dispatcher.BeginInvoke(new Action(async () =>
+                    {
+                        ProviderManager.Instance.GlobalProvider =
+                            await QuickCreate.CreateMsalProviderAsync(ClientId, RedirectUri, Scopes.ToArray());
+                    }), System.Windows.Threading.DispatcherPriority.Normal);
+#else
                     _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                     {
                         ProviderManager.Instance.GlobalProvider =
                             await QuickCreate.CreateMsalProviderAsync(ClientId, RedirectUri, Scopes.ToArray());
                     });
+#endif
                 }
             }
 

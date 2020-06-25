@@ -1,0 +1,30 @@
+﻿<Window x:Class="WPF_Core_GraphApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xi="clr-namespace:Microsoft.Toolkit.Wpf.UI.XamlHost;assembly=Microsoft.Toolkit.Wpf.UI.XamlHost"
+        xmlns:local="clr-namespace:WPF_Core_GraphApp"
+        mc:Ignorable="d"
+        xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:providers="clr-namespace:Microsoft.Toolkit.Wpf.Graph.Providers;assembly=Microsoft.Toolkit.Wpf.Graph.Providers" 
+        Title="MainWindow" Height="450" Width="800">
+    <!--
+        Initialize Graph Provider On Page Load 
+    
+        Register Client Id: https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app
+        
+        After finishing the initial registration page, you will also need to add an additional redirect URI. 
+        Click on "Add a Redirect URI" for Public client/native for http://localhost on that page. Then click "Save".
+    
+        See MSAL docs about running on .NET Core: https://aka.ms/msal-net-os-browser
+    -->
+    <behaviors:Interaction.Behaviors>
+        <!--<providers:InteractiveProviderBehavior ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read"/>-->
+        <providers:MockProviderBehavior SignedIn="False"/>
+    </behaviors:Interaction.Behaviors>
+
+    <Grid>
+        <xi:WindowsXamlHost InitialTypeName="UWP_XamlApplication.SamplePage"/>
+    </Grid>
+</Window>

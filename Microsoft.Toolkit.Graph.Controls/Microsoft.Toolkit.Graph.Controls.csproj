@@ -15,6 +15,8 @@
     <PackageTags>UWP Toolkit Windows Controls MSAL Microsoft Graph AadLogin ProfileCard Person PeoplePicker Login</PackageTags>
     <SignAssembly>false</SignAssembly>
     <GenerateLibraryLayout>true</GenerateLibraryLayout>
+    <Configurations>Debug;Release;CI</Configurations>
+    <Platforms>AnyCPU;ARM;ARM64;x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,8 +24,8 @@
   </ItemGroup> 
 
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="6.0.0-build.26" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="6.0.0-build.26" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="6.1.0" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="6.1.0" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
   </ItemGroup>
  
@@ -32,8 +34,8 @@
   </ItemGroup>
  
   <ItemGroup>
-    <PackageReference Include="Microsoft.Graph.Beta" Version="0.7.0-preview" />
-    <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.1" />
+    <PackageReference Include="Microsoft.Graph.Beta" Version="0.18.0-preview" />
+    <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.4" />
   </ItemGroup>
  
   <ItemGroup>

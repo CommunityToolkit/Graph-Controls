@@ -34,13 +34,13 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <summary>
         /// Login the user.
         /// </summary>
-        /// <returns><see cref="Task"/></returns>
+        /// <returns><see cref="Task"/>.</returns>
         Task LoginAsync();
 
         /// <summary>
         /// Logout the user.
         /// </summary>
-        /// <returns><see cref="Task"/></returns>
+        /// <returns><see cref="Task"/>.</returns>
         Task LogoutAsync();
     }
 }

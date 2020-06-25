@@ -3,6 +3,8 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Collections;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Graph.Extensions;
@@ -17,13 +19,8 @@ namespace Microsoft.Toolkit.Graph.Controls
     /// <summary>
     /// Control which allows user to search for a person or contact within Microsoft Graph. Built on top of <see cref="TokenizingTextBox"/>.
     /// </summary>
-    [TemplatePart(Name = PeoplePickerTokenizingTextBoxName, Type = typeof(TokenizingTextBox))]
-    public partial class PeoplePicker : Control
+    public partial class PeoplePicker : TokenizingTextBox
     {
-        private const string PeoplePickerTokenizingTextBoxName = "PART_TokenizingTextBox";
-
-        private TokenizingTextBox _tokenBox;
-
         private DispatcherTimer _typeTimer = new DispatcherTimer();
 
         /// <summary>
@@ -32,46 +29,35 @@ namespace Microsoft.Toolkit.Graph.Controls
         public PeoplePicker()
         {
             this.DefaultStyleKey = typeof(PeoplePicker);
+
+            SuggestedItemsSource = new ObservableCollection<Person>();
+
+            TextChanged += TokenBox_TextChanged;
+            TokenItemAdding += TokenBox_TokenItemTokenItemAdding;
         }
 
-        /// <inheritdoc/>
-        protected override void OnApplyTemplate()
+        private async void TokenBox_TokenItemTokenItemAdding(TokenizingTextBox sender, TokenItemAddingEventArgs args)
         {
-            base.OnApplyTemplate();
-
-            if (_tokenBox != null)
+            using (args.GetDeferral())
             {
-                _tokenBox.QueryTextChanged -= TokenBox_QueryTextChanged;
-                _tokenBox.TokenItemAdded -= TokenBox_TokenItemAdded;
-                _tokenBox.TokenItemRemoved -= TokenBox_TokenItemRemoved;
-            }
+                // Try and convert typed text to people
+                var graph = ProviderManager.Instance.GlobalProvider.Graph;
+                if (graph != null)
+                {
+                    args.Item = (await graph.FindPersonAsync(args.TokenText)).CurrentPage.FirstOrDefault();
+                }
 
-            _tokenBox = GetTemplateChild(PeoplePickerTokenizingTextBoxName) as TokenizingTextBox;
+                // If we didn't find anyone, then don't add anyone.
+                if (args.Item == null)
+                {
+                    args.Cancel = true;
 
-            if (_tokenBox != null)
-            {
-                _tokenBox.QueryTextChanged += TokenBox_QueryTextChanged;
-                _tokenBox.TokenItemAdded += TokenBox_TokenItemAdded;
-                _tokenBox.TokenItemRemoved += TokenBox_TokenItemRemoved;
-            }
-        }
-
-        private void TokenBox_TokenItemAdded(TokenizingTextBox sender, TokenizingTextBoxItem args)
-        {
-            if (args?.Content is Person person)
-            {
-                PickedPeople.Add(person);
+                    // TODO: We should raise a 'person not found' type event or automatically display some feedback?
+                }
             }
         }
 
-        private void TokenBox_TokenItemRemoved(TokenizingTextBox sender, TokenItemRemovedEventArgs args)
-        {
-            PickedPeople.Remove(args.Item as Person);
-        }
-
-        private string _previousQuery;
-
-        private void TokenBox_QueryTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        private void TokenBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (!args.CheckCurrent())
             {
@@ -81,35 +67,49 @@ namespace Microsoft.Toolkit.Graph.Controls
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
                 var text = sender.Text;
-                _typeTimer.Debounce(
-                    async () =>
-                {
-                    var graph = ProviderManager.Instance.GlobalProvider.Graph;
-                    if (graph != null)
-                    {
-                        // If empty, clear out
-                        if (string.IsNullOrWhiteSpace(text))
-                        {
-                            SuggestedPeople.Clear();
-                        }
-                        else
-                        {
-                            SuggestedPeople.Clear();
+                var list = SuggestedItemsSource as IList;
 
-                            foreach (var contact in (await graph.FindPersonAsync(text)).CurrentPage)
+                if (list != null)
+                {
+                    _typeTimer.Debounce(
+                    async () =>
+                    {
+                        var graph = ProviderManager.Instance.GlobalProvider.Graph;
+                        if (graph != null)
+                        {
+                            // If empty, will clear out
+                            list.Clear();
+
+                            if (!string.IsNullOrWhiteSpace(text))
                             {
-                                if (!PickedPeople.Any(person => person.Id == contact.Id))
+                                foreach (var user in (await graph.FindUserAsync(text)).CurrentPage)
                                 {
-                                    SuggestedPeople.Add(contact);
+                                    // Exclude people in suggested list that we already have picked
+                                    if (!Items.Any(person => (person as Person)?.Id == user.Id))
+                                    {
+                                        list.Add(user.ToPerson());
+                                    }
+                                }
+
+                                // Grab ids of current suggestions
+                                var ids = list.Cast<object>().Select(person => (person as Person).Id);
+
+                                foreach (var contact in (await graph.FindPersonAsync(text)).CurrentPage)
+                                {
+                                    // Exclude people in suggested list that we already have picked
+                                    // Or already suggested
+                                    if (!Items.Any(person => (person as Person)?.Id == contact.Id) &&
+                                        !ids.Any(id => id == contact.Id))
+                                    {
+                                        list.Add(contact);
+                                    }
                                 }
                             }
                         }
 
-                        _previousQuery = text;
-                    }
-
-                    // TODO: If we don't have Graph connection and just list of Person should we auto-filter here?
-                }, TimeSpan.FromSeconds(0.3));
+                        // TODO: If we don't have Graph connection and just list of Person should we auto-filter here?
+                    }, TimeSpan.FromSeconds(0.3));
+                }
             }
         }
     }

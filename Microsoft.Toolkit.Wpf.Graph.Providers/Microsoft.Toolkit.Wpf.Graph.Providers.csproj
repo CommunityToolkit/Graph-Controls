@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Platforms>AnyCPU;x86;x64</Platforms>
+    <Configurations>Debug;Release;CI</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DefineConstants>DOTNET</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Microsoft.Toolkit.Graph.Controls\Providers\CommonProviderBehaviorBase.cs" Link="Providers\CommonProviderBehaviorBase.cs" />
+    <Compile Include="..\Microsoft.Toolkit.Graph.Controls\Providers\CommonProviderBehaviorBase.Properties.cs" Link="Providers\CommonProviderBehaviorBase.Properties.cs" />
+    <Compile Include="..\Microsoft.Toolkit.Graph.Controls\Providers\InteractiveProviderBehavior.cs" Link="Providers\InteractiveProviderBehavior.cs" />
+    <Compile Include="..\Microsoft.Toolkit.Graph.Controls\Providers\MockProviderBehavior.cs" Link="Providers\MockProviderBehavior.cs" />
+    <Compile Include="..\Microsoft.Toolkit.Graph.Controls\Providers\QuickCreate.cs" Link="Providers\QuickCreate.cs" />
+    <Compile Include="..\Microsoft.Toolkit.Graph.Controls\Providers\ScopeSet.cs" Link="Providers\ScopeSet.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
+  </ItemGroup>
+</Project>

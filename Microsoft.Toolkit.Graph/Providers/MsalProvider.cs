@@ -6,9 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
+using Microsoft.Toolkit.Graph.Extensions;
 
 namespace Microsoft.Toolkit.Graph.Providers
 {
@@ -39,7 +41,7 @@ namespace Microsoft.Toolkit.Graph.Providers
                 return _state;
             }
 
-            set
+            private set
             {
                 var current = _state;
                 _state = value;
@@ -55,7 +57,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         public event EventHandler<StateChangedEventArgs> StateChanged;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MsalProvider"/> class. <see cref="CreateAsync"/>
+        /// Initializes a new instance of the <see cref="MsalProvider"/> class. <see cref="CreateAsync"/>.
         /// </summary>
         private MsalProvider()
         {
@@ -75,8 +77,9 @@ namespace Microsoft.Toolkit.Graph.Providers
             {
                 Client = client,
                 Provider = provider,
-                Graph = new GraphServiceClient(provider)
             };
+
+            msal.Graph = new GraphServiceClient(msal);
 
             await msal.TrySilentSignInAsync();
 
@@ -86,6 +89,8 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <inheritdoc/>
         public async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
+            request.AddSdkVersion();
+
             try
             {
                 await Provider.AuthenticateRequestAsync(request);

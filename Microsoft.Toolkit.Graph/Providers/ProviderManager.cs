@@ -23,12 +23,12 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <summary>
         /// Gets the name of the toolkit client to identify self in Graph calls.
         /// </summary>
-        public static readonly string ClientName = "Windows Community Toolkit" + ThisAssembly.AssemblyVersion;
+        public static readonly string ClientName = "wct/" + ThisAssembly.AssemblyVersion;
 
         /// <summary>
-        /// Gets the instance of the GlobalProvider
+        /// Gets the instance of the GlobalProvider.
         /// </summary>
-        public static ProviderManager Instance => Singleton<ProviderManager>.Instance;
+        public static ProviderManager Instance { get; } = new ProviderManager();
 
         /// <summary>
         /// Event called when the <see cref="IProvider"/> changes.
@@ -68,6 +68,11 @@ namespace Microsoft.Toolkit.Graph.Providers
 
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GlobalProvider)));
             }
+        }
+
+        private ProviderManager()
+        {
+            // Use Instance
         }
 
         private void ProviderStateChanged(object sender, StateChangedEventArgs e)

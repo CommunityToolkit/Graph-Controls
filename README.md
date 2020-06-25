@@ -8,31 +8,25 @@ If you need similar controls for the Web, please use the [Microsoft Graph Toolki
 
 ## <a name="supported"></a> Supported SDKs
 
-* Windows 10 18362 (🚧 TODO: Check Lower SDKs)
+* UWP Windows 10 18362 (🚧 TODO: Check Lower SDKs for UWP)
+* XAML Islands on .NET Core 3 w/ Windows 10 18362 (See Sample)
 * `LoginButton` & `PersonView` on Android via [Uno.Graph-Controls](https://aka.ms/wgt-uno) use `Uno.Microsoft.Graph.Controls` package. (🚧 `PeoplePicker` soon!)
 * 🚧 Coming Soon 🚧
-  * XAML Islands Sample
   * iOS (Waiting on [MSAL#1378](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/pull/1378) merge should be 4.4.0?)
 
 ## <a name="documentation"></a> Getting Started
 
 Before using controls that access [Microsoft Graph](https://graph.microsoft.com), you will need to [register your application](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app) to get a **ClientID**.
 
-> After finishing the initial registration page, you will also need to add an additional redirect URI. Clcik on "Add a Redirect URI" and check the `https://login.microsoftonline.com/common/oauth2/nativeclient` checkbox on that page. Then click "Save".
+> After finishing the initial registration page, you will also need to add an additional redirect URI. Click on "Add a Redirect URI", then "Add a platform", and then on "Mobile and desktop applications". Check the `https://login.microsoftonline.com/common/oauth2/nativeclient` checkbox on that page. Then click "Configure".
 
 ### UWP Quick Start
 
-To include the latest preview MyGet package in your Visual Studio environment, open your _Package Sources_ settings from the title-bar search, click the green '+' and change the source following :
-
-`https://dotnet.myget.org/F/uwpcommunitytoolkit/api/v3/index.json`
-
-Give it a name, and then click the `Update` button. Then use the following command on the _Package Manager Console_:
+Use the following command on the _Package Manager Console_ to install the NuGet to your project:
 
 ```powershell
 Install-Package Microsoft.Toolkit.Graph.Controls -IncludePrerelease
 ```
-
-<!-- TODO: Update instructions later to single PMC line when https://github.com/NuGet/Home/issues/7189 is fixed. -->
 
 Then open your `MainPage.xaml` file and add the following behavior:
 
@@ -47,7 +41,11 @@ Then open your `MainPage.xaml` file and add the following behavior:
 </Page>
 ```
 
+*You can also use the `<providers:MockProviderBehavior/>` instead to provide some test data, though we're currently investigating an issue with the search results returned for PeoplePicker, see [Issue #24](https://github.com/windows-toolkit/Graph-Controls/issues/24).*
+
 You can use the `Scopes` property to preemptively request permissions from the user of your app for data your app needs to access from Microsoft Graph.
+
+You only need the main/first page of your app to load use the provider behavior. This will initialize the graph provider for your entire application.
 
 **That's all you need to get started!**
 
