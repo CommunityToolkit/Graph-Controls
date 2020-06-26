@@ -18,7 +18,7 @@ namespace Microsoft.Toolkit.Graph.Providers
     //// TODO: Need to set up XAML Islands sample to test in the new repo and make sure this works from this context.
 
     /// <summary>
-    /// Helper class for XAML Islands to easily initialize provider from just ClientId from within WPF context.
+    /// Helper class to easily initialize provider from just ClientId.
     /// </summary>
     public static class QuickCreate
     {

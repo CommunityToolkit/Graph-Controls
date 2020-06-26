@@ -10,7 +10,8 @@
     xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:providers="using:Microsoft.Toolkit.Graph.Providers"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"><!-- Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/1286 -->
     <!-- 
         Initialize Graph Provider On Page Load 
     
@@ -29,14 +30,14 @@
         <StackPanel Margin="16,48">
             <wgt:PeoplePicker x:Name="PeopleChooser"/>
             <TextBlock Margin="0,8,0,0" FontWeight="Bold">Picked People:</TextBlock>
-            <!--<ItemsControl ItemsSource="{x:Bind PeopleChooser.PickedPeople}"
+            <ItemsControl ItemsSource="{x:Bind PeopleChooser.ItemsSource}"
                           Margin="8,0,0,0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="graph:Person">
                         <TextBlock Text="{x:Bind DisplayName}"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
-            </ItemsControl>-->
+            </ItemsControl>
         </StackPanel>
     </Grid>
 </Page>

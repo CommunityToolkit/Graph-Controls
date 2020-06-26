@@ -185,6 +185,12 @@ namespace Microsoft.Toolkit.Graph.Controls
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task LogoutAsync()
         {
+            // Close Menu
+            if (FlyoutBase.GetAttachedFlyout(_loginButton) is FlyoutBase flyout)
+            {
+                flyout.Hide();
+            }
+
             if (IsLoading)
             {
                 return;
@@ -216,12 +222,6 @@ namespace Microsoft.Toolkit.Graph.Controls
                 IsLoading = false;
 
                 LogoutCompleted?.Invoke(this, new EventArgs());
-            }
-
-            // Close Menu
-            if (FlyoutBase.GetAttachedFlyout(_loginButton) is FlyoutBase flyout)
-            {
-                flyout.Hide();
             }
         }
     }
