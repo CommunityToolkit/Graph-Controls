@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp5.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Title>Windows Community Toolkit Graph Controls</Title>
     <PackageId>Microsoft.Toolkit.Graph.Controls</PackageId>
     <Description>
@@ -19,7 +19,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="0.1.0-prerelease.200512.7" />
+    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="0.1.0-prerelease.200629.3" />
     <!--<PackageReference Include="Microsoft.VCRTForwarders.140" Version="1.0.6" />-->
   </ItemGroup>
   <ItemGroup>
@@ -35,17 +35,17 @@
     </Resource>
   </ItemGroup>
   <ItemGroup Condition="Exists('$(OutputPath)\$(AssemblyName).pri')">
-    <None Include="$(SolutionDir)\build\CopyPri.targets" Pack="True" PackagePath="buildTransitive\netcoreapp5.0\$(AssemblyName).targets" />
+    <None Include="$(SolutionDir)\build\CopyPri.targets" Pack="True" PackagePath="buildTransitive\net5.0\$(AssemblyName).targets" />
     <!-- Small fix for wrong TFM in final nuget -->
-    <None Include="$(OutputPath)\$(AssemblyName).pri;$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\$(AssemblyName).xml;$(OutputPath)\$(AssemblyName).pdb" Pack="True" PackagePath="lib\netcoreapp5.0\"/>
+    <None Include="$(OutputPath)\$(AssemblyName).pri;$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\$(AssemblyName).xml;$(OutputPath)\$(AssemblyName).pdb" Pack="True" PackagePath="lib\net5.0\"/>
   </ItemGroup>
 
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-preview1" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-preview1" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-build.47.g38f43b5ce8" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-build.47.g38f43b5ce8" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
     <PackageReference Include="Microsoft.WinUI">
-      <Version>3.0.0-preview1.200515.3</Version>
+      <Version>3.0.0-preview1.200629.2-CI</Version>
     </PackageReference>
   </ItemGroup>
  
