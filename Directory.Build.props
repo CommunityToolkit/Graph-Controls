@@ -61,7 +61,6 @@
       </ItemGroup>
       <PropertyGroup Condition="'$(Configuration)' == 'Release' or '$(Configuration)' == 'CI'">
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <DisableEmbeddedXbf>false</DisableEmbeddedXbf>
       </PropertyGroup>
     </When>
   </Choose>

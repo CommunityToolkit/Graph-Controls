@@ -13,8 +13,6 @@
       - PeoplePicker: The PeoplePicker Control is a simple control that allows for selection of one or more users.
     </Description>
     <PackageTags>UWP Toolkit Windows Controls MSAL Microsoft Graph AadLogin ProfileCard Person PeoplePicker Login</PackageTags>
-    <!-- Small fix for wrong TFM in final nuget -->
-    <IncludeBuildOutput>false</IncludeBuildOutput>
     <AssetTargetFallback>uap10.0.$(DefaultTargetPlatformMinVersion)</AssetTargetFallback>
   </PropertyGroup>
   
@@ -22,32 +20,22 @@
     <PackageReference Include="Microsoft.Windows.CsWinRT" Version="0.1.0-prerelease.200629.3" />
     <!--<PackageReference Include="Microsoft.VCRTForwarders.140" Version="1.0.6" />-->
   </ItemGroup>
-  <ItemGroup>
-    <None Include="$(OutputPath)\$(AssemblyName)\**\*.xaml;$(OutputPath)\$(AssemblyName)\**\*.xbf">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)\$(AssemblyName)</PackagePath>
-    </None>
-  </ItemGroup>
-  <ItemGroup Condition="Exists('$(OutputPath)\$(AssemblyName)\$(AssemblyName).xr.xml')">
-    <Resource Include="$(OutputPath)\$(AssemblyName)\$(AssemblyName).xr.xml">
-      <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)\$(AssemblyName)\$(AssemblyName).xr.xml</PackagePath>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup Condition="Exists('$(OutputPath)\$(AssemblyName).pri')">
-    <None Include="$(SolutionDir)\build\CopyPri.targets" Pack="True" PackagePath="buildTransitive\net5.0\$(AssemblyName).targets" />
-    <!-- Small fix for wrong TFM in final nuget -->
-    <None Include="$(OutputPath)\$(AssemblyName).pri;$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\$(AssemblyName).xml;$(OutputPath)\$(AssemblyName).pdb" Pack="True" PackagePath="lib\net5.0\"/>
-  </ItemGroup>
-
+  
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-build.48.gd3d21cc9ac" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-build.48.gd3d21cc9ac" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-build.49.g8695d221eb" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-build.49.g8695d221eb" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
     <PackageReference Include="Microsoft.WinUI">
-      <Version>3.0.0-preview1.200629.2-CI</Version>
+      <Version>3.0.0-preview2.200701.0-CI</Version>
     </PackageReference>
   </ItemGroup>
+
+  <!-- Temporary fix to a bug in WinUI3 -->
+  <Target Name="RemoveXrXmlFilesFromOutputItems2" AfterTargets="AddPriPayloadFilesToCopyToOutputDirectoryItems" Condition="'$(UsingMicrosoftNETSdk)'=='true'">
+    <ItemGroup>
+      <_AllChildProjectItemsWithTargetPath Remove="@(_AllChildProjectItemsWithTargetPath)" Condition="$([System.String]::new('%(Identity)').EndsWith('.xr.xml'))"/>
+    </ItemGroup>
+  </Target>
  
   <ItemGroup>
     <None Include="VisualStudioToolsManifest.xml" Pack="true" PackagePath="tools" />

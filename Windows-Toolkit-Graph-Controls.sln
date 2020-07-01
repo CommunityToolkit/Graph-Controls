@@ -14,7 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build Config", "Build Confi
 		azure-pipelines.yml = azure-pipelines.yml
 		build\build.cake = build\build.cake
 		build\build.ps1 = build\build.ps1
-		build\CopyPri.targets = build\CopyPri.targets
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
 		build\header.txt = build\header.txt
