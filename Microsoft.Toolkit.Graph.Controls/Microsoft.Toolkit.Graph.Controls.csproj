@@ -18,25 +18,17 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.CsWinRT" Version="0.1.0-prerelease.200629.3" />
-    <!--<PackageReference Include="Microsoft.VCRTForwarders.140" Version="1.0.6" />-->
   </ItemGroup>
   
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-build.49.g8695d221eb" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-build.49.g8695d221eb" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-build.52.g07f4dd1bd0" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-build.52.g07f4dd1bd0" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
     <PackageReference Include="Microsoft.WinUI">
-      <Version>3.0.0-preview2.200701.0-CI</Version>
+      <Version>3.0.0-preview2.200707.3-CI</Version>
     </PackageReference>
   </ItemGroup>
 
-  <!-- Temporary fix to a bug in WinUI3 -->
-  <Target Name="RemoveXrXmlFilesFromOutputItems2" AfterTargets="AddPriPayloadFilesToCopyToOutputDirectoryItems" Condition="'$(UsingMicrosoftNETSdk)'=='true'">
-    <ItemGroup>
-      <_AllChildProjectItemsWithTargetPath Remove="@(_AllChildProjectItemsWithTargetPath)" Condition="$([System.String]::new('%(Identity)').EndsWith('.xr.xml'))"/>
-    </ItemGroup>
-  </Target>
- 
   <ItemGroup>
     <None Include="VisualStudioToolsManifest.xml" Pack="true" PackagePath="tools" />
   </ItemGroup>

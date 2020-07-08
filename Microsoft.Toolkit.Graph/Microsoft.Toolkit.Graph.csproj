@@ -14,6 +14,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Graph.Beta" Version="0.18.0-preview" />
     <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.4" />
-    <PackageReference Include="Microsoft.Toolkit" Version="8.0.0-build.49.g8695d221eb" />
+    <PackageReference Include="Microsoft.Toolkit" Version="8.0.0-build.52.g07f4dd1bd0" />
   </ItemGroup>
 </Project>
