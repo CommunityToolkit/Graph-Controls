@@ -21,11 +21,11 @@
   </ItemGroup>
   
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-build.52.g07f4dd1bd0" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-build.52.g07f4dd1bd0" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-preview2" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-preview2" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
     <PackageReference Include="Microsoft.WinUI">
-      <Version>3.0.0-preview2.200707.3-CI</Version>
+      <Version>3.0.0-preview2.200713.0</Version>
     </PackageReference>
   </ItemGroup>
 

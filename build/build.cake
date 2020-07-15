@@ -180,8 +180,7 @@ Task("Build")
         MaxCpuCount = 0
     }
     .SetConfiguration("CI")
-    .WithTarget("Build")
-    .WithProperty("GenerateLibraryLayout", "true");
+    .WithTarget("Build");
 
     UpdateToolsPath(buildSettings);
 
@@ -228,7 +227,6 @@ Task("Package")
     }
     .SetConfiguration("CI")
     .WithTarget("Pack")
-    .WithProperty("GenerateLibraryLayout", "true")
 	.WithProperty("PackageOutputPath", nupkgDir);
 
     UpdateToolsPath(buildSettings);

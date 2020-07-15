@@ -23,6 +23,10 @@
     <NoWarn>CS8002;CS8305</NoWarn> <!-- Temporary since WinUI3 is not stable yet -->
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
   <PropertyGroup>
     <SignAssembly Condition="'$(SignAssembly)' == ''" >true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)toolkit.snk</AssemblyOriginatorKeyFile>
