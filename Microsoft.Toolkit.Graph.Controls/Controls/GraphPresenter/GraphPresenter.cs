@@ -2,17 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using Microsoft.Graph;
-using Microsoft.Toolkit.Graph.Providers;
-using Microsoft.Toolkit.Uwp.Helpers;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.Graph;
+using Microsoft.Toolkit.Uwp.Helpers;
+using Newtonsoft.Json.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -58,6 +54,11 @@ namespace Microsoft.Toolkit.Graph.Controls
         public List<QueryOption> QueryOptions { get; set; } = new List<QueryOption>();
 
         /// <summary>
+        /// Gets or sets a string to indicate a sorting order for the <see cref="RequestBuilder"/>. This is a helper to add this specific request option to the <see cref="QueryOptions"/>.
+        /// </summary>
+        public string OrderBy { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="GraphPresenter"/> class.
         /// </summary>
         public GraphPresenter()
@@ -75,6 +76,17 @@ namespace Microsoft.Toolkit.Graph.Controls
                                         RequestBuilder.Client); // TODO: Do we need separate Options here?
                 request.Method = "GET";
                 request.QueryOptions = QueryOptions?.Select(option => option.ToQueryOption())?.ToList();
+
+                if (request.QueryOptions == null)
+                {
+                    request.QueryOptions = new List<Microsoft.Graph.QueryOption>();
+                }
+
+                // Handle Special QueryOptions
+                if (!string.IsNullOrWhiteSpace(OrderBy))
+                {
+                    request.QueryOptions.Add(new Microsoft.Graph.QueryOption("$orderby", OrderBy));
+                }
 
                 // TODO: Add Exception Handling
                 // Note: CalendarView not supported https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/740

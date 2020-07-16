@@ -49,6 +49,7 @@
                 <!-- Use GraphPresenter to make call to OneDrive Recent Filelist -->
                 <TextBlock Margin="0,8,0,8" FontWeight="Bold">Recent Files:</TextBlock>
                 <wgt:GraphPresenter RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.CalendarView, Mode=OneWay}"
+                                    OrderBy="start/dateTime"
                                     ResponseType="graph:Event"
                                     IsCollection="True">
                     <wgt:GraphPresenter.QueryOptions>
