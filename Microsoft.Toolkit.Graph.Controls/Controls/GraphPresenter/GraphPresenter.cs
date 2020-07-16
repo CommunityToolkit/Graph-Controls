@@ -26,9 +26,9 @@ namespace Microsoft.Toolkit.Graph.Controls
         /// <summary>
         /// Gets or sets a <see cref="IBaseRequestBuilder"/> to be used to make a request to the graph. The results will be automatically populated to the <see cref="ContentPresenter.Content"/> property. Use a <see cref="ContentPresenter.ContentTemplate"/> to change the presentation of the data.
         /// </summary>
-        public object RequestBuilder
+        public IBaseRequestBuilder RequestBuilder
         {
-            get { return (object)GetValue(RequestBuilderProperty); }
+            get { return (IBaseRequestBuilder)GetValue(RequestBuilderProperty); }
             set { SetValue(RequestBuilderProperty, value); }
         }
 
@@ -39,43 +39,65 @@ namespace Microsoft.Toolkit.Graph.Controls
         /// The identifier for the <see cref="RequestBuilder"/> dependency property.
         /// </returns>
         public static readonly DependencyProperty RequestBuilderProperty =
-            DependencyProperty.Register(nameof(RequestBuilder), typeof(object), typeof(GraphPresenter), new PropertyMetadata(null, OnDataChanged));
+            DependencyProperty.Register(nameof(RequestBuilder), typeof(IBaseRequestBuilder), typeof(GraphPresenter), new PropertyMetadata(null));
 
+        /// <summary>
+        /// Gets or sets the <see cref="Type"/> of item returned by the <see cref="RequestBuilder"/>.
+        /// Set to the base item type and use the <see cref="IsCollection"/> property to indicate if a collection is expected back.
+        /// </summary>
         public Type ResponseType { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the returned data from the <see cref="RequestBuilder"/> is a collection.
+        /// </summary>
         public bool IsCollection { get; set; }
 
-        private static async void OnDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Gets or sets list of <see cref="QueryOption"/> representing <see cref="Microsoft.Graph.QueryOption"/> values to pass into the request built by <see cref="RequestBuilder"/>.
+        /// </summary>
+        public List<QueryOption> QueryOptions { get; set; } = new List<QueryOption>();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GraphPresenter"/> class.
+        /// </summary>
+        public GraphPresenter()
         {
-            if (d is GraphPresenter presenter)
+            Loaded += GraphPresenter_Loaded;
+        }
+
+        private async void GraphPresenter_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Note: some interfaces from the Graph SDK don't implement IBaseRequestBuilder properly, see https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/722
+            if (RequestBuilder != null)
             {
-                // Use BaseRequestBuilder as some interfaces from the Graph SDK don't implement IBaseRequestBuilder properly, see https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/722
-                if (e.NewValue is BaseRequestBuilder builder)
+                var request = new BaseRequest(
+                                        RequestBuilder.RequestUrl,
+                                        RequestBuilder.Client); // TODO: Do we need separate Options here?
+                request.Method = "GET";
+                request.QueryOptions = QueryOptions?.Select(option => option.ToQueryOption())?.ToList();
+
+                // TODO: Add Exception Handling
+                // Note: CalendarView not supported https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/740
+                var response = await request.SendAsync<object>(null, CancellationToken.None).ConfigureAwait(false) as JObject;
+
+                //// TODO: Deal with paging?
+
+                var values = response["value"];
+                object data = null;
+
+                if (IsCollection)
                 {
-                    var request = new BaseRequest(builder.RequestUrl, builder.Client, null);
-                    request.Method = "GET";
-
-                    var response = await request.SendAsync<object>(null, CancellationToken.None).ConfigureAwait(false) as JObject;
-
-                    //// TODO: Deal with paging?
-
-                    var values = response["value"];
-                    object data = null;
-
-                    if (presenter.IsCollection)
-                    {
-                        data = values.ToObject(Array.CreateInstance(presenter.ResponseType, 0).GetType());
-                    }
-                    else
-                    {
-                        data = values.ToObject(presenter.ResponseType);
-                    }
-
-                    await DispatcherHelper.ExecuteOnUIThreadAsync(() =>
-                    {
-                        presenter.Content = data;
-                    });
+                    data = values.ToObject(Array.CreateInstance(ResponseType, 0).GetType());
                 }
+                else
+                {
+                    data = values.ToObject(ResponseType);
+                }
+
+                await DispatcherHelper.ExecuteOnUIThreadAsync(() =>
+                {
+                    Content = data;
+                });
             }
         }
     }

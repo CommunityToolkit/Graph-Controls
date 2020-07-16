@@ -2,11 +2,12 @@
     x:Class="SampleTest.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:SampleTest"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:SampleTest"
     xmlns:wgt="using:Microsoft.Toolkit.Graph.Controls"
     xmlns:graph="using:Microsoft.Graph"
+    xmlns:global="using:System.Globalization"
     xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:providers="using:Microsoft.Toolkit.Graph.Providers"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
@@ -47,30 +48,36 @@
                 </ItemsControl>
                 <!-- Use GraphPresenter to make call to OneDrive Recent Filelist -->
                 <TextBlock Margin="0,8,0,8" FontWeight="Bold">Recent Files:</TextBlock>
-                <wgt:GraphPresenter RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.Drive.Recent(), Mode=OneWay}"
-                                    ResponseType="graph:DriveItem"
+                <wgt:GraphPresenter RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.CalendarView, Mode=OneWay}"
+                                    ResponseType="graph:Event"
                                     IsCollection="True">
+                    <wgt:GraphPresenter.QueryOptions>
+                        <!-- Need to create separate Properties as multiple functions not supported in x:Bind see https://github.com/microsoft/microsoft-ui-xaml/issues/2407 -->
+                        <wgt:QueryOption Name="startDateTime" Value="{x:Bind Today.ToString('o', global:CultureInfo.InvariantCulture)}"/>
+                        <wgt:QueryOption Name="endDateTime" Value="{x:Bind ThreeDaysFromNow.ToString('o', global:CultureInfo.InvariantCulture)}"/>
+                    </wgt:GraphPresenter.QueryOptions>
                     <wgt:GraphPresenter.ContentTemplate>
                         <DataTemplate>
-                            <!-- Return result is a collection of DriveItem's as we used 'IsCollection', so bind that first. -->
+                            <!-- Return result is a collection of Event's as we used 'IsCollection', so bind that first. -->
                             <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
                                 <ItemsControl ItemsSource="{Binding}">
                                     <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="graph:DriveItem">
+                                        <DataTemplate x:DataType="graph:Event">
                                             <StackPanel>
-                                                <controls:ImageEx DataContext="{x:Bind RemoteItem, Converter={StaticResource OneDriveThumbnailConverter}}"
-                                                                  PlaceholderSource="/Assets/FileIcon.png"
-                                                                  Source="{Binding Result.Medium.Url}" Width="176" Height="176"/>
-                                                <TextBlock Text="{Binding Name}"/>
-                                                <TextBlock Text="{Binding Size, Converter={StaticResource FileSizeConverter}}"/>
+                                                <TextBlock FontWeight="Bold">
+                                                    <Run Text="{x:Bind local:MainPage.ToLocalTime(Start), Mode=OneWay}"/>
+                                                    <Run> - </Run>
+                                                    <Run Text="{x:Bind local:MainPage.ToLocalTime(End), Mode=OneWay}"/>
+                                                </TextBlock>
+                                                <TextBlock Text="{Binding Subject}" Style="{StaticResource TitleTextBlockStyle}"/>
+                                                <TextBlock>
+                                                    <Run FontFamily="Segoe MDL2 Assets" Text="&amp;#xE707"/>
+                                                    <Run> </Run>
+                                                    <Run Text="{x:Bind Location.DisplayName, Mode=OneWay}"/>
+                                                </TextBlock>
                                             </StackPanel>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <controls:UniformGrid Columns="2" ColumnSpacing="8"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
                                 </ItemsControl>
                             </ScrollViewer>
                         </DataTemplate>
