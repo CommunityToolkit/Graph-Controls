@@ -1,71 +1,71 @@
 # Control which branches get CI triggers (defaults to all branches if this parameter is not set)
 trigger:
-- master
-- rel/*
+  - main
+  - rel/*
 
 # Specify the target branches for pull request builds
 pr:
-- master
-- rel/*
+  - main
+  - rel/*
 
 # Microsoft-hosted agent pool for Visual Studio 2019
 pool:
   vmImage: windows-2019
 
-variables: 
+variables:
   BuildConfiguration: CI
 
 steps:
-# Setup Environment Variables
-- task: BatchScript@1
-  inputs:
-    filename: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\Common7\\Tools\\VsDevCmd.bat"
-    arguments: -no_logo
-    modifyEnvironment: true
-  displayName: Setup Environment Variables
+  # Setup Environment Variables
+  - task: BatchScript@1
+    inputs:
+      filename: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\Common7\\Tools\\VsDevCmd.bat"
+      arguments: -no_logo
+      modifyEnvironment: true
+    displayName: Setup Environment Variables
 
-# Install Nuget Tool Installer
-- task: NuGetToolInstaller@0
-  displayName: Use NuGet 5.0.0
-  inputs:
-    versionSpec: 5.0.0
+  # Install Nuget Tool Installer
+  - task: NuGetToolInstaller@0
+    displayName: Use NuGet 5.0.0
+    inputs:
+      versionSpec: 5.0.0
 
-# Install NBGV Tool
-- task: DotNetCoreCLI@2
-  inputs:
-    command: custom
-    custom: tool
-    arguments: install --tool-path . nbgv
-  displayName: Install NBGV tool
+  # Install NBGV Tool
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: custom
+      custom: tool
+      arguments: install --tool-path . nbgv
+    displayName: Install NBGV tool
 
-# Set cloud build variables
-- script: nbgv cloud
-  displayName: Set Version
+  # Set cloud build variables
+  - script: nbgv cloud
+    displayName: Set Version
 
-# Install Windows SDK 18362 (minimum compatible sdk)
-- powershell: .\build\Install-WindowsSdkISO.ps1 18362
-  displayName: Insider SDK
+  # Install Windows SDK 18362 (minimum compatible sdk)
+  - powershell: .\build\Install-WindowsSdkISO.ps1 18362
+    displayName: Insider SDK
 
-# Run cake build
-- powershell: .\build.ps1 -target=Package
-  displayName: Build
-  workingDirectory: .\build
+  # Run cake build
+  - powershell: .\build.ps1 -target=Package
+    displayName: Build
+    workingDirectory: .\build
 
-# Sign Nuget package
-- task: PowerShell@2
-  displayName: Authenticode Sign Packages
-  inputs:
-    filePath: build/Sign-Package.ps1
-  env:
-    SignClientUser: $(SignClientUser)
-    SignClientSecret: $(SignClientSecret)
-    ArtifactDirectory: bin\nupkg
-  condition: and(succeeded(), not(eq(variables['build.reason'], 'PullRequest')), not(eq(variables['SignClientSecret'], '')), not(eq(variables['SignClientUser'], '')))
+  # Sign Nuget package
+  - task: PowerShell@2
+    displayName: Authenticode Sign Packages
+    inputs:
+      filePath: build/Sign-Package.ps1
+    env:
+      SignClientUser: $(SignClientUser)
+      SignClientSecret: $(SignClientSecret)
+      ArtifactDirectory: bin\nupkg
+    condition: and(succeeded(), not(eq(variables['build.reason'], 'PullRequest')), not(eq(variables['SignClientSecret'], '')), not(eq(variables['SignClientUser'], '')))
 
-# Publish nuget package
-- task: PublishBuildArtifacts@1
-  displayName: Publish Package Artifacts
-  inputs:
-    pathToPublish: .\bin\nupkg
-    artifactType: container
-    artifactName: Packages
+  # Publish nuget package
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Package Artifacts
+    inputs:
+      pathToPublish: .\bin\nupkg
+      artifactType: container
+      artifactName: Packages
