@@ -17,10 +17,11 @@
     <IsWpfProject>$(MSBuildProjectName.Contains('Wpf'))</IsWpfProject>
     <DefaultTargetPlatformVersion>18362</DefaultTargetPlatformVersion>
     <DefaultTargetPlatformMinVersion>17134</DefaultTargetPlatformMinVersion>
+    <MicrosoftWinUIVersion>3.0.0-preview2.200713.0</MicrosoftWinUIVersion>
     <TargetPlatformVersion>10.0.$(DefaultTargetPlatformVersion).0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.$(DefaultTargetPlatformMinVersion).0</TargetPlatformMinVersion>
     <PackageOutputPath>$(MSBuildThisFileDirectory)bin\nupkg</PackageOutputPath>
-    <NoWarn>CS8002;CS8305</NoWarn> <!-- Temporary since WinUI3 is not stable yet -->
+    <NoWarn>CS8002;CS8305;NU1701</NoWarn> <!-- Temporary since WinUI3 is not stable yet -->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
