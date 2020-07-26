@@ -8,8 +8,12 @@ using Windows.UI.Xaml.Data;
 
 namespace Microsoft.Toolkit.Graph.Controls.Converters
 {
+    /// <summary>
+    /// The <see cref="FileSizeConverter"/> takes a long value in and converts it to a human readible string using the <see cref="Microsoft.Toolkit.Graph.Extensions.GraphExtensions.ToFileSizeString(long)"/> method.
+    /// </summary>
     public class FileSizeConverter : IValueConverter
     {
+        /// <inheritdoc/>
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             if (value is long size)
@@ -20,6 +24,7 @@ namespace Microsoft.Toolkit.Graph.Controls.Converters
             return null;
         }
 
+        /// <inheritdoc/>
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {
             throw new NotImplementedException();

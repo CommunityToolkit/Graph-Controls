@@ -6,7 +6,7 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace Microsoft.Toolkit.Graph.Providers // TODO: Move to base-toolkit
+namespace Microsoft.Toolkit.Graph.Providers // TODO: Remove
 {
     /// <summary>
     /// Helper class to wrap around a Task to provide more information usable for UI databinding scenarios. As discussed in MSDN Magazine: https://msdn.microsoft.com/magazine/dn605875.
@@ -106,7 +106,10 @@ namespace Microsoft.Toolkit.Graph.Providers // TODO: Move to base-toolkit
         /// <summary>
         /// Gets a value indicating whether the task is not completed.
         /// </summary>
-        public bool IsNotCompleted { get { return !Task.IsCompleted; } }
+        public bool IsNotCompleted
+        {
+            get { return !Task.IsCompleted; }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the task was successfully completed.
@@ -138,7 +141,10 @@ namespace Microsoft.Toolkit.Graph.Providers // TODO: Move to base-toolkit
         /// <summary>
         /// Gets the exception which occured on the task (if one occurred).
         /// </summary>
-        public AggregateException Exception { get { return Task.Exception; } }
+        public AggregateException Exception
+        {
+            get { return Task.Exception; }
+        }
 
         /// <summary>
         /// Gets the inner exception of the task.
