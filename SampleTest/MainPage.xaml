@@ -127,6 +127,40 @@
                             </StackPanel>
                         </ScrollViewer>
                     </PivotItem>
+                    <PivotItem Header="(Mail) Messages">
+                        <ScrollViewer>
+                            <StackPanel>
+                                <TextBlock>The following example shows the `Me.Messages` API for getting a user's inbox mail messages.</TextBlock>
+                                <TextBlock Margin="0,8,0,0" FontWeight="Bold">My Messages:</TextBlock>
+                                <wgt:GraphPresenter RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.Messages, Mode=OneWay}"
+                                    ResponseType="graph:Message"
+                                    IsCollection="True">
+                                    <wgt:GraphPresenter.ContentTemplate>
+                                        <DataTemplate>
+                                            <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                                                <ItemsControl ItemsSource="{Binding}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="graph:Message">
+                                                            <StackPanel>
+                                                                <wgt:PersonView PersonQuery="{x:Bind Sender.EmailAddress.Address}" ShowName="True" Margin="-4"/>
+                                                                <TextBlock Text="{Binding Subject}" Style="{StaticResource BaseTextBlockStyle}" Padding="0"/>
+                                                                <TextBlock Text="{x:Bind local:MainPage.RemoveWhitespace(BodyPreview)}" TextWrapping="WrapWholeWords"/>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                    <ItemsControl.ItemContainerStyle>
+                                                        <Style TargetType="ContentPresenter">
+                                                            <Setter Property="Margin" Value="0,8,0,8"/>
+                                                        </Style>
+                                                    </ItemsControl.ItemContainerStyle>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </DataTemplate>
+                                    </wgt:GraphPresenter.ContentTemplate>
+                                </wgt:GraphPresenter>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </PivotItem>
                 </Pivot>
             </Grid>
         </PivotItem>

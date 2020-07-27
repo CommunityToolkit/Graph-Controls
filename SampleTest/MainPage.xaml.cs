@@ -5,6 +5,7 @@
 using Microsoft.Graph;
 using Microsoft.Graph.Extensions;
 using System;
+using System.Text.RegularExpressions;
 using Windows.UI.Xaml.Controls;
 
 namespace SampleTest
@@ -26,6 +27,12 @@ namespace SampleTest
         public static string ToLocalTime(DateTimeTimeZone value)
         {
             return value.ToDateTimeOffset().LocalDateTime.ToString("g");
+        }
+
+        public static string RemoveWhitespace(string value)
+        {
+            //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2654
+            return Regex.Replace(value, @"\t|\r|\n", " ");
         }
     }
 }
