@@ -21,6 +21,8 @@ namespace Microsoft.Toolkit.Graph.Providers
     /// </summary>
     public class MockProvider : IProvider
     {
+        private static readonly string GRAPH_PROXY_URL = "https://proxy.apisandbox.msdn.microsoft.com/svc?url=";
+
         private ProviderState _state = ProviderState.Loading;
 
         /// <inheritdoc/>
@@ -42,22 +44,15 @@ namespace Microsoft.Toolkit.Graph.Providers
 
         /// <inheritdoc/>
         public GraphServiceClient Graph => new GraphServiceClient(
-            "https://proxy.apisandbox.msdn.microsoft.com/svc?url=" + HttpUtility.HtmlEncode("https://graph.microsoft.com/beta/"),
-            new DelegateAuthenticationProvider((requestMessage) =>
-            {
-                //// Temporary Workaround for https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/59
-                //// ------------------------
-                var requestUri = requestMessage.RequestUri.ToString();
-                var index = requestUri.IndexOf("&");
-                if (index >= 0)
-                {
-                    requestMessage.RequestUri = new Uri(requestUri.Remove(index, 1).Insert(index, "?"));
-                }
+                        new DelegateAuthenticationProvider((requestMessage) =>
+                    {
+                        var requestUri = requestMessage.RequestUri.ToString();
 
-                //// End Workaround
+                        // Prepend Proxy Service URI to our request
+                        requestMessage.RequestUri = new Uri(GRAPH_PROXY_URL + HttpUtility.UrlEncode(requestUri));
 
-                return this.AuthenticateRequestAsync(requestMessage);
-            }));
+                        return this.AuthenticateRequestAsync(requestMessage);
+                    }));
 
         /// <inheritdoc/>
         public event EventHandler<StateChangedEventArgs> StateChanged;

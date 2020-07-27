@@ -65,14 +65,14 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="graph:Event">
                                             <StackPanel>
+                                                <TextBlock Text="{Binding Subject}" Style="{StaticResource TitleTextBlockStyle}"/>
                                                 <TextBlock FontWeight="Bold">
                                                     <Run Text="{x:Bind local:MainPage.ToLocalTime(Start), Mode=OneWay}"/>
                                                     <Run> - </Run>
                                                     <Run Text="{x:Bind local:MainPage.ToLocalTime(End), Mode=OneWay}"/>
                                                 </TextBlock>
-                                                <TextBlock Text="{Binding Subject}" Style="{StaticResource TitleTextBlockStyle}"/>
                                                 <TextBlock>
-                                                    <Run FontFamily="Segoe MDL2 Assets" Text="&amp;#xE707"/>
+                                                    <Run FontFamily="Segoe MDL2 Assets" Text="&#xE707;"/>
                                                     <Run> </Run>
                                                     <Run Text="{x:Bind Location.DisplayName, Mode=OneWay}"/>
                                                 </TextBlock>
