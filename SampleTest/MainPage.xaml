@@ -32,10 +32,25 @@
         <providers:MockProviderBehavior/>
     </Interactivity:Interaction.Behaviors>
 
-    <Grid>
-        <wgt:LoginButton VerticalAlignment="Top" HorizontalAlignment="Right"/>
-        <ScrollViewer Margin="16,48,16,16">
+    <Pivot>
+        <Pivot.ItemContainerStyle>
+            <Style TargetType="PivotItem">
+                <Setter Property="Margin" Value="8,8,8,0"/>
+            </Style>
+        </Pivot.ItemContainerStyle>
+        <PivotItem Header="LoginButton">
             <StackPanel>
+                <wgt:LoginButton VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                <TextBlock TextWrapping="WrapWholeWords">
+                    The `LoginButton` above allows your user and application to easily connect to the Microsoft Graph. They can then also easily logout from the drop-down menu.
+                </TextBlock>
+            </StackPanel>
+        </PivotItem>
+        <PivotItem Header="PeoplePicker">
+            <StackPanel>
+                <TextBlock TextWrapping="WrapWholeWords" Margin="0,0,0,16">
+                    The `PeoplePicker` lets a logged in user easily search for familiar people they interact with or contacts. Great for emails or messages.
+                </TextBlock>
                 <wgt:PeoplePicker x:Name="PeopleChooser"/>
                 <TextBlock Margin="0,8,0,0" FontWeight="Bold">Picked People:</TextBlock>
                 <ItemsControl ItemsSource="{x:Bind PeopleChooser.ItemsSource}"
@@ -46,45 +61,74 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <!-- Use GraphPresenter to make call to OneDrive Recent Filelist -->
-                <TextBlock Margin="0,8,0,8" FontWeight="Bold">Recent Files:</TextBlock>
-                <wgt:GraphPresenter RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.CalendarView, Mode=OneWay}"
+            </StackPanel>
+        </PivotItem>
+        <PivotItem Header="GraphPresenter">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock TextWrapping="WrapWholeWords">
+                    The `GraphPresenter` is a unique control in the library which makes it easier for a developer to make any graph call and configure a nice display template in XAML. This opens up a world of possibilities for many uses outside of any other control available within this library. You can see a few examples of what's possible below.
+                </TextBlock>
+                <Pivot Grid.Row="1">
+                    <Pivot.ItemContainerStyle>
+                        <Style TargetType="PivotItem">
+                            <Setter Property="Margin" Value="8,8,8,0"/>
+                        </Style>
+                    </Pivot.ItemContainerStyle>
+                    <PivotItem Header="CalendarView">
+                        <ScrollViewer>
+                            <StackPanel>
+                                <TextBlock>The following example shows the `Me.CalendarView` API.</TextBlock>
+                                <TextBlock Margin="0,8,0,0" FontWeight="Bold">My Upcoming Calendar Events:</TextBlock>
+                                <wgt:GraphPresenter RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.CalendarView, Mode=OneWay}"
                                     OrderBy="start/dateTime"
                                     ResponseType="graph:Event"
                                     IsCollection="True">
-                    <wgt:GraphPresenter.QueryOptions>
-                        <!-- Need to create separate Properties as multiple functions not supported in x:Bind see https://github.com/microsoft/microsoft-ui-xaml/issues/2407 -->
-                        <wgt:QueryOption Name="startDateTime" Value="{x:Bind Today.ToString('o', global:CultureInfo.InvariantCulture)}"/>
-                        <wgt:QueryOption Name="endDateTime" Value="{x:Bind ThreeDaysFromNow.ToString('o', global:CultureInfo.InvariantCulture)}"/>
-                    </wgt:GraphPresenter.QueryOptions>
-                    <wgt:GraphPresenter.ContentTemplate>
-                        <DataTemplate>
-                            <!-- Return result is a collection of Event's as we used 'IsCollection', so bind that first. -->
-                            <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
-                                <ItemsControl ItemsSource="{Binding}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="graph:Event">
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding Subject}" Style="{StaticResource TitleTextBlockStyle}"/>
-                                                <TextBlock FontWeight="Bold">
+                                    <wgt:GraphPresenter.QueryOptions>
+                                        <!-- Need to create separate Properties as multiple functions not supported in x:Bind see https://github.com/microsoft/microsoft-ui-xaml/issues/2407 -->
+                                        <wgt:QueryOption Name="startDateTime" Value="{x:Bind Today.ToString('o', global:CultureInfo.InvariantCulture)}"/>
+                                        <wgt:QueryOption Name="endDateTime" Value="{x:Bind ThreeDaysFromNow.ToString('o', global:CultureInfo.InvariantCulture)}"/>
+                                    </wgt:GraphPresenter.QueryOptions>
+                                    <wgt:GraphPresenter.ContentTemplate>
+                                        <DataTemplate>
+                                            <!-- Return result is a collection of Event's as we used 'IsCollection', so bind that first. -->
+                                            <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                                                <ItemsControl ItemsSource="{Binding}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="graph:Event">
+                                                            <StackPanel>
+                                                                <TextBlock Text="{Binding Subject}" Style="{StaticResource TitleTextBlockStyle}"/>
+                                                                <TextBlock FontWeight="Bold">
                                                     <Run Text="{x:Bind local:MainPage.ToLocalTime(Start), Mode=OneWay}"/>
                                                     <Run> - </Run>
                                                     <Run Text="{x:Bind local:MainPage.ToLocalTime(End), Mode=OneWay}"/>
-                                                </TextBlock>
-                                                <TextBlock>
+                                                                </TextBlock>
+                                                                <TextBlock>
                                                     <Run FontFamily="Segoe MDL2 Assets" Text="&#xE707;"/>
                                                     <Run> </Run>
                                                     <Run Text="{x:Bind Location.DisplayName, Mode=OneWay}"/>
-                                                </TextBlock>
-                                            </StackPanel>
+                                                                </TextBlock>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                    <ItemsControl.ItemContainerStyle>
+                                                        <Style TargetType="ContentPresenter">
+                                                            <Setter Property="Margin" Value="0,8,0,8"/>
+                                                        </Style>
+                                                    </ItemsControl.ItemContainerStyle>
+                                                </ItemsControl>
+                                            </ScrollViewer>
                                         </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </ScrollViewer>
-                        </DataTemplate>
-                    </wgt:GraphPresenter.ContentTemplate>
-                </wgt:GraphPresenter>
-            </StackPanel>
-        </ScrollViewer>
-    </Grid>
+                                    </wgt:GraphPresenter.ContentTemplate>
+                                </wgt:GraphPresenter>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </PivotItem>
+                </Pivot>
+            </Grid>
+        </PivotItem>
+    </Pivot>
 </Page>
