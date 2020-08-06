@@ -161,6 +161,68 @@
                             </StackPanel>
                         </ScrollViewer>
                     </PivotItem>
+                    <PivotItem Header="Tasks">
+                        <ScrollViewer>
+                            <StackPanel>
+                                <TextBlock>The following example shows the `Me.Planner.Tasks` API for getting a user's tasks.</TextBlock>
+                                <TextBlock Margin="0,8,0,0" FontWeight="Bold">My Tasks:</TextBlock>
+                                <wgt:GraphPresenter RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.Planner.Tasks, Mode=OneWay}"
+                                    ResponseType="graph:PlannerTask"
+                                    IsCollection="True">
+                                    <wgt:GraphPresenter.ContentTemplate>
+                                        <DataTemplate>
+                                            <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                                                <ItemsControl ItemsSource="{Binding}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="graph:PlannerTask">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition/>
+                                                                    <RowDefinition/>
+                                                                    <RowDefinition/>
+                                                                </Grid.RowDefinitions>
+                                                                <!-- We've disabled the checkbox as we're not going to make the call back to the graph to modify the item. -->
+                                                                <CheckBox IsEnabled="False" IsChecked="{x:Bind local:MainPage.IsTaskCompleted(PercentComplete), Mode=OneWay}"/>
+                                                                <TextBlock Text="{x:Bind Title, Mode=OneWay}" Grid.Column="1"/>
+                                                                <ItemsControl ItemsSource="{x:Bind Assignments, Mode=OneWay}" Grid.Column="1" Grid.Row="1">
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <!-- We're getting a KVP from the PlannerAssignments type, the Key is the UserId string, we'll use that to look-up our user info. -->
+                                                                            <wgt:PersonView UserId="{Binding Key}" Margin="-4"/>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                </ItemsControl>
+                                                                <TextBlock FontWeight="Bold" Grid.Column="2" Grid.Row="2">
+                                                                    <Run>Due </Run>
+                                                                    <Run Text="{x:Bind local:MainPage.ToLocalTime(DueDateTime), Mode=OneWay}" />
+                                                                </TextBlock>
+                                                                
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                    <ItemsControl.ItemContainerStyle>
+                                                        <Style TargetType="ContentPresenter">
+                                                            <Setter Property="Margin" Value="0,8,0,8"/>
+                                                        </Style>
+                                                    </ItemsControl.ItemContainerStyle>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </DataTemplate>
+                                    </wgt:GraphPresenter.ContentTemplate>
+                                </wgt:GraphPresenter>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </PivotItem>
                 </Pivot>
             </Grid>
         </PivotItem>

@@ -29,10 +29,20 @@ namespace SampleTest
             return value.ToDateTimeOffset().LocalDateTime.ToString("g");
         }
 
+        public static string ToLocalTime(DateTimeOffset? value)
+        {
+            return value?.LocalDateTime.ToString("g");
+        }
+
         public static string RemoveWhitespace(string value)
         {
             //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2654
             return Regex.Replace(value, @"\t|\r|\n", " ");
+        }
+
+        public static bool IsTaskCompleted(int? percentCompleted)
+        {
+            return percentCompleted == 100;
         }
     }
 }
