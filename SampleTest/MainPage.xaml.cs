@@ -4,6 +4,7 @@
 
 using Microsoft.Graph;
 using Microsoft.Graph.Extensions;
+using Microsoft.Toolkit.Graph.Providers;
 using System;
 using System.Text.RegularExpressions;
 using Windows.UI.Xaml.Controls;
@@ -15,8 +16,10 @@ namespace SampleTest
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2407
         public DateTime Today => DateTimeOffset.Now.Date.ToUniversalTime();
 
+        //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2407
         public DateTime ThreeDaysFromNow => Today.AddDays(3);
 
         public MainPage()
@@ -26,11 +29,13 @@ namespace SampleTest
 
         public static string ToLocalTime(DateTimeTimeZone value)
         {
+            //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2407
             return value.ToDateTimeOffset().LocalDateTime.ToString("g");
         }
 
         public static string ToLocalTime(DateTimeOffset? value)
         {
+            //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2654
             return value?.LocalDateTime.ToString("g");
         }
 
@@ -43,6 +48,12 @@ namespace SampleTest
         public static bool IsTaskCompleted(int? percentCompleted)
         {
             return percentCompleted == 100;
+        }
+
+        public static IBaseRequestBuilder GetTeamsChannelMessagesBuilder(string team, string channel)
+        {
+            //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3064
+            return ProviderManager.Instance.GlobalProvider.Graph.Teams[team].Channels[channel].Messages;
         }
     }
 }

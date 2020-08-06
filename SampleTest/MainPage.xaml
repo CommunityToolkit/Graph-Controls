@@ -223,6 +223,43 @@
                             </StackPanel>
                         </ScrollViewer>
                     </PivotItem>
+                    <PivotItem Header="Teams Messages">
+                        <ScrollViewer>
+                            <StackPanel>
+                                <TextBlock>The following example shows the beta `Teams/id/Channels/id/messages` API for getting a list of messages (without replies) from a Channel in Teams.</TextBlock>
+                                <TextBlock Margin="0,8,0,0" FontWeight="Bold">My Chat Messages:</TextBlock>
+                                <wgt:GraphPresenter RequestBuilder="{x:Bind local:MainPage.GetTeamsChannelMessagesBuilder('02bd9fd6-8f93-4758-87c3-1fb73740a315', '19:d0bba23c2fc8413991125a43a54cc30e@thread.skype'), Mode=OneWay}"
+                                    ResponseType="graph:ChatMessage"
+                                    IsCollection="True">
+                                    <wgt:GraphPresenter.ContentTemplate>
+                                        <DataTemplate>
+                                            <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                                                <ItemsControl ItemsSource="{Binding}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="graph:ChatMessage">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                </Grid.ColumnDefinitions>
+                                                                <wgt:PersonView UserId="{x:Bind From.User.Id, Mode=OneWay}" Margin="-4,-4,8,-4"/>
+                                                                <TextBlock Text="{x:Bind Body.Content, Mode=OneWay}" TextWrapping="WrapWholeWords" Grid.Column="1"/>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                    <ItemsControl.ItemContainerStyle>
+                                                        <Style TargetType="ContentPresenter">
+                                                            <Setter Property="Margin" Value="0,8,0,8"/>
+                                                        </Style>
+                                                    </ItemsControl.ItemContainerStyle>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </DataTemplate>
+                                    </wgt:GraphPresenter.ContentTemplate>
+                                </wgt:GraphPresenter>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </PivotItem>
                 </Pivot>
             </Grid>
         </PivotItem>
