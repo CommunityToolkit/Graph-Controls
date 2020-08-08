@@ -11,14 +11,10 @@
     xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:providers="using:Microsoft.Toolkit.Graph.Providers"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:converters="using:Microsoft.Toolkit.Graph.Controls.Converters"
+    xmlns:ex="using:Microsoft.Toolkit.Extensions"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     xmlns:controlsKeepThis="using:Microsoft.Toolkit.Uwp.UI.Controls"><!-- Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/1286 -->
-    <Page.Resources>
-        <converters:OneDriveThumbnailConverter x:Key="OneDriveThumbnailConverter"/>
-        <converters:FileSizeConverter x:Key="FileSizeConverter"/>
-    </Page.Resources>
     <!-- 
         Initialize Graph Provider On Page Load 
     
@@ -243,7 +239,7 @@
                                                                     <ColumnDefinition Width="*"/>
                                                                 </Grid.ColumnDefinitions>
                                                                 <wgt:PersonView UserId="{x:Bind From.User.Id, Mode=OneWay}" Margin="-4,-4,8,-4"/>
-                                                                <TextBlock Text="{x:Bind Body.Content, Mode=OneWay}" TextWrapping="WrapWholeWords" Grid.Column="1"/>
+                                                                <TextBlock Text="{x:Bind ex:StringExtensions.DecodeHtml(Body.Content), Mode=OneWay}" TextWrapping="WrapWholeWords" Grid.Column="1"/>
                                                             </Grid>
                                                         </DataTemplate>
                                                     </ItemsControl.ItemTemplate>
