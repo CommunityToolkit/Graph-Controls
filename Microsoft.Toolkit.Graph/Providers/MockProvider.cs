@@ -21,7 +21,7 @@ namespace Microsoft.Toolkit.Graph.Providers
     /// </summary>
     public class MockProvider : IProvider
     {
-        private static readonly string GRAPH_PROXY_URL = "https://proxy.apisandbox.msdn.microsoft.com/svc?url=";
+        private const string GRAPH_PROXY_URL = "https://proxy.apisandbox.msdn.microsoft.com/svc?url=";
 
         private ProviderState _state = ProviderState.Loading;
 

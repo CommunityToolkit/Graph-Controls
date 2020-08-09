@@ -75,12 +75,7 @@ namespace Microsoft.Toolkit.Graph.Controls
                                         RequestBuilder.RequestUrl,
                                         RequestBuilder.Client); // TODO: Do we need separate Options here?
                 request.Method = "GET";
-                request.QueryOptions = QueryOptions?.Select(option => option.ToQueryOption())?.ToList();
-
-                if (request.QueryOptions == null)
-                {
-                    request.QueryOptions = new List<Microsoft.Graph.QueryOption>();
-                }
+                request.QueryOptions = QueryOptions?.Select(option => option.ToQueryOption())?.ToList() ?? new List<Microsoft.Graph.QueryOption>();
 
                 // Handle Special QueryOptions
                 if (!string.IsNullOrWhiteSpace(OrderBy))
