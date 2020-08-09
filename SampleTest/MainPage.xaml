@@ -139,7 +139,7 @@
                                                         <DataTemplate x:DataType="graph:Message">
                                                             <StackPanel>
                                                                 <wgt:PersonView PersonQuery="{x:Bind Sender.EmailAddress.Address}" ShowName="True" Margin="-4"/>
-                                                                <TextBlock Text="{Binding Subject}" Style="{StaticResource BaseTextBlockStyle}" Padding="0"/>
+                                                                <TextBlock Text="{x:Bind Subject}" Style="{StaticResource BaseTextBlockStyle}" Padding="0"/>
                                                                 <TextBlock Text="{x:Bind local:MainPage.RemoveWhitespace(BodyPreview)}" TextWrapping="WrapWholeWords"/>
                                                             </StackPanel>
                                                         </DataTemplate>

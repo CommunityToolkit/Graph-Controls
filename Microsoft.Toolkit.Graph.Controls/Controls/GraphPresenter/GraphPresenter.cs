@@ -88,28 +88,33 @@ namespace Microsoft.Toolkit.Graph.Controls
                     request.QueryOptions.Add(new Microsoft.Graph.QueryOption("$orderby", OrderBy));
                 }
 
-                // TODO: Add Exception Handling
-                // Note: CalendarView not supported https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/740
-                var response = await request.SendAsync<object>(null, CancellationToken.None).ConfigureAwait(false) as JObject;
-
-                //// TODO: Deal with paging?
-
-                var values = response["value"];
-                object data = null;
-
-                if (IsCollection)
+                try
                 {
-                    data = values.ToObject(Array.CreateInstance(ResponseType, 0).GetType());
+                    var response = await request.SendAsync<object>(null, CancellationToken.None).ConfigureAwait(false) as JObject;
+
+                    //// TODO: Deal with paging?
+
+                    var values = response["value"];
+                    object data = null;
+
+                    if (IsCollection)
+                    {
+                        data = values.ToObject(Array.CreateInstance(ResponseType, 0).GetType());
+                    }
+                    else
+                    {
+                        data = values.ToObject(ResponseType);
+                    }
+
+                    await DispatcherHelper.ExecuteOnUIThreadAsync(() =>
+                    {
+                        Content = data;
+                    });
                 }
-                else
+                catch
                 {
-                    data = values.ToObject(ResponseType);
+                    // TODO: We should figure out what we want to do for Loading/Error states here.
                 }
-
-                await DispatcherHelper.ExecuteOnUIThreadAsync(() =>
-                {
-                    Content = data;
-                });
             }
         }
     }
