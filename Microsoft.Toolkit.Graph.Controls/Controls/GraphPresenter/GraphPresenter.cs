@@ -101,10 +101,7 @@ namespace Microsoft.Toolkit.Graph.Controls
                         data = values.ToObject(ResponseType);
                     }
 
-                    await DispatcherHelper.ExecuteOnUIThreadAsync(() =>
-                    {
-                        Content = data;
-                    });
+                    _ = DispatcherHelper.ExecuteOnUIThreadAsync(() => Content = data);
                 }
                 catch
                 {
