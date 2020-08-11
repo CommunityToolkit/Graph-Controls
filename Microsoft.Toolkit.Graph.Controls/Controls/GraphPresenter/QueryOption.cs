@@ -25,7 +25,7 @@ namespace Microsoft.Toolkit.Graph.Controls
         /// <summary>
         /// Implicit conversion for <see cref="QueryOption"/> to <see cref="Microsoft.Graph.QueryOption"/>.
         /// </summary>
-        /// <param name="option">query option to convert</param>
+        /// <param name="option">query option to convert.</param>
         public static implicit operator Microsoft.Graph.QueryOption(QueryOption option)
         {
             return new Microsoft.Graph.QueryOption(option.Name, option.Value);
