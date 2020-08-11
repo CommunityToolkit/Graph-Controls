@@ -16,10 +16,10 @@ namespace SampleTest
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2407
+        // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2407
         public DateTime Today => DateTimeOffset.Now.Date.ToUniversalTime();
 
-        //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2407
+        // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2407
         public DateTime ThreeDaysFromNow => Today.AddDays(3);
 
         public MainPage()
@@ -29,19 +29,19 @@ namespace SampleTest
 
         public static string ToLocalTime(DateTimeTimeZone value)
         {
-            //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2407
+            // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2407
             return value.ToDateTimeOffset().LocalDateTime.ToString("g");
         }
 
         public static string ToLocalTime(DateTimeOffset? value)
         {
-            //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2654
+            // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2654
             return value?.LocalDateTime.ToString("g");
         }
 
         public static string RemoveWhitespace(string value)
         {
-            //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2654
+            // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2654
             return Regex.Replace(value, @"\t|\r|\n", " ");
         }
 
@@ -52,7 +52,7 @@ namespace SampleTest
 
         public static IBaseRequestBuilder GetTeamsChannelMessagesBuilder(string team, string channel)
         {
-            //// Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3064
+            // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3064
             return ProviderManager.Instance.GlobalProvider.Graph.Teams[team].Channels[channel].Messages;
         }
     }

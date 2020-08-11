@@ -23,12 +23,12 @@ namespace Microsoft.Toolkit.Graph.Controls
         public string Value { get; set; }
 
         /// <summary>
-        /// Constructs a <see cref="Microsoft.Graph.QueryOption"/> value representing this proxy.
+        /// Implicit conversion for <see cref="QueryOption"/> to <see cref="Microsoft.Graph.QueryOption"/>.
         /// </summary>
-        /// <returns><see cref="Microsoft.Graph.QueryOption"/> result.</returns>
-        public Microsoft.Graph.QueryOption ToQueryOption()
+        /// <param name="option">query option to convert</param>
+        public static implicit operator Microsoft.Graph.QueryOption(QueryOption option)
         {
-            return new Microsoft.Graph.QueryOption(Name, Value);
+            return new Microsoft.Graph.QueryOption(option.Name, option.Value);
         }
     }
 }
