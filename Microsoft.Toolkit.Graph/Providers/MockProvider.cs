@@ -49,7 +49,7 @@ namespace Microsoft.Toolkit.Graph.Providers
                         var requestUri = requestMessage.RequestUri.ToString();
 
                         // Prepend Proxy Service URI to our request
-                        requestMessage.RequestUri = new Uri(GRAPH_PROXY_URL + HttpUtility.UrlEncode(requestUri));
+                        requestMessage.RequestUri = new Uri(GRAPH_PROXY_URL + Uri.EscapeDataString(requestUri));
 
                         return this.AuthenticateRequestAsync(requestMessage);
                     }));
