@@ -9,7 +9,7 @@ using System.Windows;
 using Microsoft.Toolkit.Graph.Providers;
 #else
 using System.Linq;
-using Windows.UI.Core;
+using Windows.System;
 #endif
 
 #if DOTNET
@@ -48,7 +48,7 @@ namespace Microsoft.Toolkit.Graph.Providers
                             await QuickCreate.CreateMsalProviderAsync(ClientId, RedirectUri, Scopes.ToArray());
                     }), System.Windows.Threading.DispatcherPriority.Normal);
 #else
-                    _ = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                    _ = DispatcherQueue.GetForCurrentThread().TryEnqueue(DispatcherQueuePriority.Normal, async () =>
                     {
                         ProviderManager.Instance.GlobalProvider =
                             await QuickCreate.CreateMsalProviderAsync(ClientId, RedirectUri, Scopes.ToArray());

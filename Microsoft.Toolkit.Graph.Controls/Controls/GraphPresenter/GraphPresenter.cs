@@ -9,6 +9,7 @@ using System.Threading;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Newtonsoft.Json.Linq;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -68,6 +69,8 @@ namespace Microsoft.Toolkit.Graph.Controls
 
         private async void GraphPresenter_Loaded(object sender, RoutedEventArgs e)
         {
+            var dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+
             // Note: some interfaces from the Graph SDK don't implement IBaseRequestBuilder properly, see https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/722
             if (RequestBuilder != null)
             {
@@ -101,7 +104,7 @@ namespace Microsoft.Toolkit.Graph.Controls
                         data = values.ToObject(ResponseType);
                     }
 
-                    _ = DispatcherHelper.ExecuteOnUIThreadAsync(() => Content = data);
+                    _ = DispatcherQueueHelper.ExecuteOnUIThreadAsync(dispatcherQueue, () => Content = data);
                 }
                 catch
                 {
