@@ -75,186 +75,206 @@
                         </Style>
                     </Pivot.ItemContainerStyle>
                     <PivotItem Header="CalendarView">
-                        <ScrollViewer>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
                             <StackPanel>
                                 <TextBlock>The following example shows the `Me.CalendarView` API.</TextBlock>
                                 <TextBlock Margin="0,8,0,0" FontWeight="Bold">My Upcoming Calendar Events:</TextBlock>
-                                <wgt:GraphPresenter RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.CalendarView, Mode=OneWay}"
+                            </StackPanel>
+                            <wgt:GraphPresenter Grid.Row="1"
+                                    RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.CalendarView, Mode=OneWay}"
                                     OrderBy="start/dateTime"
                                     ResponseType="graph:Event"
                                     IsCollection="True">
-                                    <wgt:GraphPresenter.QueryOptions>
-                                        <!-- Need to create separate Properties as multiple functions not supported in x:Bind see https://github.com/microsoft/microsoft-ui-xaml/issues/2407 -->
-                                        <wgt:QueryOption Name="startDateTime" Value="{x:Bind Today.ToString('o', global:CultureInfo.InvariantCulture)}"/>
-                                        <wgt:QueryOption Name="endDateTime" Value="{x:Bind ThreeDaysFromNow.ToString('o', global:CultureInfo.InvariantCulture)}"/>
-                                    </wgt:GraphPresenter.QueryOptions>
-                                    <wgt:GraphPresenter.ContentTemplate>
-                                        <DataTemplate>
-                                            <!-- Return result is a collection of Event's as we used 'IsCollection', so bind that first. -->
-                                            <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
-                                                <ItemsControl ItemsSource="{Binding}">
-                                                    <ItemsControl.ItemTemplate>
-                                                        <DataTemplate x:DataType="graph:Event">
-                                                            <StackPanel>
-                                                                <TextBlock Text="{Binding Subject}" Style="{StaticResource TitleTextBlockStyle}"/>
-                                                                <TextBlock FontWeight="Bold">
+                                <wgt:GraphPresenter.QueryOptions>
+                                    <!-- Need to create separate Properties as multiple functions not supported in x:Bind see https://github.com/microsoft/microsoft-ui-xaml/issues/2407 -->
+                                    <wgt:QueryOption Name="startDateTime" Value="{x:Bind Today.ToString('o', global:CultureInfo.InvariantCulture)}"/>
+                                    <wgt:QueryOption Name="endDateTime" Value="{x:Bind ThreeDaysFromNow.ToString('o', global:CultureInfo.InvariantCulture)}"/>
+                                </wgt:GraphPresenter.QueryOptions>
+                                <wgt:GraphPresenter.ContentTemplate>
+                                    <DataTemplate>
+                                        <!-- Return result is a collection of Event's as we used 'IsCollection', so bind that first. -->
+                                        <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{Binding}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="graph:Event">
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding Subject}" Style="{StaticResource TitleTextBlockStyle}"/>
+                                                            <TextBlock FontWeight="Bold">
                                                     <Run Text="{x:Bind local:MainPage.ToLocalTime(Start), Mode=OneWay}"/>
                                                     <Run> - </Run>
                                                     <Run Text="{x:Bind local:MainPage.ToLocalTime(End), Mode=OneWay}"/>
-                                                                </TextBlock>
-                                                                <TextBlock>
+                                                            </TextBlock>
+                                                            <TextBlock>
                                                     <Run FontFamily="Segoe MDL2 Assets" Text="&#xE707;"/>
                                                     <Run> </Run>
                                                     <Run Text="{x:Bind Location.DisplayName, Mode=OneWay}"/>
-                                                                </TextBlock>
-                                                            </StackPanel>
-                                                        </DataTemplate>
-                                                    </ItemsControl.ItemTemplate>
-                                                    <ItemsControl.ItemContainerStyle>
-                                                        <Style TargetType="ContentPresenter">
-                                                            <Setter Property="Margin" Value="0,8,0,8"/>
-                                                        </Style>
-                                                    </ItemsControl.ItemContainerStyle>
-                                                </ItemsControl>
-                                            </ScrollViewer>
-                                        </DataTemplate>
-                                    </wgt:GraphPresenter.ContentTemplate>
-                                </wgt:GraphPresenter>
-                            </StackPanel>
-                        </ScrollViewer>
+                                                            </TextBlock>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                                <ItemsControl.ItemContainerStyle>
+                                                    <Style TargetType="ContentPresenter">
+                                                        <Setter Property="Margin" Value="0,8,0,8"/>
+                                                    </Style>
+                                                </ItemsControl.ItemContainerStyle>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </DataTemplate>
+                                </wgt:GraphPresenter.ContentTemplate>
+                            </wgt:GraphPresenter>
+                        </Grid>
                     </PivotItem>
                     <PivotItem Header="(Mail) Messages">
-                        <ScrollViewer>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
                             <StackPanel>
                                 <TextBlock>The following example shows the `Me.Messages` API for getting a user's inbox mail messages.</TextBlock>
                                 <TextBlock Margin="0,8,0,0" FontWeight="Bold">My Messages:</TextBlock>
-                                <wgt:GraphPresenter RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.Messages, Mode=OneWay}"
+                            </StackPanel>
+                            <wgt:GraphPresenter Grid.Row="1"
+                                    RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.Messages, Mode=OneWay}"
                                     ResponseType="graph:Message"
                                     IsCollection="True">
-                                    <wgt:GraphPresenter.ContentTemplate>
-                                        <DataTemplate>
-                                            <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
-                                                <ItemsControl ItemsSource="{Binding}">
-                                                    <ItemsControl.ItemTemplate>
-                                                        <DataTemplate x:DataType="graph:Message">
-                                                            <StackPanel>
-                                                                <wgt:PersonView PersonQuery="{x:Bind Sender.EmailAddress.Address}" ShowName="True" Margin="-4"/>
-                                                                <TextBlock Text="{x:Bind Subject}" Style="{StaticResource BaseTextBlockStyle}" Padding="0"/>
-                                                                <TextBlock Text="{x:Bind local:MainPage.RemoveWhitespace(BodyPreview)}" TextWrapping="WrapWholeWords"/>
-                                                            </StackPanel>
-                                                        </DataTemplate>
-                                                    </ItemsControl.ItemTemplate>
-                                                    <ItemsControl.ItemContainerStyle>
-                                                        <Style TargetType="ContentPresenter">
-                                                            <Setter Property="Margin" Value="0,8,0,8"/>
-                                                        </Style>
-                                                    </ItemsControl.ItemContainerStyle>
-                                                </ItemsControl>
-                                            </ScrollViewer>
-                                        </DataTemplate>
-                                    </wgt:GraphPresenter.ContentTemplate>
-                                </wgt:GraphPresenter>
-                            </StackPanel>
-                        </ScrollViewer>
+                                <wgt:GraphPresenter.ContentTemplate>
+                                    <DataTemplate>
+                                        <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{Binding}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="graph:Message">
+                                                        <StackPanel>
+                                                            <wgt:PersonView PersonQuery="{x:Bind Sender.EmailAddress.Address}" ShowName="True" Margin="-4"/>
+                                                            <TextBlock Text="{x:Bind Subject}" Style="{StaticResource BaseTextBlockStyle}" Padding="0"/>
+                                                            <TextBlock Text="{x:Bind local:MainPage.RemoveWhitespace(BodyPreview)}" TextWrapping="WrapWholeWords"/>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                                <ItemsControl.ItemContainerStyle>
+                                                    <Style TargetType="ContentPresenter">
+                                                        <Setter Property="Margin" Value="0,8,0,8"/>
+                                                    </Style>
+                                                </ItemsControl.ItemContainerStyle>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </DataTemplate>
+                                </wgt:GraphPresenter.ContentTemplate>
+                            </wgt:GraphPresenter>
+                        </Grid>
                     </PivotItem>
                     <PivotItem Header="Tasks">
-                        <ScrollViewer>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
                             <StackPanel>
                                 <TextBlock>The following example shows the `Me.Planner.Tasks` API for getting a user's tasks.</TextBlock>
                                 <TextBlock Margin="0,8,0,0" FontWeight="Bold">My Tasks:</TextBlock>
-                                <wgt:GraphPresenter RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.Planner.Tasks, Mode=OneWay}"
+                            </StackPanel>
+                            <wgt:GraphPresenter Grid.Row="1"
+                                    RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.Planner.Tasks, Mode=OneWay}"
                                     ResponseType="graph:PlannerTask"
                                     IsCollection="True">
-                                    <wgt:GraphPresenter.ContentTemplate>
-                                        <DataTemplate>
-                                            <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
-                                                <ItemsControl ItemsSource="{Binding}">
-                                                    <ItemsControl.ItemTemplate>
-                                                        <DataTemplate x:DataType="graph:PlannerTask">
-                                                            <Grid>
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                    <ColumnDefinition Width="*"/>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                </Grid.ColumnDefinitions>
-                                                                <Grid.RowDefinitions>
-                                                                    <RowDefinition/>
-                                                                    <RowDefinition/>
-                                                                    <RowDefinition/>
-                                                                </Grid.RowDefinitions>
-                                                                <!-- We've disabled the checkbox as we're not going to make the call back to the graph to modify the item. -->
-                                                                <CheckBox IsEnabled="False" IsChecked="{x:Bind local:MainPage.IsTaskCompleted(PercentComplete), Mode=OneWay}"/>
-                                                                <TextBlock Text="{x:Bind Title, Mode=OneWay}" Grid.Column="1"/>
-                                                                <ItemsControl ItemsSource="{x:Bind Assignments, Mode=OneWay}" Grid.Column="1" Grid.Row="1">
-                                                                    <ItemsControl.ItemTemplate>
-                                                                        <DataTemplate>
-                                                                            <!-- We're getting a KVP from the PlannerAssignments type, the Key is the UserId string, we'll use that to look-up our user info. -->
-                                                                            <wgt:PersonView UserId="{Binding Key}" Margin="-4"/>
-                                                                        </DataTemplate>
-                                                                    </ItemsControl.ItemTemplate>
-                                                                    <ItemsControl.ItemsPanel>
-                                                                        <ItemsPanelTemplate>
-                                                                            <StackPanel Orientation="Horizontal"/>
-                                                                        </ItemsPanelTemplate>
-                                                                    </ItemsControl.ItemsPanel>
-                                                                </ItemsControl>
-                                                                <TextBlock FontWeight="Bold" Grid.Column="2" Grid.Row="2">
+                                <wgt:GraphPresenter.ContentTemplate>
+                                    <DataTemplate>
+                                        <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{Binding}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="graph:PlannerTask">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition/>
+                                                                <RowDefinition/>
+                                                                <RowDefinition/>
+                                                            </Grid.RowDefinitions>
+                                                            <!-- We've disabled the checkbox as we're not going to make the call back to the graph to modify the item. -->
+                                                            <CheckBox IsEnabled="False" IsChecked="{x:Bind local:MainPage.IsTaskCompleted(PercentComplete), Mode=OneWay}"/>
+                                                            <TextBlock Text="{x:Bind Title, Mode=OneWay}" Grid.Column="1"/>
+                                                            <ItemsControl ItemsSource="{x:Bind Assignments, Mode=OneWay}" Grid.Column="1" Grid.Row="1">
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <!-- We're getting a KVP from the PlannerAssignments type, the Key is the UserId string, we'll use that to look-up our user info. -->
+                                                                        <wgt:PersonView UserId="{Binding Key}" Margin="-4"/>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                                <ItemsControl.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <StackPanel Orientation="Horizontal"/>
+                                                                    </ItemsPanelTemplate>
+                                                                </ItemsControl.ItemsPanel>
+                                                            </ItemsControl>
+                                                            <TextBlock FontWeight="Bold" Grid.Column="2" Grid.Row="2">
                                                                     <Run>Due </Run>
                                                                     <Run Text="{x:Bind local:MainPage.ToLocalTime(DueDateTime), Mode=OneWay}" />
-                                                                </TextBlock>
-                                                                
-                                                            </Grid>
-                                                        </DataTemplate>
-                                                    </ItemsControl.ItemTemplate>
-                                                    <ItemsControl.ItemContainerStyle>
-                                                        <Style TargetType="ContentPresenter">
-                                                            <Setter Property="Margin" Value="0,8,0,8"/>
-                                                        </Style>
-                                                    </ItemsControl.ItemContainerStyle>
-                                                </ItemsControl>
-                                            </ScrollViewer>
-                                        </DataTemplate>
-                                    </wgt:GraphPresenter.ContentTemplate>
-                                </wgt:GraphPresenter>
-                            </StackPanel>
-                        </ScrollViewer>
+                                                            </TextBlock>
+
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                                <ItemsControl.ItemContainerStyle>
+                                                    <Style TargetType="ContentPresenter">
+                                                        <Setter Property="Margin" Value="0,8,0,8"/>
+                                                    </Style>
+                                                </ItemsControl.ItemContainerStyle>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </DataTemplate>
+                                </wgt:GraphPresenter.ContentTemplate>
+                            </wgt:GraphPresenter>
+                        </Grid>
                     </PivotItem>
                     <PivotItem Header="Teams Messages">
-                        <ScrollViewer>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
                             <StackPanel>
                                 <TextBlock>The following example shows the beta `Teams/id/Channels/id/messages` API for getting a list of messages (without replies) from a Channel in Teams.</TextBlock>
                                 <TextBlock Margin="0,8,0,0" FontWeight="Bold">My Chat Messages:</TextBlock>
-                                <wgt:GraphPresenter RequestBuilder="{x:Bind local:MainPage.GetTeamsChannelMessagesBuilder('02bd9fd6-8f93-4758-87c3-1fb73740a315', '19:d0bba23c2fc8413991125a43a54cc30e@thread.skype'), Mode=OneWay}"
+                            </StackPanel>
+                            <wgt:GraphPresenter Grid.Row="1"
+                                    RequestBuilder="{x:Bind local:MainPage.GetTeamsChannelMessagesBuilder('02bd9fd6-8f93-4758-87c3-1fb73740a315', '19:d0bba23c2fc8413991125a43a54cc30e@thread.skype'), Mode=OneWay}"
                                     ResponseType="graph:ChatMessage"
                                     IsCollection="True">
-                                    <wgt:GraphPresenter.ContentTemplate>
-                                        <DataTemplate>
-                                            <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
-                                                <ItemsControl ItemsSource="{Binding}">
-                                                    <ItemsControl.ItemTemplate>
-                                                        <DataTemplate x:DataType="graph:ChatMessage">
-                                                            <Grid>
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="Auto"/>
-                                                                    <ColumnDefinition Width="*"/>
-                                                                </Grid.ColumnDefinitions>
-                                                                <wgt:PersonView UserId="{x:Bind From.User.Id, Mode=OneWay}" Margin="-4,-4,8,-4"/>
-                                                                <TextBlock Text="{x:Bind ex:StringExtensions.DecodeHtml(Body.Content), Mode=OneWay}" TextWrapping="WrapWholeWords" Grid.Column="1"/>
-                                                            </Grid>
-                                                        </DataTemplate>
-                                                    </ItemsControl.ItemTemplate>
-                                                    <ItemsControl.ItemContainerStyle>
-                                                        <Style TargetType="ContentPresenter">
-                                                            <Setter Property="Margin" Value="0,8,0,8"/>
-                                                        </Style>
-                                                    </ItemsControl.ItemContainerStyle>
-                                                </ItemsControl>
-                                            </ScrollViewer>
-                                        </DataTemplate>
-                                    </wgt:GraphPresenter.ContentTemplate>
-                                </wgt:GraphPresenter>
-                            </StackPanel>
-                        </ScrollViewer>
+                                <wgt:GraphPresenter.ContentTemplate>
+                                    <DataTemplate>
+                                        <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{Binding}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="graph:ChatMessage">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <wgt:PersonView UserId="{x:Bind From.User.Id, Mode=OneWay}" Margin="-4,-4,8,-4"/>
+                                                            <TextBlock Text="{x:Bind ex:StringExtensions.DecodeHtml(Body.Content), Mode=OneWay}" TextWrapping="WrapWholeWords" Grid.Column="1"/>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                                <ItemsControl.ItemContainerStyle>
+                                                    <Style TargetType="ContentPresenter">
+                                                        <Setter Property="Margin" Value="0,8,0,8"/>
+                                                    </Style>
+                                                </ItemsControl.ItemContainerStyle>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </DataTemplate>
+                                </wgt:GraphPresenter.ContentTemplate>
+                            </wgt:GraphPresenter>
+                        </Grid>
                     </PivotItem>
                 </Pivot>
             </Grid>
