@@ -1,6 +1,6 @@
 #module nuget:?package=Cake.LongPath.Module&version=0.7.0
 
-#addin nuget:?package=Cake.FileHelpers&version=3.2.1
+#addin nuget:?package=Cake.FileHelpers&version=3.3.0
 #addin nuget:?package=Cake.Powershell&version=0.4.8
 
 #tool nuget:?package=vswhere&version=2.8.4
@@ -19,7 +19,7 @@ var target = Argument("target", "Default");
 // VERSIONS
 //////////////////////////////////////////////////////////////////////
 
-var gitVersioningVersion = "3.1.91";
+var gitVersioningVersion = "3.2.31";
 var inheritDocVersion = "2.5.2";
 
 //////////////////////////////////////////////////////////////////////
