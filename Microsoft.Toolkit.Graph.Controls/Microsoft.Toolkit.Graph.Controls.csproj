@@ -14,6 +14,7 @@
     </Description>
     <PackageTags>UWP Toolkit Windows Controls MSAL Microsoft Graph AadLogin ProfileCard Person PeoplePicker Login</PackageTags>
     <AssetTargetFallback>uap10.0.$(DefaultTargetPlatformMinVersion)</AssetTargetFallback>
+    <LangVersion>8.0</LangVersion>
     <IsWinUIAlpha Condition="'$(IsWinUIAlpha)' == ''">true</IsWinUIAlpha>
     <WindowsKitsPath Condition="'$(IsWinUIAlpha)' == 'true'">WinUI-Alpha-Projects-Don-t-Use-SDK-Xaml-Tools</WindowsKitsPath>
   </PropertyGroup>
@@ -39,7 +40,7 @@
   </ItemGroup>
  
   <ItemGroup>
-    <PackageReference Include="Microsoft.Graph.Beta" Version="0.18.0-preview" />
-    <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.4" />
+    <PackageReference Include="Microsoft.Graph.Beta" Version="0.21.0-preview" />
+    <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.5" />
   </ItemGroup>
 </Project>

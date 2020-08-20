@@ -41,7 +41,7 @@ Then open your `MainPage.xaml` file and add the following behavior:
 </Page>
 ```
 
-*You can also use the `<providers:MockProviderBehavior/>` instead to provide some test data, though we're currently investigating an issue with the search results returned for PeoplePicker, see [Issue #24](https://github.com/windows-toolkit/Graph-Controls/issues/24).*
+*You can also use the `<providers:MockProviderBehavior/>` instead to provide some test data.*
 
 You can use the `Scopes` property to preemptively request permissions from the user of your app for data your app needs to access from Microsoft Graph.
 
