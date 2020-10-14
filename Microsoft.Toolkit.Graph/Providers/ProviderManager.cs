@@ -4,9 +4,6 @@
 
 using System;
 using System.ComponentModel;
-using Microsoft.Graph;
-using Microsoft.Identity.Client;
-using Microsoft.Toolkit.Helpers;
 
 namespace Microsoft.Toolkit.Graph.Providers
 {

@@ -4,6 +4,7 @@
 
 using Windows.ApplicationModel;
 using Microsoft.UI.Xaml;
+using System;
 
 namespace SampleTest
 {
@@ -13,6 +14,15 @@ namespace SampleTest
 
         public App()
         {
+            WinRT.ComWrappersSupport.RegisterProjectionAssembly(typeof(App).Assembly);
+            WinRT.ComWrappersSupport.RegisterProjectionAssembly(typeof(Microsoft.Xaml.Interactivity.Interaction).Assembly);
+            WinRT.ComWrappersSupport.RegisterProjectionAssembly(typeof(Microsoft.Xaml.Interactions.Core.CallMethodAction).Assembly);
+
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                WinRT.ComWrappersSupport.RegisterProjectionAssembly(assembly);
+            }
+
             this.InitializeComponent();
             this.Suspending += OnSuspending;
         }

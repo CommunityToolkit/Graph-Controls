@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
     <Title>Windows Community Toolkit Graph Controls</Title>
     <PackageId>Microsoft.Toolkit.Graph.Controls</PackageId>
     <Description>
@@ -13,20 +13,15 @@
       - PeoplePicker: The PeoplePicker Control is a simple control that allows for selection of one or more users.
     </Description>
     <PackageTags>UWP Toolkit Windows Controls MSAL Microsoft Graph AadLogin ProfileCard Person PeoplePicker Login</PackageTags>
-    <AssetTargetFallback>uap10.0.$(DefaultTargetPlatformMinVersion)</AssetTargetFallback>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="0.1.0-prerelease.200629.3" />
-  </ItemGroup>
-  
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-preview2" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-preview2" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-build.69.g10356f8bc4" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-build.69.g10356f8bc4" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
     <PackageReference Include="Microsoft.WinUI">
-      <Version>3.0.0-preview2.200713.0</Version>
+      <Version>3.0.0-development.201009.6-CI</Version>
     </PackageReference>
   </ItemGroup>
 
@@ -42,7 +37,9 @@
   <ItemGroup>
     <Content Update="Assets\person.png">
       <Pack>true</Pack>
-      <PackagePath>lib\$(TargetFramework)\$(AssemblyName)\Assets\person.png</PackagePath>
+      <!--<PackagePath>lib\$(TargetFramework)\$(AssemblyName)\Assets\person.png</PackagePath>-->
+      <!-- https://github.com/dotnet/sdk/issues/14155 -->
+      <PackagePath>lib\net5.0-windows10.0.19041\$(AssemblyName)\Assets\person.png</PackagePath>
     </Content>
   </ItemGroup>
  
