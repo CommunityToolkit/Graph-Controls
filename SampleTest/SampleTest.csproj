@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net5.0-windows10.0.18362.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17134.0</TargetPlatformMinVersion>
     <RootNamespace>SampleTest</RootNamespace>
 
@@ -20,10 +20,11 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.WinUI">
-      <Version>3.0.0-development.201009.6-CI</Version>
+      <Version>3.0.0-preview3.201105.2-nightly</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VCRTForwarders.140" Version="1.0.6" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.Toolkit.Graph.Controls\Microsoft.Toolkit.Graph.Controls.csproj">
       <Project>{42252ee8-7e68-428f-972b-6d2dd3aa12cc}</Project>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net5.0-windows10.0.18362.0</TargetFramework>
     <Title>Windows Community Toolkit Graph Controls</Title>
     <PackageId>Microsoft.Toolkit.Graph.Controls</PackageId>
     <Description>
@@ -17,14 +17,14 @@
   </PropertyGroup>
   
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-build.69.g10356f8bc4" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-build.69.g10356f8bc4" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-build.80.gcb9e7794d6" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-build.80.gcb9e7794d6" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
     <PackageReference Include="Microsoft.WinUI">
-      <Version>3.0.0-development.201009.6-CI</Version>
+      <Version>3.0.0-preview3.201105.2-nightly</Version>
     </PackageReference>
   </ItemGroup>
-
+  
   <ItemGroup>
     <None Include="VisualStudioToolsManifest.xml" Pack="true" PackagePath="tools" />
   </ItemGroup>
@@ -39,7 +39,7 @@
       <Pack>true</Pack>
       <!--<PackagePath>lib\$(TargetFramework)\$(AssemblyName)\Assets\person.png</PackagePath>-->
       <!-- https://github.com/dotnet/sdk/issues/14155 -->
-      <PackagePath>lib\net5.0-windows10.0.19041\$(AssemblyName)\Assets\person.png</PackagePath>
+      <PackagePath>lib\net5.0-windows10.0.18362\$(AssemblyName)\Assets\person.png</PackagePath>
     </Content>
   </ItemGroup>
  
