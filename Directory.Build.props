@@ -16,8 +16,8 @@
     <IsUwpProject Condition="'$(IsDesignProject)' != 'true'">$(MSBuildProjectName.Contains('Uwp'))</IsUwpProject>
     <IsSampleProject>$(MSBuildProjectName.Contains('Sample'))</IsSampleProject>
     <IsWpfProject>$(MSBuildProjectName.Contains('Wpf'))</IsWpfProject>
-    <DefaultTargetPlatformVersion>17763</DefaultTargetPlatformVersion>
-    <DefaultTargetPlatformMinVersion>16299</DefaultTargetPlatformMinVersion>
+    <DefaultTargetPlatformVersion>19041</DefaultTargetPlatformVersion>
+    <DefaultTargetPlatformMinVersion>17763</DefaultTargetPlatformMinVersion>
     <PackageOutputPath>$(MSBuildThisFileDirectory)bin\nupkg</PackageOutputPath>
   </PropertyGroup>
 

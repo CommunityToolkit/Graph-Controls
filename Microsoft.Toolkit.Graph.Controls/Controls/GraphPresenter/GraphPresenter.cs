@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.Graph;
-using Microsoft.Toolkit.Uwp.Helpers;
+using Microsoft.Toolkit.Uwp.Extensions;
 using Newtonsoft.Json.Linq;
 using Windows.System;
 using Windows.UI.Xaml;
@@ -104,7 +104,7 @@ namespace Microsoft.Toolkit.Graph.Controls
                         data = values.ToObject(ResponseType);
                     }
 
-                    _ = DispatcherQueueHelper.ExecuteOnUIThreadAsync(dispatcherQueue, () => Content = data);
+                    _ = dispatcherQueue.EnqueueAsync(() => Content = data);
                 }
                 catch
                 {
