@@ -1,7 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
-    <TargetFramework>uap10.0.16299</TargetFramework>
+    <TargetFramework>uap10.0.17763</TargetFramework>
     <Title>Windows Community Toolkit Graph Controls</Title>
     <PackageId>Microsoft.Toolkit.Graph.Controls</PackageId>
     <Description>
@@ -25,8 +25,8 @@
   </ItemGroup> 
 
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="7.0.0-preview2" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="7.0.0-preview2" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="7.0.0-preview4" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="7.0.0-preview4" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
   </ItemGroup>
  
@@ -35,7 +35,7 @@
   </ItemGroup>
  
   <ItemGroup>
-    <PackageReference Include="Microsoft.Graph.Beta" Version="0.21.0-preview" />
+    <PackageReference Include="Microsoft.Graph.Beta" Version="0.32.0-preview" />
     <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.5" />
   </ItemGroup>
  

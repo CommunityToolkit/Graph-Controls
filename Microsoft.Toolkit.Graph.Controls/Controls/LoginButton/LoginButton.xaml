@@ -1,22 +1,23 @@
-﻿<ResourceDictionary
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Microsoft.Toolkit.Graph.Controls"
-    xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
-    xmlns:graphconverters="using:Microsoft.Toolkit.Graph.Converters">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+                    xmlns:graphconverters="using:Microsoft.Toolkit.Graph.Converters"
+                    xmlns:local="using:Microsoft.Toolkit.Graph.Controls">
 
-    <converters:BoolNegationConverter x:Key="InverseBoolConverter"/>
-    <converters:EmptyObjectToObjectConverter x:Key="InverseNullToVisibilityConverter" EmptyValue="Visible" NotEmptyValue="Collapsed"/>
-    <graphconverters:UserToPersonConverter x:Key="UserToPersonConverter"/>
+    <converters:BoolNegationConverter x:Key="InverseBoolConverter" />
+    <converters:EmptyObjectToObjectConverter x:Key="InverseNullToVisibilityConverter"
+                                             EmptyValue="Visible"
+                                             NotEmptyValue="Collapsed" />
+    <graphconverters:UserToPersonConverter x:Key="UserToPersonConverter" />
 
     <Style TargetType="local:LoginButton">
         <Setter Property="Padding" Value="4" />
-        <Setter Property="HorizontalAlignment" Value="Left"/>
-        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:LoginButton">
-                    <!-- TODO: In Future Use DropDownButton -->
+                    <!--  TODO: In Future Use DropDownButton  -->
                     <Button x:Name="PART_LoginButton"
                             Margin="{TemplateBinding Padding}"
                             Background="{TemplateBinding Background}"
@@ -24,14 +25,19 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}, RelativeSource={RelativeSource TemplatedParent}}">
                         <StackPanel Orientation="Horizontal">
-                            <local:PersonView PersonDetails="{Binding UserDetails, Converter={StaticResource UserToPersonConverter}, RelativeSource={RelativeSource TemplatedParent}}" ShowName="True"/>
-                            <TextBlock Visibility="{Binding UserDetails, Converter={StaticResource InverseNullToVisibilityConverter}, RelativeSource={RelativeSource TemplatedParent}}"
-                                       VerticalAlignment="Center">Sign In</TextBlock>
+                            <local:PersonView PersonDetails="{Binding UserDetails, Converter={StaticResource UserToPersonConverter}, RelativeSource={RelativeSource TemplatedParent}}"
+                                              ShowName="True" />
+                            <TextBlock VerticalAlignment="Center"
+                                       Visibility="{Binding UserDetails, Converter={StaticResource InverseNullToVisibilityConverter}, RelativeSource={RelativeSource TemplatedParent}}">
+                                Sign In
+                            </TextBlock>
                         </StackPanel>
                         <FlyoutBase.AttachedFlyout>
                             <Flyout>
                                 <StackPanel>
-                                    <local:PersonView PersonDetails="{Binding UserDetails, Converter={StaticResource UserToPersonConverter}, RelativeSource={RelativeSource TemplatedParent}}" ShowName="True" ShowEmail="True"/>
+                                    <local:PersonView PersonDetails="{Binding UserDetails, Converter={StaticResource UserToPersonConverter}, RelativeSource={RelativeSource TemplatedParent}}"
+                                                      ShowEmail="True"
+                                                      ShowName="True" />
                                     <HyperlinkButton x:Name="PART_SignOutButton">Sign Out</HyperlinkButton>
                                 </StackPanel>
                             </Flyout>
