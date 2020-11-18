@@ -16,7 +16,7 @@
     <IsSampleProject>$(MSBuildProjectName.Contains('Sample'))</IsSampleProject>
     <IsWpfProject>$(MSBuildProjectName.Contains('Wpf'))</IsWpfProject>
     <DefaultTargetPlatformVersion>18362</DefaultTargetPlatformVersion>
-    <DefaultTargetPlatformMinVersion>17134</DefaultTargetPlatformMinVersion>
+    <DefaultTargetPlatformMinVersion>17763</DefaultTargetPlatformMinVersion>
     <TargetPlatformVersion>10.0.$(DefaultTargetPlatformVersion).0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.$(DefaultTargetPlatformMinVersion).0</TargetPlatformMinVersion>
     <PackageOutputPath>$(MSBuildThisFileDirectory)bin\nupkg</PackageOutputPath>
