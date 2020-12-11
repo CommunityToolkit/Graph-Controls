@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Graph.Beta" Version="0.32.0-preview" />
     <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.5" />
-    <PackageReference Include="Microsoft.Toolkit" Version="8.0.0-build.80.gcb9e7794d6" />
+    <PackageReference Include="Microsoft.Toolkit" Version="8.0.0-build.89.g260ada150d" />
   </ItemGroup>
   
   <!-- Workaround for recursive MRT issue -->

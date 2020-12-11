@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.Graph;
+using Microsoft.System;
 using Microsoft.Toolkit.Graph.Extensions;
 using Microsoft.Toolkit.Graph.Providers;
 using Microsoft.Toolkit.Uwp.UI.Controls;
@@ -21,7 +22,7 @@ namespace Microsoft.Toolkit.Graph.Controls
     /// </summary>
     public partial class PeoplePicker : TokenizingTextBox
     {
-        private DispatcherTimer _typeTimer = new DispatcherTimer();
+        private DispatcherQueueTimer _typeTimer = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PeoplePicker"/> class.
@@ -71,6 +72,11 @@ namespace Microsoft.Toolkit.Graph.Controls
 
                 if (list != null)
                 {
+                    if (_typeTimer == null)
+                    {
+                        _typeTimer = DispatcherQueue.CreateTimer();
+                    }
+
                     _typeTimer.Debounce(
                     async () =>
                     {
