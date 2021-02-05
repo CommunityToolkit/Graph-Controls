@@ -19,6 +19,7 @@
     <DefaultTargetPlatformMinVersion>17763</DefaultTargetPlatformMinVersion>
     <TargetPlatformVersion>10.0.$(DefaultTargetPlatformVersion).0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.$(DefaultTargetPlatformMinVersion).0</TargetPlatformMinVersion>
+    <SupportedOSPlatformVersion>$(TargetPlatformMinVersion)</SupportedOSPlatformVersion>
     <PackageOutputPath>$(MSBuildThisFileDirectory)bin\nupkg</PackageOutputPath>
     <NoWarn>CS8002;CS8305</NoWarn> <!-- Temporary since WinUI3 is not stable yet -->
   </PropertyGroup>
@@ -64,7 +65,7 @@
         <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
       </ItemGroup>
       <PropertyGroup Condition="'$(Configuration)' == 'Release' or '$(Configuration)' == 'CI'">
-        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
       </PropertyGroup>
     </When>
   </Choose>

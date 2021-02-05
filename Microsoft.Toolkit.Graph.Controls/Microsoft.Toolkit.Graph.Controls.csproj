@@ -17,11 +17,12 @@
   </PropertyGroup>
   
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-build.89.g260ada150d" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-build.89.g260ada150d" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-build.108.g8572c1cb0a" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Behaviors" Version="8.0.0-build.108.g8572c1cb0a" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-build.108.g8572c1cb0a" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
     <PackageReference Include="Microsoft.WinUI">
-      <Version>3.0.0-preview3.201113.0</Version>
+      <Version>3.0.0-preview4.210210.4</Version>
     </PackageReference>
   </ItemGroup>
   
