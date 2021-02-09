@@ -66,8 +66,9 @@ namespace Microsoft.Toolkit.Graph.Extensions
                     .WithScopes(new string[] { "people.read" })
                     .GetAsync();
             }
-            catch
+            catch (Exception e)
             {
+
             }
 
             return new UserPeopleCollectionPage();

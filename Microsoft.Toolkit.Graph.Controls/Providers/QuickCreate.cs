@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Graph.Auth;
@@ -34,23 +35,28 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <param name="redirectUri">RedirectUri for auth response.</param>
         /// <param name="scopes">List of Scopes to initially request.</param>
         /// <returns>New <see cref="MsalProvider"/> reference.</returns>
-        public static async Task<MsalProvider> CreateMsalProviderAsync(string clientid, string redirectUri = "https://login.microsoftonline.com/common/oauth2/nativeclient", string[] scopes = null)
+        public static async Task<MsalProvider> CreateMsalProviderAsync(MsalConfig config)
         {
-            var client = PublicClientApplicationBuilder.Create(clientid)
+            var client = PublicClientApplicationBuilder.Create(config.ClientId)
                 .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
-                .WithRedirectUri(redirectUri)
+                .WithRedirectUri(config.RedirectUri)
                 .WithClientName(ProviderManager.ClientName)
                 .WithClientVersion(Assembly.GetExecutingAssembly().GetName().Version.ToString())
                 .Build();
 
-            if (scopes == null)
-            {
-                scopes = new string[] { string.Empty };
-            }
-
-            var provider = new InteractiveAuthenticationProvider(client, scopes);
+            var provider = new InteractiveAuthenticationProvider(client, config.Scopes);
 
             return await MsalProvider.CreateAsync(client, provider);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public static async Task<WindowsProvider> CreateWindowsProviderAsync(WindowsConfig config)
+        {
+            return await WindowsProvider.CreateAsync(config.ClientId, config.Scopes.ToArray());
         }
     }
 }

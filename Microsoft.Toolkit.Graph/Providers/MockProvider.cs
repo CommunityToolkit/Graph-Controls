@@ -38,7 +38,7 @@ namespace Microsoft.Toolkit.Graph.Providers
                 var current = _state;
                 _state = value;
 
-                StateChanged?.Invoke(this, new StateChangedEventArgs(current, _state));
+                StateChanged?.Invoke(this, new ProviderStateChangedEventArgs(current, _state));
             }
         }
 
@@ -55,7 +55,7 @@ namespace Microsoft.Toolkit.Graph.Providers
                     }));
 
         /// <inheritdoc/>
-        public event EventHandler<StateChangedEventArgs> StateChanged;
+        public event EventHandler<ProviderStateChangedEventArgs> StateChanged;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MockProvider"/> class.

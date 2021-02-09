@@ -1,8 +1,6 @@
 ﻿<Page x:Class="SampleTest.MainPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
-      xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ex="using:Microsoft.Toolkit.Extensions"
       xmlns:global="using:System.Globalization"
@@ -21,10 +19,15 @@
         After finishing the initial registration page, you will also need to add an additional redirect URI.
         Click on "Add a Redirect URI" and check the https://login.microsoftonline.com/common/oauth2/nativeclient checkbox on that page. Then click "Save".
     -->
-    <Interactivity:Interaction.Behaviors>
+    <!--<Interactivity:Interaction.Behaviors>-->
         <!--<providers:InteractiveProviderBehavior ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read,Calendars.Read,Mail.Read,Group.Read.All,ChannelMessage.Read.All"/>-->
-        <providers:MockProviderBehavior />
-    </Interactivity:Interaction.Behaviors>
+        <!--<providers:MockProviderBehavior />-->
+    <!--</Interactivity:Interaction.Behaviors>-->
+    <providers:GraphExtensions.GraphConfig>
+        <!--<providers:MsalConfig ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read,Calendars.Read,Mail.Read,Group.Read.All,ChannelMessage.Read.All" />-->
+        <!--<providers:WindowsConfig ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read,Calendars.Read,Mail.Read,Group.Read.All,ChannelMessage.Read.All" />-->
+        <providers:MockConfig />
+    </providers:GraphExtensions.GraphConfig>
 
     <Pivot>
         <Pivot.ItemContainerStyle>
@@ -280,8 +283,8 @@
                             </StackPanel>
                             <wgt:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
-                                                RequestBuilder="{x:Bind local:MainPage.GetTeamsChannelMessagesBuilder('02bd9fd6-8f93-4758-87c3-1fb73740a315', '19:d0bba23c2fc8413991125a43a54cc30e@thread.skype'), Mode=OneWay}"
-                                                ResponseType="graph:ChatMessage">
+                                                ResponseType="graph:ChatMessage"
+                                                x:Name="TeamsMessagePresenter">
                                 <wgt:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
                                         <ScrollViewer HorizontalScrollMode="Disabled"

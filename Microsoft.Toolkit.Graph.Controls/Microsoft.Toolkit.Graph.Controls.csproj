@@ -21,6 +21,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Providers\CommonProviderBehaviorBase.cs" />
+    <Compile Remove="Providers\CommonProviderBehaviorBase.Properties.cs" />
+    <Compile Remove="Providers\InteractiveProviderBehavior.cs" />
+    <Compile Remove="Providers\MockProviderBehavior.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Assets\person.png" />
   </ItemGroup> 
 

@@ -29,7 +29,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <summary>
         /// Event called when the login <see cref="State"/> changes.
         /// </summary>
-        event EventHandler<StateChangedEventArgs> StateChanged;
+        event EventHandler<ProviderStateChangedEventArgs> StateChanged;
 
         /// <summary>
         /// Login the user.

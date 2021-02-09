@@ -72,7 +72,7 @@ namespace Microsoft.Toolkit.Graph.Providers
             // Use Instance
         }
 
-        private void ProviderStateChanged(object sender, StateChangedEventArgs e)
+        private void ProviderStateChanged(object sender, ProviderStateChangedEventArgs e)
         {
             ProviderUpdated?.Invoke(this, new ProviderUpdatedEventArgs(ProviderManagerChangedState.ProviderStateChanged));
         }

@@ -25,6 +25,18 @@ namespace SampleTest
         public MainPage()
         {
             this.InitializeComponent();
+            ProviderManager.Instance.ProviderUpdated += this.Instance_ProviderUpdated;
+        }
+
+        private void Instance_ProviderUpdated(object sender, ProviderUpdatedEventArgs e)
+        {
+            IProvider provider = ProviderManager.Instance.GlobalProvider;
+            if (provider != null)
+            {
+                string teamId = "02bd9fd6-8f93-4758-87c3-1fb73740a315";
+                string channelId = "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype";
+                TeamsMessagePresenter.RequestBuilder = GetTeamsChannelMessagesBuilder(teamId, channelId);
+            }
         }
 
         public static string ToLocalTime(DateTimeTimeZone value)
