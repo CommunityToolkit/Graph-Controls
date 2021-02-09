@@ -21,7 +21,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <summary>
         /// Gets or sets the redirect URI (the URI the identity provider will send the security tokens back to).
         /// </summary>
-        public string RedirectUri { get; set; } = "https://login.microsoftonline.com/common/oauth2/nativeclient";
+        public string RedirectUri { get; set; }
 
         /// <summary>
         /// Gets or sets the list of Scopes (permissions) to request on initial login.
