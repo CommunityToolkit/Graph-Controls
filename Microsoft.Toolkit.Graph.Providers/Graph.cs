@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace Microsoft.Toolkit.Graph.Providers
 {
@@ -48,7 +49,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// The identifier for the Config dependency property.
         /// </returns>
         public static readonly DependencyProperty ConfigProperty =
-            DependencyProperty.RegisterAttached("Config", typeof(IGraphConfig), typeof(FrameworkElement), new PropertyMetadata(null, OnConfigChanged));
+            DependencyProperty.RegisterAttached("Config", typeof(IGraphConfig), typeof(Page), new PropertyMetadata(null, OnConfigChanged));
 
         private static void OnConfigChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
