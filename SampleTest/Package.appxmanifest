@@ -6,44 +6,44 @@
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   IgnorableNamespaces="uap mp">
 
-  <Identity
-    Name="1206Weaver.GraphControlsTestApp"
-    Publisher="CN=837C3C71-9A7D-469F-8F51-7E72CC6915ED"
-    Version="1.0.0.0" />
+    <Identity
+      Name="54b2f5a5-a4ed-4158-b816-d7a6a07d85e5"
+      Publisher="CN=mhawker"
+      Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="c072cef2-3d4b-4616-81ec-eab3055b2f30" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+    <mp:PhoneIdentity PhoneProductId="54b2f5a5-a4ed-4158-b816-d7a6a07d85e5" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
-  <Properties>
-    <DisplayName>GraphControlsTestApp</DisplayName>
-    <PublisherDisplayName>Weaver</PublisherDisplayName>
-    <Logo>Assets\StoreLogo.png</Logo>
-  </Properties>
+    <Properties>
+        <DisplayName>SampleTest</DisplayName>
+        <PublisherDisplayName>mhawker</PublisherDisplayName>
+        <Logo>Assets\StoreLogo.png</Logo>
+    </Properties>
 
-  <Dependencies>
-    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
-  </Dependencies>
+    <Dependencies>
+        <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
+    </Dependencies>
 
-  <Resources>
-    <Resource Language="x-generate"/>
-  </Resources>
+    <Resources>
+        <Resource Language="x-generate"/>
+    </Resources>
 
-  <Applications>
-    <Application Id="App"
-      Executable="$targetnametoken$.exe"
-      EntryPoint="SampleTest.App">
-      <uap:VisualElements
-        DisplayName="WCT Graph Controls Sample"
-        Square150x150Logo="Assets\Square150x150Logo.png"
-        Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="SampleTest"
-        BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
-        <uap:SplashScreen Image="Assets\SplashScreen.png" />
-      </uap:VisualElements>
-    </Application>
-  </Applications>
+    <Applications>
+        <Application Id="App"
+          Executable="$targetnametoken$.exe"
+          EntryPoint="SampleTest.App">
+            <uap:VisualElements
+              DisplayName="WCT Graph Controls Sample"
+              Square150x150Logo="Assets\Square150x150Logo.png"
+              Square44x44Logo="Assets\Square44x44Logo.png"
+              Description="SampleTest"
+              BackgroundColor="transparent">
+                <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
+                <uap:SplashScreen Image="Assets\SplashScreen.png" />
+            </uap:VisualElements>
+        </Application>
+    </Applications>
 
-  <Capabilities>
-    <Capability Name="internetClient" />
-  </Capabilities>
+    <Capabilities>
+        <Capability Name="internetClient" />
+    </Capabilities>
 </Package>
