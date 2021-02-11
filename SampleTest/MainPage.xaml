@@ -10,7 +10,6 @@
       xmlns:providers="using:Microsoft.Toolkit.Graph.Providers"
       xmlns:msal="using:Microsoft.Toolkit.Graph.Providers.Msal"
       xmlns:uwp="using:Microsoft.Toolkit.Graph.Providers.Uwp"
-      xmlns:mock="using:Microsoft.Toolkit.Graph.Providers.Mock"
       xmlns:wgt="using:Microsoft.Toolkit.Graph.Controls"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
       mc:Ignorable="d">
@@ -25,7 +24,7 @@
     <providers:Graph.Config>
         <!--<msal:MsalConfig ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read,Calendars.Read,Mail.Read,Group.Read.All,ChannelMessage.Read.All" />-->
         <!--<uwp:WindowsConfig ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read,Calendars.Read,Mail.Read,Group.Read.All,ChannelMessage.Read.All" />-->
-        <mock:MockConfig />
+        <providers:MockConfig />
     </providers:Graph.Config>
 
     <Pivot>

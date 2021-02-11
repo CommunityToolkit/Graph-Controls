@@ -2,8 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using Microsoft.Graph;
-using Microsoft.Toolkit.Graph.Providers.Mock;
 using System;
 using System.Collections.Generic;
 using Windows.UI.Xaml;
@@ -71,10 +69,21 @@ namespace Microsoft.Toolkit.Graph.Providers
         private static Dictionary<Type, Func<IGraphConfig, IProvider>> _providers = new Dictionary<Type, Func<IGraphConfig, IProvider>>();
 
         /// <summary>
-        /// 
+        /// Register a provider to be available for declaration in XAML using the ConfigProperty.
+        /// Use in the static constructor of an IGraphConfig implementation.
         /// </summary>
-        /// <param name="configType"></param>
-        /// <param name="providerFactory"></param>
+        /// <code>
+        /// static MsalConfig()
+        /// {
+        ///     Graph.RegisterConfig(typeof(MsalConfig), (c) => MsalProvider.Create(c as MsalConfig));
+        /// }.
+        /// </code>
+        /// <param name="configType">
+        /// The Type of the IGraphConfig implementation associated with provider.
+        /// </param>
+        /// <param name="providerFactory">
+        /// A factory function for creating a new instance of the IProvider implementation.
+        /// </param>
         public static void RegisterConfig(Type configType, Func<IGraphConfig, IProvider> providerFactory)
         {
             if (!_providers.ContainsKey(configType))

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Graph.Providers.Extensions;
 
-namespace Microsoft.Toolkit.Graph.Providers.Mock
+namespace Microsoft.Toolkit.Graph.Providers
 {
     /// <summary>
     /// Provider to connect to the example data set for Microsoft Graph. Useful for prototyping and samples.
