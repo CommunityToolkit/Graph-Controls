@@ -3,47 +3,22 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.Graph;
-using Microsoft.Toolkit.Graph.Extensions;
+using Microsoft.Toolkit.Graph.Providers.Extensions;
 
-namespace Microsoft.Toolkit.Graph.Providers
+namespace Microsoft.Toolkit.Graph.Providers.Mock
 {
     /// <summary>
     /// Provider to connect to the example data set for Microsoft Graph. Useful for prototyping and samples.
     /// </summary>
-    public class MockProvider : IProvider
+    public class MockProvider : BaseProvider
     {
         private const string GRAPH_PROXY_URL = "https://proxy.apisandbox.msdn.microsoft.com/svc?url=";
 
-        private ProviderState _state = ProviderState.Loading;
-
         /// <inheritdoc/>
-        public ProviderState State
-        {
-            get
-            {
-                return _state;
-            }
-
-            private set
-            {
-                var current = _state;
-                _state = value;
-
-                StateChanged?.Invoke(this, new ProviderStateChangedEventArgs(current, _state));
-            }
-        }
-
-        /// <inheritdoc/>
-        public GraphServiceClient Graph => new GraphServiceClient(
+        public override GraphServiceClient Graph => new GraphServiceClient(
                         new DelegateAuthenticationProvider((requestMessage) =>
                     {
                         var requestUri = requestMessage.RequestUri.ToString();
@@ -54,16 +29,13 @@ namespace Microsoft.Toolkit.Graph.Providers
                         return this.AuthenticateRequestAsync(requestMessage);
                     }));
 
-        /// <inheritdoc/>
-        public event EventHandler<ProviderStateChangedEventArgs> StateChanged;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="MockProvider"/> class.
         /// </summary>
-        /// <param name="signedIn">Whether the default state should be signedIn, defaults to true.</param>
-        public MockProvider(bool signedIn = true)
+        /// <param name="config">Configuration for the MockProvider.</param>
+        public MockProvider(MockConfig config = null)
         {
-            if (signedIn)
+            if (config == null || config.SignedIn)
             {
                 State = ProviderState.SignedIn;
             }
@@ -74,7 +46,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         }
 
         /// <inheritdoc/>
-        public Task AuthenticateRequestAsync(HttpRequestMessage request)
+        public override Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
             request.AddSdkVersion();
 
@@ -84,7 +56,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         }
 
         /// <inheritdoc/>
-        public async Task LoginAsync()
+        public override async Task LoginAsync()
         {
             State = ProviderState.Loading;
             await Task.Delay(3000);
@@ -92,7 +64,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         }
 
         /// <inheritdoc/>
-        public async Task LogoutAsync()
+        public override async Task LogoutAsync()
         {
             State = ProviderState.Loading;
             await Task.Delay(3000);

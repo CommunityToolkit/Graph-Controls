@@ -2,6 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using Microsoft.Graph;
+using Microsoft.Toolkit.Graph.Providers.Mock;
+using System;
+using System.Collections.Generic;
 using Windows.UI.Xaml;
 
 namespace Microsoft.Toolkit.Graph.Providers
@@ -48,21 +52,34 @@ namespace Microsoft.Toolkit.Graph.Providers
         public static readonly DependencyProperty ConfigProperty =
             DependencyProperty.RegisterAttached("Config", typeof(IGraphConfig), typeof(FrameworkElement), new PropertyMetadata(null, OnConfigChanged));
 
-        private static async void OnConfigChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+        private static void OnConfigChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             IGraphConfig config = GetConfig(sender);
 
-            if (config is MockConfig mockConfig)
+            Type configType = config.GetType();
+            if (_providers.ContainsKey(configType))
             {
-                ProviderManager.Instance.GlobalProvider = new MockProvider(mockConfig.SignedIn);
+                var providerFactory = _providers[configType];
+                ProviderManager.Instance.GlobalProvider = providerFactory.Invoke(config);
             }
-            else if (config is MsalConfig msalConfig)
+            else if (config is MockConfig mockConfig)
             {
-                ProviderManager.Instance.GlobalProvider = await QuickCreate.CreateMsalProviderAsync(msalConfig);
+                ProviderManager.Instance.GlobalProvider = new MockProvider(mockConfig);
             }
-            else if (config is WindowsConfig winConfig)
+        }
+
+        private static Dictionary<Type, Func<IGraphConfig, IProvider>> _providers = new Dictionary<Type, Func<IGraphConfig, IProvider>>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configType"></param>
+        /// <param name="providerFactory"></param>
+        public static void RegisterConfig(Type configType, Func<IGraphConfig, IProvider> providerFactory)
+        {
+            if (!_providers.ContainsKey(configType))
             {
-                ProviderManager.Instance.GlobalProvider = await QuickCreate.CreateWindowsProviderAsync(winConfig);
+                _providers.Add(configType, providerFactory);
             }
         }
     }

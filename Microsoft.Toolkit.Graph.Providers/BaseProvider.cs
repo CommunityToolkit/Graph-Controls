@@ -6,6 +6,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Graph;
+using Microsoft.Toolkit.Graph.Providers.Extensions;
 
 namespace Microsoft.Toolkit.Graph.Providers
 {
@@ -40,7 +41,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <summary>
         /// Gets or sets the service client instance for making Graph calls.
         /// </summary>
-        public GraphServiceClient Graph { get; protected set; }
+        public virtual GraphServiceClient Graph { get; protected set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseProvider"/> class.
@@ -58,5 +59,16 @@ namespace Microsoft.Toolkit.Graph.Providers
 
         /// <inheritdoc />
         public abstract Task AuthenticateRequestAsync(HttpRequestMessage request);
+
+        /// <summary>
+        /// Append the Sdk version to the request headers.
+        /// </summary>
+        /// <param name="request">
+        /// The request to append the header to.
+        /// </param>
+        protected void AddSdkVersion(HttpRequestMessage request)
+        {
+            request.AddSdkVersion();
+        }
     }
 }

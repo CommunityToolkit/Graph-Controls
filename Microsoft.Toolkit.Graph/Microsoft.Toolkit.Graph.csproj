@@ -21,6 +21,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Extensions\HttpRequestMessageExtensions.cs" />
+    <Compile Remove="Providers\BaseProvider.cs" />
+    <Compile Remove="Providers\MsalProvider.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Graph.Beta" Version="0.37.0-preview" />
     <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.6" />
     <PackageReference Include="Microsoft.Toolkit" Version="7.0.0-preview4" />

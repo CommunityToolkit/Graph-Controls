@@ -13,7 +13,7 @@ using Windows.Security.Authentication.Web;
 using Windows.Security.Authentication.Web.Core;
 using Windows.UI.ApplicationSettings;
 
-namespace Microsoft.Toolkit.Graph.Providers
+namespace Microsoft.Toolkit.Graph.Providers.Uwp
 {
     /// <summary>
     /// A provider for leveraging Windows system authentication.
@@ -56,18 +56,28 @@ namespace Microsoft.Toolkit.Graph.Providers
         private string _clientId;
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public static WindowsProvider Create(WindowsConfig config)
+        {
+            return Create(config.ClientId, config.Scopes.ToArray());
+        }
+
+        /// <summary>
         /// Creates a new instance of the WindowsProvider and attempts to sign in silently.
         /// </summary>
         /// <param name="clientId"></param>
         /// <param name="scopes"></param>
         /// <returns>A new instance of a WindowsProvider.</returns>
-        public static async Task<WindowsProvider> CreateAsync(string clientId, string[] scopes)
+        public static WindowsProvider Create(string clientId, string[] scopes)
         {
             var provider = new WindowsProvider(clientId, scopes);
 
             provider.Graph = new GraphServiceClient(provider);
 
-            await provider.TrySilentSignInAsync();
+            provider.TrySilentSignInAsync();
 
             return provider;
         }

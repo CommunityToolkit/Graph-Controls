@@ -2,13 +2,18 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-namespace Microsoft.Toolkit.Graph.Providers
+namespace Microsoft.Toolkit.Graph.Providers.Msal
 {
     /// <summary>
-    /// Basic configuration for talking to the Graph.
+    /// Configuration values for initializing the MsalProvider.
     /// </summary>
-    public class WindowsConfig : IGraphConfig
+    public class MsalConfig : IGraphConfig
     {
+        static MsalConfig()
+        {
+            Graph.RegisterConfig(typeof(MsalConfig), (c) => MsalProvider.Create(c as MsalConfig));
+        }
+
         /// <summary>
         /// Gets or sets the Client ID (the unique application (client) ID assigned to your app by Azure AD when the app was registered).
         /// </summary>
@@ -19,12 +24,17 @@ namespace Microsoft.Toolkit.Graph.Providers
         public string ClientId { get; set; }
 
         /// <summary>
+        /// Gets or sets the redirect URI (the URI the identity provider will send the security tokens back to).
+        /// </summary>
+        public string RedirectUri { get; set; }
+
+        /// <summary>
         /// Gets or sets the list of Scopes (permissions) to request on initial login.
         /// </summary>
         /// <remarks>
         /// This list can be modified by controls which require specific scopes to function.
         /// This will aid in requesting all scopes required by controls used before login is initiated, if using the LoginButton.
         /// </remarks>
-        public ScopeSet Scopes { get; set; } = new ScopeSet { "User.Read", "User.ReadBasic.All" };
+        public ScopeSet Scopes { get; set; }
     }
 }

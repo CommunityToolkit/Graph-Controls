@@ -161,6 +161,14 @@
       <Project>{42252ee8-7e68-428f-972b-6d2dd3aa12cc}</Project>
       <Name>Microsoft.Toolkit.Graph.Controls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Toolkit.Graph.Providers.Msal\Microsoft.Toolkit.Graph.Providers.Msal.csproj">
+      <Project>{36d0b51d-111b-4fc3-84e0-ce085172b9cc}</Project>
+      <Name>Microsoft.Toolkit.Graph.Providers.Msal</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Toolkit.Graph.Providers\Microsoft.Toolkit.Graph.Providers.csproj">
+      <Project>{10dff17a-183c-4112-9b94-b9e2aac5e4c8}</Project>
+      <Name>Microsoft.Toolkit.Graph.Providers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj">
       <Project>{B2246169-0CD8-473C-AFF6-172310E2C3F6}</Project>
       <Name>Microsoft.Toolkit.Graph</Name>

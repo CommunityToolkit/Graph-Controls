@@ -11,12 +11,12 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Microsoft.Toolkit.Graph.Extensions
+namespace Microsoft.Toolkit.Graph.Providers.Extensions
 {
     /// <summary>
     /// Helpers for Graph related HTTP Headers.
     /// </summary>
-    internal static class HttpRequestMessageExtensions
+    public static class HttpRequestMessageExtensions
     {
         private const string SdkVersion = "SdkVersion";
         private const string LibraryName = "wct";
