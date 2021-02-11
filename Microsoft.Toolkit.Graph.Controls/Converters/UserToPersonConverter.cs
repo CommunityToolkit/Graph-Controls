@@ -5,7 +5,7 @@
 using System;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Graph.Extensions;
-using Windows.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Data;
 
 namespace Microsoft.Toolkit.Graph.Converters
 {

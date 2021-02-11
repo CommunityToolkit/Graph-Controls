@@ -7,11 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.Graph;
+using Microsoft.System;
 using Microsoft.Toolkit.Uwp.Extensions;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json.Linq;
-using Windows.System;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 
 namespace Microsoft.Toolkit.Graph.Controls
 {

@@ -7,7 +7,7 @@ using System.Windows;
 using Microsoft.Toolkit.Wpf.UI.Behaviors;
 #else
 using Microsoft.Toolkit.Uwp.UI.Behaviors;
-using Windows.UI.Xaml;
+using Microsoft.UI.Xaml;
 #endif
 
 #if DOTNET

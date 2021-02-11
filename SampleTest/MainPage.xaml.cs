@@ -7,7 +7,7 @@ using Microsoft.Graph.Extensions;
 using Microsoft.Toolkit.Graph.Providers;
 using System;
 using System.Text.RegularExpressions;
-using Windows.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls;
 
 namespace SampleTest
 {

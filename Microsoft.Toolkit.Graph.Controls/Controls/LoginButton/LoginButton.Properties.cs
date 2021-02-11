@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using Microsoft.Graph;
-using Windows.UI.Xaml;
+using Microsoft.UI.Xaml;
 
 namespace Microsoft.Toolkit.Graph.Controls
 {

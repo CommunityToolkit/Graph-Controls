@@ -9,7 +9,7 @@ using System.Windows;
 using Microsoft.Toolkit.Graph.Providers;
 #else
 using System.Linq;
-using Windows.System;
+using Microsoft.System;
 #endif
 
 #if DOTNET

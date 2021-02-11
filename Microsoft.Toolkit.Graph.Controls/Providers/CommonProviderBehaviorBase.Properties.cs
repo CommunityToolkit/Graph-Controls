@@ -5,7 +5,7 @@
 #if DOTNET
 using System.Windows;
 #else
-using Windows.UI.Xaml;
+using Microsoft.UI.Xaml;
 #endif
 
 #if DOTNET

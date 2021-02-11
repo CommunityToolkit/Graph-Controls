@@ -26,9 +26,14 @@ steps:
 
   # Install Nuget Tool Installer
   - task: NuGetToolInstaller@0
-    displayName: Use NuGet 5.0.0
+    displayName: Use NuGet 5.8.1
     inputs:
-      versionSpec: 5.0.0
+      versionSpec: 5.8.1
+
+  - task: NuGetAuthenticate@0
+    displayName: 'NuGet Authenticate'
+    inputs:
+      forceReinstallCredentialProvider: true
 
   # Install NBGV Tool
   - task: DotNetCoreCLI@2
@@ -43,8 +48,8 @@ steps:
     displayName: Set Version
 
   # Install Windows SDK 18362 (minimum compatible sdk)
-  - powershell: .\build\Install-WindowsSdkISO.ps1 18362
-    displayName: Insider SDK
+  #- powershell: .\build\Install-WindowsSdkISO.ps1 18362
+  #  displayName: Insider SDK
 
   # Run cake build
   - powershell: .\build.ps1 -target=Package

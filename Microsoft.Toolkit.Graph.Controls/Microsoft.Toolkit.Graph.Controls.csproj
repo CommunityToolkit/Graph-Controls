@@ -1,7 +1,7 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>uap10.0.17763</TargetFramework>
+    <TargetFramework>net5.0-windows10.0.18362.0</TargetFramework>
     <Title>Windows Community Toolkit Graph Controls</Title>
     <PackageId>Microsoft.Toolkit.Graph.Controls</PackageId>
     <Description>
@@ -13,23 +13,19 @@
       - PeoplePicker: The PeoplePicker Control is a simple control that allows for selection of one or more users.
     </Description>
     <PackageTags>UWP Toolkit Windows Controls MSAL Microsoft Graph AadLogin ProfileCard Person PeoplePicker Login</PackageTags>
-    <SignAssembly>false</SignAssembly>
-    <GenerateLibraryLayout>true</GenerateLibraryLayout>
     <LangVersion>8.0</LangVersion>
-    <Configurations>Debug;Release;CI</Configurations>
-    <Platforms>AnyCPU;ARM;ARM64;x64;x86</Platforms>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="Assets\person.png" />
-  </ItemGroup> 
-
+  
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="7.0.0-preview4" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="7.0.0-preview4" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="8.0.0-preview4" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Behaviors" Version="8.0.0-preview4" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-preview4" />
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
+    <PackageReference Include="Microsoft.WinUI">
+      <Version>3.0.0-preview4.210210.4</Version>
+    </PackageReference>
   </ItemGroup>
- 
+  
   <ItemGroup>
     <None Include="VisualStudioToolsManifest.xml" Pack="true" PackagePath="tools" />
   </ItemGroup>
@@ -38,20 +34,14 @@
     <PackageReference Include="Microsoft.Graph.Beta" Version="0.37.0-preview" />
     <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.6" />
   </ItemGroup>
- 
+  
   <ItemGroup>
-    <Page Update="Controls\PersonView\PersonView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Content Update="Assets\person.png">
+      <Pack>true</Pack>
+      <!--<PackagePath>lib\$(TargetFramework)\$(AssemblyName)\Assets\person.png</PackagePath>-->
+      <!-- https://github.com/dotnet/sdk/issues/14155 -->
+      <PackagePath>lib\net5.0-windows10.0.18362\$(AssemblyName)\Assets\person.png</PackagePath>
+    </Content>
   </ItemGroup>
-
-  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
-  <!-- https://weblogs.asp.net/rweigelt/disable-warnings-in-generated-c-files-of-uwp-app -->
-  <Target Name="PragmaWarningDisablePrefixer" AfterTargets="MarkupCompilePass2">
-    <ItemGroup>
-      <GeneratedCSFiles Include="**\*.g.cs;**\*.g.i.cs" />
-    </ItemGroup>
-    <Message Text="CSFiles: @(GeneratedCSFiles->'&quot;%(Identity)&quot;')" />
-    <Exec Command="for %%f in (@(GeneratedCSFiles->'&quot;%(Identity)&quot;')) do echo #pragma warning disable &gt; %%f.temp &amp;&amp; type %%f &gt;&gt; %%f.temp &amp;&amp; move /y %%f.temp %%f &gt; NUL" />
-  </Target>
+ 
 </Project>

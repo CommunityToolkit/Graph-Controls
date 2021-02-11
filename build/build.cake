@@ -3,6 +3,8 @@
 #addin nuget:?package=Cake.FileHelpers&version=3.3.0
 #addin nuget:?package=Cake.Powershell&version=0.4.8
 
+#tool nuget:?package=vswhere&version=2.8.4
+
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -53,7 +55,7 @@ void VerifyHeaders(bool Replace)
     Func<IFileSystemInfo, bool> exclude_objDir =
         fileSystemInfo => !fileSystemInfo.Path.Segments.Contains("obj");
 
-    var files = GetFiles(baseDir + "/**/*.cs", exclude_objDir).Where(file =>
+    var files = GetFiles(baseDir + "/**/*.cs", new GlobberSettings { Predicate = exclude_objDir }).Where(file =>
     {
         var path = file.ToString();
         return !(path.EndsWith(".g.cs") || path.EndsWith(".i.cs") || System.IO.Path.GetFileName(path).Contains("TemporaryGeneratedFile"));
@@ -89,6 +91,19 @@ void VerifyHeaders(bool Replace)
     {
         throw new Exception("Please run UpdateHeaders.bat or '.\\build.ps1 -target=UpdateHeaders' and commit the changes.");
     }
+}
+
+void UpdateToolsPath(MSBuildSettings buildSettings)
+{
+    // Workaround for https://github.com/cake-build/cake/issues/2128
+	var vsInstallation = VSWhereLatest(new VSWhereLatestSettings { Requires = "Microsoft.Component.MSBuild", IncludePrerelease = true });
+
+	if (vsInstallation != null)
+	{
+		buildSettings.ToolPath = vsInstallation.CombineWithFilePath(@"MSBuild\Current\Bin\MSBuild.exe");
+		if (!FileExists(buildSettings.ToolPath))
+			buildSettings.ToolPath = vsInstallation.CombineWithFilePath(@"MSBuild\15.0\Bin\MSBuild.exe");
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -153,6 +168,8 @@ Task("Build")
     .SetConfiguration("CI")
     .WithTarget("Restore");
 
+    UpdateToolsPath(buildSettings);
+
     MSBuild(Solution, buildSettings);
 
     EnsureDirectoryExists(nupkgDir);
@@ -163,8 +180,9 @@ Task("Build")
         MaxCpuCount = 0
     }
     .SetConfiguration("CI")
-    .WithTarget("Build")
-    .WithProperty("GenerateLibraryLayout", "true");
+    .WithTarget("Build");
+
+    UpdateToolsPath(buildSettings);
 
 	MSBuild(Solution, buildSettings);
 });
@@ -209,8 +227,9 @@ Task("Package")
     }
     .SetConfiguration("CI")
     .WithTarget("Pack")
-    .WithProperty("GenerateLibraryLayout", "true")
 	.WithProperty("PackageOutputPath", nupkgDir);
+
+    UpdateToolsPath(buildSettings);
 
     MSBuild(Solution, buildSettings);
 });
@@ -246,7 +265,7 @@ Task("StyleXaml")
     Func<IFileSystemInfo, bool> exclude_objDir =
         fileSystemInfo => !fileSystemInfo.Path.Segments.Contains("obj");
 
-    var files = GetFiles(baseDir + "/**/*.xaml", exclude_objDir);
+    var files = GetFiles(baseDir + "/**/*.xaml", new GlobberSettings { Predicate = exclude_objDir });
     Information("\nChecking " + files.Count() + " file(s) for XAML Structure");
     foreach(var file in files)
     {
