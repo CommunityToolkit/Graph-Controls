@@ -1,0 +1,41 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras">
+
+  <PropertyGroup>
+    <TargetFramework>uap10.0.17763</TargetFramework>
+    <Title>Windows Community Toolkit Uwp Graph Provider</Title>
+    <PackageId>Microsoft.Toolkit.Graph.Providers.Msal</PackageId>
+    <Description>
+      This library provides an IProvider implenetation that authenticates using the native Windows dialoges. It is part of the Windows Community Toolkit.
+
+      Classes:
+      - UwpProvider: 
+      - UwpConfig: 
+    </Description>
+    <PackageTags>UWP Toolkit Windows Controls MSAL Microsoft Graph AadLogin Login</PackageTags>
+    <SignAssembly>false</SignAssembly>
+    <GenerateLibraryLayout>true</GenerateLibraryLayout>
+    <LangVersion>8.0</LangVersion>
+    <Configurations>Debug;Release;CI</Configurations>
+    <Platforms>AnyCPU;ARM;ARM64;x64;x86</Platforms>
+  </PropertyGroup>
+
+	<ItemGroup>
+      <ProjectReference Include="..\Microsoft.Toolkit.Graph.Providers\Microsoft.Toolkit.Graph.Providers.csproj" />
+      <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj" />
+  </ItemGroup>
+ 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Graph.Beta" Version="0.37.0-preview" />
+    <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.6" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
+  <!-- https://weblogs.asp.net/rweigelt/disable-warnings-in-generated-c-files-of-uwp-app -->
+  <Target Name="PragmaWarningDisablePrefixer" AfterTargets="MarkupCompilePass2">
+    <ItemGroup>
+      <GeneratedCSFiles Include="**\*.g.cs;**\*.g.i.cs" />
+    </ItemGroup>
+    <Message Text="CSFiles: @(GeneratedCSFiles->'&quot;%(Identity)&quot;')" />
+    <Exec Command="for %%f in (@(GeneratedCSFiles->'&quot;%(Identity)&quot;')) do echo #pragma warning disable &gt; %%f.temp &amp;&amp; type %%f &gt;&gt; %%f.temp &amp;&amp; move /y %%f.temp %%f &gt; NUL" />
+  </Target>
+</Project>

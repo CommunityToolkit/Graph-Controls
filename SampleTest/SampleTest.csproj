@@ -165,6 +165,10 @@
       <Project>{36d0b51d-111b-4fc3-84e0-ce085172b9cc}</Project>
       <Name>Microsoft.Toolkit.Graph.Providers.Msal</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Toolkit.Graph.Providers.Uwp\Microsoft.Toolkit.Graph.Providers.Uwp.csproj">
+      <Project>{6bb9c83f-eaee-4d9c-b184-b8834592828b}</Project>
+      <Name>Microsoft.Toolkit.Graph.Providers.Uwp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Microsoft.Toolkit.Graph.Providers\Microsoft.Toolkit.Graph.Providers.csproj">
       <Project>{10dff17a-183c-4112-9b94-b9e2aac5e4c8}</Project>
       <Name>Microsoft.Toolkit.Graph.Providers</Name>
