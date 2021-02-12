@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>uap10.0.17763</TargetFramework>
     <Title>Windows Community Toolkit Graph Providers</Title>
-    <PackageId>Microsoft.Toolkit.Graph.Controls</PackageId>
+    <PackageId>Microsoft.Toolkit.Graph.Providers</PackageId>
     <Description>
       This library provides base constructs for building Microsoft Graph XAML providers. It is part of the Windows Community Toolkit.
 
