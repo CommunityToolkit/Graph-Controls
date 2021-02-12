@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>uap10.0.17763</TargetFramework>
     <Title>Windows Community Toolkit Uwp Graph Provider</Title>
-    <PackageId>Microsoft.Toolkit.Graph.Providers.Msal</PackageId>
+    <PackageId>Microsoft.Toolkit.Graph.Providers.Uwp</PackageId>
     <Description>
       This library provides an IProvider implenetation that authenticates using the native Windows dialoges. It is part of the Windows Community Toolkit.
 
