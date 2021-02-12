@@ -5,7 +5,7 @@
 namespace Microsoft.Toolkit.Graph.Providers
 {
     /// <summary>
-    /// 
+    /// An interface to base Graph configuration implementations on.
     /// </summary>
     public interface IGraphConfig
     {

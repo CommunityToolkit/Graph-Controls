@@ -23,7 +23,7 @@ namespace Microsoft.Toolkit.Graph.Providers.Extensions
         private const string Bearer = "Bearer";
         private const string MockGraphToken = "{token:https://graph.microsoft.com/}";
 
-        public static void AddSdkVersion(this HttpRequestMessage request)
+        internal static void AddSdkVersion(this HttpRequestMessage request)
         {
             if (request == null || request.Headers == null)
             {
@@ -39,7 +39,7 @@ namespace Microsoft.Toolkit.Graph.Providers.Extensions
             }
         }
 
-        public static void AddMockProviderToken(this HttpRequestMessage request)
+        internal static void AddMockProviderToken(this HttpRequestMessage request)
         {
             request
                .Headers

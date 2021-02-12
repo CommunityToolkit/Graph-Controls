@@ -29,7 +29,7 @@ namespace Microsoft.Toolkit.Graph.Providers.Msal
         protected IAuthenticationProvider Provider { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MsalProvider"/> class. <see cref="CreateAsync"/>.
+        /// Initializes a new instance of the <see cref="MsalProvider"/> class. <see cref="Create(MsalConfig)"/>.
         /// </summary>
         private MsalProvider()
         {
@@ -38,8 +38,12 @@ namespace Microsoft.Toolkit.Graph.Providers.Msal
         /// <summary>
         /// Easily creates a <see cref="MsalProvider"/> from a config object.
         /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
+        /// <param name="config">
+        /// The configuration object used to initialize the provider.
+        /// </param>
+        /// <returns>
+        /// A new instance of the MsalProvider.
+        /// </returns>
         public static MsalProvider Create(MsalConfig config)
         {
             return Create(config.ClientId, config.RedirectUri, config.Scopes.ToArray());
@@ -80,7 +84,7 @@ namespace Microsoft.Toolkit.Graph.Providers.Msal
             };
             msal.Graph = new GraphServiceClient(msal);
 
-            msal.TrySilentSignInAsync();
+            _ = msal.TrySilentSignInAsync();
 
             return msal;
         }

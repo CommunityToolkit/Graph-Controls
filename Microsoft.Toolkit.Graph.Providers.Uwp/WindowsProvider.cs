@@ -56,10 +56,14 @@ namespace Microsoft.Toolkit.Graph.Providers.Uwp
         private string _clientId;
 
         /// <summary>
-        /// 
+        /// Creates a new instance of the WindowsProvider with a WindowsConfig object.
         /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
+        /// <param name="config">
+        /// The configuration object used to initialize the provider.
+        /// </param>
+        /// <returns>
+        /// A new instance of the WindowsProvider.
+        /// </returns>
         public static WindowsProvider Create(WindowsConfig config)
         {
             return Create(config.ClientId, config.Scopes.ToArray());
@@ -68,8 +72,12 @@ namespace Microsoft.Toolkit.Graph.Providers.Uwp
         /// <summary>
         /// Creates a new instance of the WindowsProvider and attempts to sign in silently.
         /// </summary>
-        /// <param name="clientId"></param>
-        /// <param name="scopes"></param>
+        /// <param name="clientId">
+        /// The clientId value used to initialize the provider.
+        /// </param>
+        /// <param name="scopes">
+        /// The scope values used to initialize the provider.
+        /// </param>
         /// <returns>A new instance of a WindowsProvider.</returns>
         public static WindowsProvider Create(string clientId, string[] scopes)
         {
@@ -77,7 +85,7 @@ namespace Microsoft.Toolkit.Graph.Providers.Uwp
 
             provider.Graph = new GraphServiceClient(provider);
 
-            provider.TrySilentSignInAsync();
+            _ = provider.TrySilentSignInAsync();
 
             return provider;
         }
