@@ -23,7 +23,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <returns>
         /// The value of the property on the target.
         /// </returns>
-        public static IGraphConfig GetConfig(DependencyObject target)
+        public static IGraphConfig GetConfig(ResourceDictionary target)
         {
             return (IGraphConfig)target.GetValue(ConfigProperty);
         }
@@ -37,7 +37,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <param name="value">
         /// The value to apply to the target property.
         /// </param>
-        public static void SetConfig(DependencyObject target, IGraphConfig value)
+        public static void SetConfig(ResourceDictionary target, IGraphConfig value)
         {
             target.SetValue(ConfigProperty, value);
         }
@@ -49,7 +49,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// The identifier for the Config dependency property.
         /// </returns>
         public static readonly DependencyProperty ConfigProperty =
-            DependencyProperty.RegisterAttached("Config", typeof(IGraphConfig), typeof(Page), new PropertyMetadata(null, OnConfigChanged));
+            DependencyProperty.RegisterAttached("Config", typeof(IGraphConfig), typeof(Graph), new PropertyMetadata(null, OnConfigChanged));
 
         private static void OnConfigChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
