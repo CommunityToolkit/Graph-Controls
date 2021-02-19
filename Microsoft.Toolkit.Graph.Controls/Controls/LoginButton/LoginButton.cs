@@ -110,6 +110,8 @@ namespace Microsoft.Toolkit.Graph.Controls
             }
             else if (provider.State == ProviderState.SignedIn)
             {
+                IsLoading = true;
+
                 try
                 {
                     // https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-login/mgt-login.ts#L139

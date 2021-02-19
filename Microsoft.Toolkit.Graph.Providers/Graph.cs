@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 
 namespace Microsoft.Toolkit.Graph.Providers
 {
@@ -53,17 +52,24 @@ namespace Microsoft.Toolkit.Graph.Providers
 
         private static void OnConfigChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            IGraphConfig config = GetConfig(sender);
+            if (sender is ResourceDictionary rd)
+            {
+                IGraphConfig config = GetConfig(rd);
 
-            Type configType = config.GetType();
-            if (_providers.ContainsKey(configType))
-            {
-                var providerFactory = _providers[configType];
-                ProviderManager.Instance.GlobalProvider = providerFactory.Invoke(config);
+                Type configType = config.GetType();
+                if (_providers.ContainsKey(configType))
+                {
+                    var providerFactory = _providers[configType];
+                    ProviderManager.Instance.GlobalProvider = providerFactory.Invoke(config);
+                }
+                else if (config is MockConfig mockConfig)
+                {
+                    ProviderManager.Instance.GlobalProvider = new MockProvider(mockConfig);
+                }
             }
-            else if (config is MockConfig mockConfig)
+            else
             {
-                ProviderManager.Instance.GlobalProvider = new MockProvider(mockConfig);
+                ProviderManager.Instance.GlobalProvider = null;
             }
         }
 
