@@ -123,8 +123,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Samples\RoamingSettings\RoamingSettings.xaml.cs">
-      <DependentUpon>RoamingSettings.xaml</DependentUpon>
+    <Compile Include="Samples\RoamingSettings\CustomRoamingSettings.cs" />
+    <Compile Include="Samples\RoamingSettings\RoamingSettingsView.xaml.cs">
+      <DependentUpon>RoamingSettingsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Samples\RoamingSettings\RoamingSettingsViewModel.cs" />
   </ItemGroup>
@@ -153,7 +154,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Samples\RoamingSettings\RoamingSettings.xaml">
+    <Page Include="Samples\RoamingSettings\RoamingSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

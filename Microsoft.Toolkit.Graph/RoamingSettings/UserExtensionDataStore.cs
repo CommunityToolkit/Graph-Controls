@@ -1,48 +1,52 @@
-﻿using System.Threading.Tasks;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System.Threading.Tasks;
 using Microsoft.Graph;
 
 namespace Microsoft.Toolkit.Graph.RoamingSettings
 {
-    public abstract class UserExtensionBase
+    public class UserExtensionDataStore
     {
-        public abstract string ExtensionId { get; }
+        public string ExtensionId { get; }
 
-        private string _userId;
+        public string UserId { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UserExtensionBase"/> class.
+        /// Initializes a new instance of the <see cref="UserExtensionDataStore"/> class.
         /// </summary>
-        /// <param name="userId"></param>
-        public UserExtensionBase(string userId)
+        public UserExtensionDataStore(string extensionId, string userId)
         {
-            _userId = userId;
+            ExtensionId = extensionId;
+            UserId = userId;
         }
 
         public virtual async Task<object> Get(string key)
         {
-            return await Get(ExtensionId, _userId, key);
+            return await Get(ExtensionId, UserId, key);
         }
 
         public virtual async Task<T> Get<T>(string key)
         {
-            return (T)await Get(ExtensionId, _userId, key);
+            return (T)await Get(ExtensionId, UserId, key);
         }
 
         public virtual async Task Set(string key, object value)
         {
-            var userExtension = await GetExtensionForUser(ExtensionId, _userId);
-            await userExtension.SetValue(_userId, key, value);
+            var userExtension = await GetExtensionForUser(ExtensionId, UserId);
+            await userExtension.SetValue(UserId, key, value);
         }
 
         public virtual async Task<Extension> Create()
         {
-            var userExtension = await Create(ExtensionId, _userId);
+            var userExtension = await Create(ExtensionId, UserId);
             return userExtension;
         }
 
         public virtual async Task Delete()
         {
-            await Delete(ExtensionId, _userId);
+            await Delete(ExtensionId, UserId);
         }
 
         public static async Task<T> Get<T>(string extensionId, string userId, string key)

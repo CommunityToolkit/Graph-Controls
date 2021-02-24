@@ -8,7 +8,7 @@
       xmlns:global="using:System.Globalization"
       xmlns:graph="using:Microsoft.Graph"
       xmlns:local="using:SampleTest"
-      xmlns:samples="using:SampleTest.Samples"
+      xmlns:roamingSettings="using:SampleTest.Samples.RoamingSettings"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:providers="using:Microsoft.Toolkit.Graph.Providers"
       xmlns:wgt="using:Microsoft.Toolkit.Graph.Controls"
@@ -43,7 +43,7 @@
             </StackPanel>
         </PivotItem>
         <PivotItem Header="RoamingSettings">
-            <samples:RoamingSettings />
+            <roamingSettings:RoamingSettingsView />
         </PivotItem>
         <PivotItem Header="PeoplePicker">
             <StackPanel>

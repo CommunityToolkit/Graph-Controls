@@ -23,7 +23,7 @@ namespace SampleTest
         // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2407
         public DateTime ThreeDaysFromNow => Today.AddDays(3);
 
-        private UserExtensionBase _roamingSettings = null;
+        private UserExtensionDataStore _roamingSettings = null;
 
         public MainPage()
         {
