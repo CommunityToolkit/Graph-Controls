@@ -1,0 +1,57 @@
+﻿<Page
+    x:Class="SampleTest.Samples.RoamingSettings"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SampleTest.Samples"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:graph="using:Microsoft.Graph"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <StackPanel Orientation="Horizontal">
+            <StackPanel>
+                <TextBlock Text="User Extensions:" />
+                <ListBox 
+                    ItemsSource="{Binding UserExtensions}"
+                    SelectionMode="Single"
+                    SelectedIndex="{Binding UserExtensionsSelectedIndex, Mode=TwoWay}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="graph:Extension">
+                            <Grid>
+                                <TextBlock Text="{Binding Id}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button Content="Create com.custom.roamingSettings" Click="CreateButton_Click" />
+                <Button Content="Delete com.custom.roamingSettings" Click="DeleteButton_Click" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Text="Additional Data:" />
+                <ListBox
+                    ItemsSource="{Binding AdditionalData}"
+                    SelectedIndex="{Binding AdditionalDataSelectedIndex, Mode=TwoWay}"
+                    SelectionMode="Single">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Key}" />
+                                <TextBlock Text="{Binding Value}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock Text="Key/Value:" />
+                <TextBox Header="Key" Text="{Binding KeyInputText, Mode=TwoWay}" />
+                <TextBox Header="Value" Text="{Binding ValueInputText, Mode=TwoWay}" />
+                <Button Content="Update" Click="UpdateButton_Click" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Page>

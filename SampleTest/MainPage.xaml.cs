@@ -5,6 +5,7 @@
 using Microsoft.Graph;
 using Microsoft.Graph.Extensions;
 using Microsoft.Toolkit.Graph.Providers;
+using Microsoft.Toolkit.Graph.RoamingSettings;
 using System;
 using System.Text.RegularExpressions;
 using Windows.UI.Xaml.Controls;
@@ -22,9 +23,28 @@ namespace SampleTest
         // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2407
         public DateTime ThreeDaysFromNow => Today.AddDays(3);
 
+        private UserExtensionBase _roamingSettings = null;
+
         public MainPage()
         {
             this.InitializeComponent();
+
+            ProviderManager.Instance.ProviderUpdated += (s, e) => this.OnGlobalProviderUpdated();
+            OnGlobalProviderUpdated();
+        }
+
+        private async void OnGlobalProviderUpdated()
+        {
+            var globalProvider = ProviderManager.Instance.GlobalProvider;
+            if (globalProvider != null && globalProvider.State == ProviderState.SignedIn)
+            {
+                var me = await globalProvider.Graph.Me.Request().GetAsync();
+                _roamingSettings = new CustomRoamingSettings(me.Id);
+            }
+            else
+            {
+                _roamingSettings = null;
+            }
         }
 
         public static string ToLocalTime(DateTimeTimeZone value)
@@ -53,7 +73,55 @@ namespace SampleTest
         public static IBaseRequestBuilder GetTeamsChannelMessagesBuilder(string team, string channel)
         {
             // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3064
-            return ProviderManager.Instance.GlobalProvider.Graph.Teams[team].Channels[channel].Messages;
+            return null;// ProviderManager.Instance.GlobalProvider.Graph.Teams[team].Channels[channel].Messages;
         }
+        /*
+        private async void GetButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            GetValueTextBlock.Text = "";
+
+            try
+            {
+                string key = GetKeyTextBox.Text;
+
+                string value = await _roamingSettings.Get<string>(key);
+
+                GetValueTextBlock.Text = value;
+            }
+            catch
+            {
+                GetValueTextBlock.Text = "Failure";
+            }
+        }
+
+        private async void SetButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            SetResponseTextBlock.Text = "";
+
+            string key = SetKeyTextBox.Text;
+            string value = SetValueTextBox.Text;
+
+            await _roamingSettings.Set(key, value);
+
+            SetResponseTextBlock.Text = "Success!";
+        }
+
+        private async void CreateButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            CreateResponseTextBlock.Text = "";
+
+            await _roamingSettings.Create();
+
+            CreateResponseTextBlock.Text = "Success!";
+        }
+
+        private async void DeleteButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            DeleteResponseTextBlock.Text = "";
+
+            await _roamingSettings.Delete();
+
+            DeleteResponseTextBlock.Text = "Success!";
+        }*/
     }
 }
