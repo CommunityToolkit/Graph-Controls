@@ -76,9 +76,10 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
             UserExtension.AdditionalData[key] = value;
         }
 
-        public virtual async Task Create()
+        public virtual async Task<Extension> Create()
         {
             UserExtension = await Create(ExtensionId, UserId);
+            return UserExtension;
         }
 
         public virtual async Task Delete()

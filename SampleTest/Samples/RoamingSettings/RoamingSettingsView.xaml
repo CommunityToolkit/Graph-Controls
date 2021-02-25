@@ -5,7 +5,6 @@
     xmlns:local="using:SampleTest.Samples.RoamingSettings"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:graph="using:Microsoft.Graph"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -26,6 +25,7 @@
             <!-- View -->
             <StackPanel>
                 <TextBlock Text="View the list of key value pairs stored in the roaming settings user extension." />
+                <TextBlock Text="Note: Some keys cannot be modified (e.g. statusCode, responseHeaders, @odata.context, extensionName)" />
                 <Button 
                     Click="ViewButton_Click"
                     Content="View" />

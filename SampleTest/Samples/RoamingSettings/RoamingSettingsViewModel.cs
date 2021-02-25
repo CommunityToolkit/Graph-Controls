@@ -88,6 +88,8 @@ namespace SampleTest.Samples.RoamingSettings
                 ErrorText = string.Empty;
 
                 await _roamingSettings.Set(KeyInputText, ValueInputText);
+
+                SyncRoamingSettings();
             }
             catch (Exception e)
             {
@@ -101,7 +103,11 @@ namespace SampleTest.Samples.RoamingSettings
             {
                 ErrorText = string.Empty;
 
-                await _roamingSettings.Create();
+                var newExtension = await _roamingSettings.Create();
+                AdditionalData = new ObservableCollection<KeyValuePair<string, object>>(newExtension.AdditionalData);
+
+                KeyInputText = string.Empty;
+                ValueInputText = string.Empty;
             }
             catch (Exception e)
             {
@@ -116,6 +122,10 @@ namespace SampleTest.Samples.RoamingSettings
                 ErrorText = string.Empty;
 
                 await _roamingSettings.Delete();
+
+                AdditionalData?.Clear();
+                KeyInputText = string.Empty;
+                ValueInputText = string.Empty;
             }
             catch (Exception e)
             {
@@ -128,15 +138,12 @@ namespace SampleTest.Samples.RoamingSettings
             try
             {
                 ErrorText = string.Empty;
+                AdditionalData?.Clear();
 
                 await _roamingSettings.Sync();
                 if (_roamingSettings?.UserExtension?.AdditionalData != null)
                 {
                     AdditionalData = new ObservableCollection<KeyValuePair<string, object>>(_roamingSettings.UserExtension.AdditionalData);
-                }
-                else
-                {
-                    AdditionalData?.Clear();
                 }
             }
             catch (Exception e)
