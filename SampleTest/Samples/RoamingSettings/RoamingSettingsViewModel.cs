@@ -5,6 +5,7 @@
 using Microsoft.Graph;
 using Microsoft.Toolkit.Graph.Providers;
 using Microsoft.Toolkit.Graph.RoamingSettings;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -19,46 +20,20 @@ namespace SampleTest.Samples.RoamingSettings
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private ObservableCollection<Extension> _userExtensions;
-        public ObservableCollection<Extension> UserExtensions
+        private string _errorText;
+        public string ErrorText
         {
-            get => _userExtensions;
-            set => Set(ref _userExtensions, value);
+            get => _errorText;
+            set => Set(ref _errorText, value);
         }
 
-        private int _userExtensionsSelectedIndex;
-        public int UserExtensionsSelectedIndex
-        {
-            get => _userExtensionsSelectedIndex;
-            set => Set(ref _userExtensionsSelectedIndex, value);
-        }
-
-        public Extension SelectedUserExtension
-        {
-            get => UserExtensionsSelectedIndex > -1 && UserExtensionsSelectedIndex <= UserExtensions?.Count
-                ? UserExtensions[UserExtensionsSelectedIndex]
-                : null;
-        }
+        private UserExtensionDataStore _roamingSettings;
 
         private ObservableCollection<KeyValuePair<string, object>> _additionalData;
         public ObservableCollection<KeyValuePair<string, object>> AdditionalData
         {
             get => _additionalData;
             set => Set(ref _additionalData, value);
-        }
-
-        private int _additionalDataSelectedIndex;
-        public int AdditionalDataSelectedIndex
-        {
-            get => _additionalDataSelectedIndex;
-            set => Set(ref _additionalDataSelectedIndex, value);
-        }
-
-        public KeyValuePair<string, object> SelectedAdditionalData
-        {
-            get => AdditionalDataSelectedIndex > -1 && AdditionalDataSelectedIndex <= AdditionalData?.Count
-                ? AdditionalData[AdditionalDataSelectedIndex]
-                : default;
         }
 
         private string _keyInputText;
@@ -79,82 +54,99 @@ namespace SampleTest.Samples.RoamingSettings
 
         public RoamingSettingsViewModel()
         {
-            _userExtensions = null;
-            _userExtensionsSelectedIndex = -1;
-            _additionalData = null;
-            _additionalDataSelectedIndex = -1;
+            _roamingSettings = null;
             _keyInputText = string.Empty;
             _valueInputText = string.Empty;
             _me = null;
 
-            PropertyChanged += OnPropertyChanged;
             ProviderManager.Instance.ProviderUpdated += (s, e) => CheckState();
             CheckState();
         }
 
-        public async void AddOrUpdateAdditionalData()
+        public async void GetValue()
         {
-            await UserExtensionsDataSource.SetValue(
-                extension: SelectedUserExtension,
-                userId: _me.Id,
-                key: KeyInputText,
-                value: ValueInputText
-                );
+            try
+            {
+                ErrorText = string.Empty;
+                ValueInputText = string.Empty;
 
-            // Reload the Extensions to show changes.
-            await LoadState();
+                string key = KeyInputText;
+                object value = await _roamingSettings.Get(key, false);
+
+                ValueInputText = value.ToString();
+            }
+            catch (Exception e)
+            {
+                ErrorText = e.Message;
+            }
+        }
+
+        public async void SetValue()
+        {
+            try
+            {
+                ErrorText = string.Empty;
+
+                await UserExtensionsDataSource.SetValue(
+                    extension: _roamingSettings.UserExtension,
+                    userId: _me.Id,
+                    key: KeyInputText,
+                    value: ValueInputText
+                    );
+            }
+            catch (Exception e)
+            {
+                ErrorText = e.Message;
+            }
         }
 
         public async void CreateCustomRoamingSettings()
         {
-            var roamingSettings = new CustomRoamingSettings(_me.Id);
-            await roamingSettings.Create();
+            try
+            {
+                ErrorText = string.Empty;
 
-            await LoadState();
+                await _roamingSettings.Create();
+            }
+            catch (Exception e)
+            {
+                ErrorText = e.Message;
+            }
         }
 
         public async void DeleteCustomRoamingSettings()
         {
-            var roamingSettings = new CustomRoamingSettings(_me.Id);
-            await roamingSettings.Delete();
+            try
+            {
+                ErrorText = string.Empty;
 
-            await LoadState();
+                await _roamingSettings.Delete();
+            }
+            catch (Exception e)
+            {
+                ErrorText = e.Message;
+            }
         }
 
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        public async void SyncRoamingSettings()
         {
-            switch(e.PropertyName)
+            try
             {
-                case nameof(UserExtensionsSelectedIndex):
-                    if (SelectedUserExtension != null)
-                    {
-                        var additionalData = SelectedUserExtension.AdditionalData != null
-                            ? SelectedUserExtension.AdditionalData
-                            : new Dictionary<string, object>();
+                ErrorText = string.Empty;
 
-                        AdditionalData = new ObservableCollection<KeyValuePair<string, object>>(additionalData);
-                    }
-                    else
-                    {
-                        AdditionalData.Clear();
-                    }
-
-                    KeyInputText = string.Empty;
-                    ValueInputText = string.Empty;
-
-                    break;
-                case nameof(AdditionalDataSelectedIndex):
-                    if (AdditionalDataSelectedIndex > -1)
-                    {
-                        KeyInputText = SelectedAdditionalData.Key;
-                        ValueInputText = SelectedAdditionalData.Value?.ToString();
-                    }
-                    else
-                    {
-                        KeyInputText = string.Empty;
-                        ValueInputText = string.Empty;
-                    }
-                    break;
+                await _roamingSettings.Sync();
+                if (_roamingSettings?.UserExtension?.AdditionalData != null)
+                {
+                    AdditionalData = new ObservableCollection<KeyValuePair<string, object>>(_roamingSettings.UserExtension.AdditionalData);
+                }
+                else
+                {
+                    AdditionalData?.Clear();
+                }
+            }
+            catch (Exception e)
+            {
+                ErrorText = e.Message;
             }
         }
 
@@ -172,23 +164,28 @@ namespace SampleTest.Samples.RoamingSettings
 
         private async Task LoadState()
         {
-            _me = await GlobalProvider.Graph.Me.Request().GetAsync();
-            string userId = _me.Id;
+            try
+            {
+                _me = await GlobalProvider.Graph.Me.Request().GetAsync();
+                string userId = _me.Id;
 
-            var userExtensions = await UserExtensionsDataSource.GetAllExtensions(userId);
-
-            UserExtensions = new ObservableCollection<Extension>(userExtensions);
+                _roamingSettings = new CustomRoamingSettings(userId, true);
+                KeyInputText = string.Empty;
+                ValueInputText = string.Empty;
+            }
+            catch (Exception e)
+            {
+                ErrorText = e.Message;
+            }
         }
 
         private void ClearState()
         {
-            UserExtensions?.Clear();
-            UserExtensionsSelectedIndex = -1;
-            AdditionalData?.Clear();
-            AdditionalDataSelectedIndex = -1;
+            _me = null;
+            _roamingSettings = null;
+
             KeyInputText = string.Empty;
             ValueInputText = string.Empty;
-            _me = null;
         }
 
         private void Set<T>(ref T field, T value, [CallerMemberName] string propertyName = null)

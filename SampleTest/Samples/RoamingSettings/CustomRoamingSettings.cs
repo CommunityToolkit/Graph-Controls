@@ -12,8 +12,8 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
         /// Initializes a new instance of the <see cref="CustomRoamingSettings"/> class.
         /// </summary>
         /// <param name="userId"></param>
-        public CustomRoamingSettings(string userId)
-            : base(_extensionId, userId)
+        public CustomRoamingSettings(string userId, bool autoSync = false)
+            : base(_extensionId, userId, autoSync)
         {
 
         }

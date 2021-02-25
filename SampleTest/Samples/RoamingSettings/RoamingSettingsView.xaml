@@ -10,7 +10,73 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <StackPanel Orientation="Horizontal">
+        <StackPanel Spacing="24">
+            <!-- Error text -->
+            <TextBlock Text="{Binding ErrorText}" Foreground="Red" />
+
+            <!-- Create -->
+            <StackPanel>
+                <TextBlock Text="Creates a custom extension on your user object in Graph." />
+                <TextBlock Text="(com.custom.roamingSettings)" />
+                <Button 
+                    Click="CreateButton_Click"
+                    Content="Create" />
+            </StackPanel>
+
+            <!-- View -->
+            <StackPanel>
+                <TextBlock Text="View the list of key value pairs stored in the roaming settings user extension." />
+                <Button 
+                    Click="ViewButton_Click"
+                    Content="View" />
+                <ListBox ItemsSource="{Binding AdditionalData}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <Run Text="{Binding Key}" />
+                                <Run Text=" : " />
+                                <Run Text="{Binding Value}" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+
+            <!-- Get/Set -->
+            <StackPanel>
+                <TextBlock Text="Get or Set individual values on the roaming settings user extension." />
+                
+                    <TextBox
+                        Header="Key"
+                        PlaceholderText="Key"
+                        Name="KeyInputTextBox"
+                        Text="{Binding KeyInputText, Mode=TwoWay}" />
+                    <Button
+                        Click="GetButton_Click"
+                        Content="Get"
+                        VerticalAlignment="Stretch" />
+
+                    <TextBox
+                        Header="Value"
+                        Name="ValueInputTextBox"
+                        PlaceholderText="Value"
+                        Text="{Binding ValueInputText, Mode=TwoWay}" />
+                    <Button
+                        Click="SetButton_Click"
+                        Content="Set"
+                        VerticalAlignment="Stretch" />
+            </StackPanel>
+
+            <!-- Delete -->
+            <StackPanel>
+                <TextBlock Text="Deletes the custom extension from the user object in Graph." />
+                <Button 
+                    Click="DeleteButton_Click"
+                    Content="Delete" />
+            </StackPanel>
+        </StackPanel>
+
+        <!--<StackPanel Orientation="Horizontal">
             <StackPanel>
                 <TextBlock Text="User Extensions:" />
                 <ListBox 
@@ -52,6 +118,6 @@
                 <TextBox Header="Value" Text="{Binding ValueInputText, Mode=TwoWay}" />
                 <Button Content="Update" Click="UpdateButton_Click" />
             </StackPanel>
-        </StackPanel>
+        </StackPanel>-->
     </Grid>
 </Page>

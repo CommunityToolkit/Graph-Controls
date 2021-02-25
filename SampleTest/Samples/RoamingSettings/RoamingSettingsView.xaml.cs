@@ -19,11 +19,6 @@ namespace SampleTest.Samples.RoamingSettings
             DataContext = new RoamingSettingsViewModel();
         }
 
-        private void UpdateButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
-        {
-            _vm.AddOrUpdateAdditionalData();
-        }
-
         private void CreateButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
             _vm.CreateCustomRoamingSettings();
@@ -32,6 +27,21 @@ namespace SampleTest.Samples.RoamingSettings
         private void DeleteButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
             _vm.DeleteCustomRoamingSettings();
+        }
+
+        private void SetButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            _vm.SetValue();
+        }
+
+        private void GetButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            _vm.GetValue();
+        }
+
+        private void ViewButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            _vm.SyncRoamingSettings();
         }
     }
 }

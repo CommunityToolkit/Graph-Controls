@@ -13,40 +13,84 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
 
         public string UserId { get; }
 
+        public Extension UserExtension { get; protected set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UserExtensionDataStore"/> class.
         /// </summary>
-        public UserExtensionDataStore(string extensionId, string userId)
+        public UserExtensionDataStore(string extensionId, string userId, bool autoSync = false)
         {
             ExtensionId = extensionId;
             UserId = userId;
+            UserExtension = null;
+
+            if (autoSync)
+            {
+                _ = Sync();
+            }
         }
 
-        public virtual async Task<object> Get(string key)
+        public object this[string key]
         {
-            return await Get(ExtensionId, UserId, key);
+            get => UserExtension?.AdditionalData[key];
+            set
+            {
+                if (UserExtension?.AdditionalData != null)
+                {
+                    UserExtension.AdditionalData[key] = value;
+                }
+            }
         }
 
-        public virtual async Task<T> Get<T>(string key)
+        public virtual async Task<object> Get(string key, bool checkCache = true)
         {
-            return (T)await Get(ExtensionId, UserId, key);
+            if (checkCache && UserExtension?.AdditionalData != null && UserExtension.AdditionalData.ContainsKey(key))
+            {
+                return UserExtension.AdditionalData[key];
+            }
+
+            object value = await Get(ExtensionId, UserId, key);
+            UserExtension.AdditionalData[key] = value;
+
+            return value;
+        }
+
+        public virtual async Task<T> Get<T>(string key, bool checkCache = true)
+        {
+            if (checkCache && UserExtension?.AdditionalData != null && UserExtension.AdditionalData.ContainsKey(key))
+            {
+                return (T)UserExtension.AdditionalData[key];
+            }
+
+            T value = (T)await Get(ExtensionId, UserId, key);
+            UserExtension.AdditionalData[key] = value;
+
+            return value;
         }
 
         public virtual async Task Set(string key, object value)
         {
             var userExtension = await GetExtensionForUser(ExtensionId, UserId);
             await userExtension.SetValue(UserId, key, value);
+
+            UserExtension.AdditionalData[key] = value;
         }
 
         public virtual async Task<Extension> Create()
         {
-            var userExtension = await Create(ExtensionId, UserId);
-            return userExtension;
+            UserExtension = await Create(ExtensionId, UserId);
+            return UserExtension;
         }
 
         public virtual async Task Delete()
         {
             await Delete(ExtensionId, UserId);
+            UserExtension = null;
+        }
+
+        public virtual async Task Sync()
+        {
+            UserExtension = await GetExtensionForUser(ExtensionId, UserId);
         }
 
         public static async Task<T> Get<T>(string extensionId, string userId, string key)
