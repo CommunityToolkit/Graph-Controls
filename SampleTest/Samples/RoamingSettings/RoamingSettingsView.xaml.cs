@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Collections.Generic;
 using Windows.UI.Xaml.Controls;
 
 namespace SampleTest.Samples.RoamingSettings
@@ -42,6 +43,15 @@ namespace SampleTest.Samples.RoamingSettings
         private void ViewButton_Click(object sender, Windows.UI.Xaml.RoutedEventArgs e)
         {
             _vm.SyncRoamingSettings();
+        }
+
+        private void AdditionalData_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            if (e.ClickedItem is KeyValuePair<string, object> kvp)
+            {
+                _vm.KeyInputText = kvp.Key;
+                _vm.ValueInputText = kvp.Value.ToString();
+            }
         }
     }
 }

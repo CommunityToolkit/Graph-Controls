@@ -87,12 +87,7 @@ namespace SampleTest.Samples.RoamingSettings
             {
                 ErrorText = string.Empty;
 
-                await UserExtensionsDataSource.SetValue(
-                    extension: _roamingSettings.UserExtension,
-                    userId: _me.Id,
-                    key: KeyInputText,
-                    value: ValueInputText
-                    );
+                await _roamingSettings.Set(KeyInputText, ValueInputText);
             }
             catch (Exception e)
             {

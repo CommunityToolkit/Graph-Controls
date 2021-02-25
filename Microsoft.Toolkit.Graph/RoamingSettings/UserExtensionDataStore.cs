@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Threading.Tasks;
 using Microsoft.Graph;
 
@@ -70,16 +71,14 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
 
         public virtual async Task Set(string key, object value)
         {
-            var userExtension = await GetExtensionForUser(ExtensionId, UserId);
-            await userExtension.SetValue(UserId, key, value);
+            await Set(ExtensionId, UserId, key, value);
 
             UserExtension.AdditionalData[key] = value;
         }
 
-        public virtual async Task<Extension> Create()
+        public virtual async Task Create()
         {
             UserExtension = await Create(ExtensionId, UserId);
-            return UserExtension;
         }
 
         public virtual async Task Delete()

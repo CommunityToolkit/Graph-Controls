@@ -9,7 +9,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
+    <ScrollViewer VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Visible">
         <StackPanel Spacing="24">
             <!-- Error text -->
             <TextBlock Text="{Binding ErrorText}" Foreground="Red" />
@@ -29,8 +29,8 @@
                 <Button 
                     Click="ViewButton_Click"
                     Content="View" />
-                <ListBox ItemsSource="{Binding AdditionalData}">
-                    <ListBox.ItemTemplate>
+                <ListView ItemsSource="{Binding AdditionalData}" IsItemClickEnabled="True" ItemClick="AdditionalData_ItemClick">
+                    <ListView.ItemTemplate>
                         <DataTemplate>
                             <TextBlock>
                                 <Run Text="{Binding Key}" />
@@ -38,8 +38,8 @@
                                 <Run Text="{Binding Value}" />
                             </TextBlock>
                         </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                    </ListView.ItemTemplate>
+                </ListView>
             </StackPanel>
 
             <!-- Get/Set -->
@@ -75,49 +75,5 @@
                     Content="Delete" />
             </StackPanel>
         </StackPanel>
-
-        <!--<StackPanel Orientation="Horizontal">
-            <StackPanel>
-                <TextBlock Text="User Extensions:" />
-                <ListBox 
-                    ItemsSource="{Binding UserExtensions}"
-                    SelectionMode="Single"
-                    SelectedIndex="{Binding UserExtensionsSelectedIndex, Mode=TwoWay}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="graph:Extension">
-                            <Grid>
-                                <TextBlock Text="{Binding Id}" />
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                <Button Content="Create com.custom.roamingSettings" Click="CreateButton_Click" />
-                <Button Content="Delete com.custom.roamingSettings" Click="DeleteButton_Click" />
-            </StackPanel>
-
-            <StackPanel>
-                <TextBlock Text="Additional Data:" />
-                <ListBox
-                    ItemsSource="{Binding AdditionalData}"
-                    SelectedIndex="{Binding AdditionalDataSelectedIndex, Mode=TwoWay}"
-                    SelectionMode="Single">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <TextBlock Text="{Binding Key}" />
-                                <TextBlock Text="{Binding Value}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
-
-            <StackPanel>
-                <TextBlock Text="Key/Value:" />
-                <TextBox Header="Key" Text="{Binding KeyInputText, Mode=TwoWay}" />
-                <TextBox Header="Value" Text="{Binding ValueInputText, Mode=TwoWay}" />
-                <Button Content="Update" Click="UpdateButton_Click" />
-            </StackPanel>
-        </StackPanel>-->
-    </Grid>
+    </ScrollViewer>
 </Page>

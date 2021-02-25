@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -14,35 +15,45 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
     {
         private static GraphServiceClient Graph => ProviderManager.Instance.GlobalProvider?.Graph;
 
-        public static async Task<Extension> UpdateExtension(this Extension extension, string userId)
-        {
-            var updatedExtension = await Graph.Users[userId].Extensions[extension.Id].Request().UpdateAsync(extension);
-            return updatedExtension;
-        }
-
         public static async Task<Extension> GetExtension(string userId, string extensionId)
         {
-            var extensions = await GetAllExtensions(userId);
-
-            foreach (var ex in extensions)
+            if (string.IsNullOrWhiteSpace(extensionId))
             {
-                if (ex.Id == extensionId)
-                {
-                    return ex;
-                }
+                throw new ArgumentNullException(nameof(extensionId));
             }
 
-            return null;
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+
+            var extension = await Graph.Users[userId].Extensions[extensionId].Request().GetAsync();
+            return extension;
         }
 
         public static async Task<IList<Extension>> GetAllExtensions(string userId)
         {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+
             var extensions = await Graph.Users[userId].Extensions.Request().GetAsync();
             return extensions;
         }
 
         public static async Task<Extension> CreateExtension(string userId, string extensionId)
         {
+            if (string.IsNullOrWhiteSpace(extensionId))
+            {
+                throw new ArgumentNullException(nameof(extensionId));
+            }
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+
             string requestUrl = Graph.Users[userId].Extensions.Request().RequestUrl;
 
             string json = "{" +
@@ -67,31 +78,45 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
 
         public static async Task DeleteExtension(string userId, string extensionId)
         {
+            if (string.IsNullOrWhiteSpace(extensionId))
+            {
+                throw new ArgumentNullException(nameof(extensionId));
+            }
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+
             await Graph.Users[userId].Extensions[extensionId].Request().DeleteAsync();
         }
 
         public static async Task<object> GetValue(this Extension extension, string key)
         {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+
             return extension.AdditionalData[key];
         }
 
         public static async Task SetValue(this Extension extension, string userId, string key, object value)
         {
-            if (extension.AdditionalData == null)
+            if (string.IsNullOrWhiteSpace(userId))
             {
-                extension.AdditionalData = new Dictionary<string, object>();
+                throw new ArgumentNullException(nameof(userId));
             }
 
-            if (extension.AdditionalData.ContainsKey(key))
+            if (string.IsNullOrWhiteSpace(key))
             {
-                extension.AdditionalData[key] = value;
-            }
-            else
-            {
-                extension.AdditionalData.Add(key, value);
+                throw new ArgumentNullException(nameof(key));
             }
 
-            await UpdateExtension(extension, userId);
+            var extensionToUpdate = (Extension)Activator.CreateInstance(typeof(Extension), true);
+            extensionToUpdate.AdditionalData = new Dictionary<string, object>() { { key, value } };
+
+            await Graph.Users[userId].Extensions[extension.Id].Request().UpdateAsync(extensionToUpdate);
         }
     }
 }
