@@ -91,14 +91,24 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
             await Graph.Users[userId].Extensions[extensionId].Request().DeleteAsync();
         }
 
-        public static async Task<object> GetValue(this Extension extension, string key)
+        public static T GetValue<T>(this Extension extension, string key)
+        {
+            return (T)GetValue(extension, key);
+        }
+
+        public static object GetValue(this Extension extension, string key)
         {
             if (string.IsNullOrWhiteSpace(key))
             {
                 throw new ArgumentNullException(nameof(key));
             }
 
-            return extension.AdditionalData[key];
+            if (extension.AdditionalData.ContainsKey(key))
+            {
+                return extension.AdditionalData[key];
+            }
+
+            return null;
         }
 
         public static async Task SetValue(this Extension extension, string userId, string key, object value)
