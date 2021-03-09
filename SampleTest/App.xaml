@@ -15,8 +15,8 @@
         -->
         <ResourceDictionary>
             <providers:Graph.Config>
-                <msal:MsalConfig ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read,Calendars.Read,Mail.Read,Group.Read.All,ChannelMessage.Read.All" />
-                <!--<providers:MockConfig />-->
+                <!--<msal:MsalConfig ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read,Calendars.Read,Mail.Read,Group.Read.All,ChannelMessage.Read.All" />-->
+                <providers:MockConfig />
             </providers:Graph.Config>
         </ResourceDictionary>
     </Application.Resources>
