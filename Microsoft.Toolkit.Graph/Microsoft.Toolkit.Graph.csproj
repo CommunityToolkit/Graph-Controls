@@ -25,4 +25,10 @@
     <PackageReference Include="Microsoft.Graph.Auth" Version="1.0.0-preview.6" />
     <PackageReference Include="Microsoft.Toolkit" Version="7.0.0-preview4" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'uap10.0.17763'">
+    <PackageReference Include="Microsoft.Toolkit.Uwp">
+      <Version>6.1.1</Version>
+    </PackageReference>
+  </ItemGroup>
 </Project>

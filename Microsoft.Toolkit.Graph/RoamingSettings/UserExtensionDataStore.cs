@@ -3,12 +3,16 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Graph;
+using Microsoft.Toolkit.Uwp.Helpers;
+using Windows.Storage;
 
 namespace Microsoft.Toolkit.Graph.RoamingSettings
 {
-    public class UserExtensionDataStore
+    public class UserExtensionDataStore : IObjectStorageHelper
     {
         public static async Task<T> Get<T>(string extensionId, string userId, string key)
         {
@@ -50,11 +54,17 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
 
         public Extension UserExtension { get; protected set; }
 
+        protected IDictionary<string, object> Settings => UserExtension?.AdditionalData;
+
+        private readonly IObjectSerializer serializer;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UserExtensionDataStore"/> class.
         /// </summary>
-        public UserExtensionDataStore(string extensionId, string userId, bool autoSync = false)
+        public UserExtensionDataStore(IObjectSerializer objectSerializer, string extensionId, string userId, bool autoSync = false)
         {
+            serializer = objectSerializer ?? throw new ArgumentNullException(nameof(objectSerializer));
+
             ExtensionId = extensionId;
             UserId = userId;
             UserExtension = null;
@@ -77,39 +87,6 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
             }
         }
 
-        public virtual async Task<object> Get(string key, bool checkCache = true)
-        {
-            if (checkCache && UserExtension?.AdditionalData != null && UserExtension.AdditionalData.ContainsKey(key))
-            {
-                return UserExtension.AdditionalData[key];
-            }
-
-            object value = await Get(ExtensionId, UserId, key);
-            UserExtension.AdditionalData[key] = value;
-
-            return value;
-        }
-
-        public virtual async Task<T> Get<T>(string key, bool checkCache = true)
-        {
-            if (checkCache && UserExtension?.AdditionalData != null && UserExtension.AdditionalData.ContainsKey(key))
-            {
-                return (T)UserExtension.AdditionalData[key];
-            }
-
-            T value = (T)await Get(ExtensionId, UserId, key);
-            UserExtension.AdditionalData[key] = value;
-
-            return value;
-        }
-
-        public virtual async Task Set(string key, object value)
-        {
-            await Set(ExtensionId, UserId, key, value);
-
-            UserExtension.AdditionalData[key] = value;
-        }
-
         public virtual async Task<Extension> Create()
         {
             UserExtension = await Create(ExtensionId, UserId);
@@ -125,6 +102,112 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
         public virtual async Task Sync()
         {
             UserExtension = await GetExtensionForUser(ExtensionId, UserId);
+        }
+
+        /// <inheritdoc />
+        public bool KeyExists(string key)
+        {
+            return UserExtension.AdditionalData.ContainsKey(key);
+        }
+
+        /// <inheritdoc />
+        public bool KeyExists(string compositeKey, string key)
+        {
+            if (KeyExists(compositeKey))
+            {
+                ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Settings[compositeKey];
+                if (composite != null)
+                {
+                    return composite.ContainsKey(key);
+                }
+            }
+
+            return false;
+        }
+
+        /// <inheritdoc />
+        public T Read<T>(string key, T @default = default)
+        {
+            if (!Settings.TryGetValue(key, out object value) || value == null)
+            {
+                return @default;
+            }
+
+            return serializer.Deserialize<T>((string)value);
+        }
+
+        /// <inheritdoc />
+        public T Read<T>(string compositeKey, string key, T @default = default)
+        {
+            ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Settings[compositeKey];
+            if (composite != null)
+            {
+                string value = (string)composite[key];
+                if (value != null)
+                {
+                    return serializer.Deserialize<T>(value);
+                }
+            }
+
+            return @default;
+        }
+
+        /// <inheritdoc />
+        public void Save<T>(string key, T value)
+        {
+            var type = typeof(T);
+            var typeInfo = type.GetTypeInfo();
+
+            Settings[key] = serializer.Serialize(value);
+        }
+
+        /// <inheritdoc />
+        public void Save<T>(string compositeKey, IDictionary<string, T> values)
+        {
+            if (KeyExists(compositeKey))
+            {
+                ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Settings[compositeKey];
+
+                foreach (KeyValuePair<string, T> setting in values)
+                {
+                    if (composite.ContainsKey(setting.Key))
+                    {
+                        composite[setting.Key] = serializer.Serialize(setting.Value);
+                    }
+                    else
+                    {
+                        composite.Add(setting.Key, serializer.Serialize(setting.Value));
+                    }
+                }
+            }
+            else
+            {
+                ApplicationDataCompositeValue composite = new ApplicationDataCompositeValue();
+                foreach (KeyValuePair<string, T> setting in values)
+                {
+                    composite.Add(setting.Key, serializer.Serialize(setting.Value));
+                }
+
+                Settings[compositeKey] = composite;
+            }
+        }
+
+        /// <inheritdoc />
+        public Task<bool> FileExistsAsync(string filePath)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<T> ReadFileAsync<T>(string filePath, T @default = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<StorageFile> SaveFileAsync<T>(string filePath, T value)
+        {
+            throw new NotImplementedException();
         }
     }
 }
