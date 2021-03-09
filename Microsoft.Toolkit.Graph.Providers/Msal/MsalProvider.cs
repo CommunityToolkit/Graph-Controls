@@ -3,23 +3,20 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Graph;
+using Microsoft.Graph.Auth;
 using Microsoft.Identity.Client;
-using Microsoft.Toolkit.Graph.Extensions;
 
-namespace Microsoft.Toolkit.Graph.Providers
+namespace Microsoft.Toolkit.Graph.Providers.Msal
 {
-    //// TODO: Move some of this to a simple base-class for non-MSAL parts related to Provider only and properties?
-
     /// <summary>
     /// <a href="https://github.com/AzureAD/microsoft-authentication-library-for-dotnet">MSAL.NET</a> provider helper for tracking authentication state using an <see cref="IAuthenticationProvider"/> class.
     /// </summary>
-    public class MsalProvider : IProvider
+    public class MsalProvider : BaseProvider
     {
         /// <summary>
         /// Gets or sets the MSAL.NET Client used to authenticate the user.
@@ -31,65 +28,71 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// </summary>
         protected IAuthenticationProvider Provider { get; set; }
 
-        private ProviderState _state = ProviderState.Loading;
-
-        /// <inheritdoc/>
-        public ProviderState State
-        {
-            get
-            {
-                return _state;
-            }
-
-            private set
-            {
-                var current = _state;
-                _state = value;
-
-                StateChanged?.Invoke(this, new StateChangedEventArgs(current, _state));
-            }
-        }
-
-        /// <inheritdoc/>
-        public GraphServiceClient Graph { get; private set; }
-
-        /// <inheritdoc/>
-        public event EventHandler<StateChangedEventArgs> StateChanged;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="MsalProvider"/> class. <see cref="CreateAsync"/>.
+        /// Initializes a new instance of the <see cref="MsalProvider"/> class. <see cref="Create(MsalConfig)"/>.
         /// </summary>
         private MsalProvider()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MsalProvider"/> class.
+        /// Easily creates a <see cref="MsalProvider"/> from a config object.
         /// </summary>
-        /// <param name="client">Existing <see cref="IPublicClientApplication"/> instance.</param>
-        /// <param name="provider">Existing <see cref="IAuthenticationProvider"/> instance.</param>
-        /// <returns>A <see cref="Task"/> returning a <see cref="MsalProvider"/> instance.</returns>
-        public static async Task<MsalProvider> CreateAsync(IPublicClientApplication client, IAuthenticationProvider provider)
+        /// <param name="config">
+        /// The configuration object used to initialize the provider.
+        /// </param>
+        /// <returns>
+        /// A new instance of the MsalProvider.
+        /// </returns>
+        public static MsalProvider Create(MsalConfig config)
+        {
+            return Create(config.ClientId, config.RedirectUri, config.Scopes.ToArray());
+        }
+
+        /// <summary>
+        /// Easily creates a <see cref="MsalProvider"/> from a ClientId.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// ProviderManager.Instance.GlobalProvider = await QuickCreate.CreateMsalProviderAsync("MyClientId");
+        /// </code>
+        /// </example>
+        /// <param name="clientid">Registered ClientId.</param>
+        /// <param name="redirectUri">RedirectUri for auth response.</param>
+        /// <param name="scopes">List of Scopes to initially request.</param>
+        /// <returns>New <see cref="MsalProvider"/> reference.</returns>
+        public static MsalProvider Create(string clientid, string redirectUri = "https://login.microsoftonline.com/common/oauth2/nativeclient", string[] scopes = null)
         {
             //// TODO: Check all config provided
+
+            var client = PublicClientApplicationBuilder.Create(clientid)
+                .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
+                .WithRedirectUri(redirectUri)
+                .WithClientName(ProviderManager.ClientName)
+                .WithClientVersion(Assembly.GetExecutingAssembly().GetName().Version.ToString())
+                .Build();
+
+            if (scopes == null)
+            {
+                scopes = new string[] { string.Empty };
+            }
 
             var msal = new MsalProvider
             {
                 Client = client,
-                Provider = provider,
+                Provider = new InteractiveAuthenticationProvider(client, scopes),
             };
-
             msal.Graph = new GraphServiceClient(msal);
 
-            await msal.TrySilentSignInAsync();
+            _ = msal.TrySilentSignInAsync();
 
             return msal;
         }
 
         /// <inheritdoc/>
-        public async Task AuthenticateRequestAsync(HttpRequestMessage request)
+        public override async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
-            request.AddSdkVersion();
+            AddSdkVersion(request);
 
             try
             {
@@ -159,14 +162,14 @@ namespace Microsoft.Toolkit.Graph.Providers
         }
 
         /// <inheritdoc/>
-        public async Task LoginAsync()
+        public override async Task LoginAsync()
         {
             // Force fake request to start auth process
             await AuthenticateRequestAsync(new System.Net.Http.HttpRequestMessage());
         }
 
         /// <inheritdoc/>
-        public async Task LogoutAsync()
+        public override async Task LogoutAsync()
         {
             // Forcibly remove each user.
             foreach (var user in await Client.GetAccountsAsync())

@@ -2,28 +2,24 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Microsoft.Toolkit.Graph.Extensions
+namespace Microsoft.Toolkit.Graph.Providers.Extensions
 {
     /// <summary>
     /// Helpers for Graph related HTTP Headers.
     /// </summary>
-    internal static class HttpRequestMessageExtensions
+    public static class HttpRequestMessageExtensions
     {
         private const string SdkVersion = "SdkVersion";
         private const string LibraryName = "wct";
         private const string Bearer = "Bearer";
         private const string MockGraphToken = "{token:https://graph.microsoft.com/}";
 
-        public static void AddSdkVersion(this HttpRequestMessage request)
+        internal static void AddSdkVersion(this HttpRequestMessage request)
         {
             if (request == null || request.Headers == null)
             {
@@ -39,7 +35,7 @@ namespace Microsoft.Toolkit.Graph.Extensions
             }
         }
 
-        public static void AddMockProviderToken(this HttpRequestMessage request)
+        internal static void AddMockProviderToken(this HttpRequestMessage request)
         {
             request
                .Headers

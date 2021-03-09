@@ -1,8 +1,6 @@
 ﻿<Page x:Class="SampleTest.MainPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
-      xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ex="using:Microsoft.Toolkit.Extensions"
       xmlns:global="using:System.Globalization"
@@ -13,19 +11,7 @@
       xmlns:wgt="using:Microsoft.Toolkit.Graph.Controls"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
       mc:Ignorable="d">
-    <!--
-        Initialize Graph Provider On Page Load
-        
-        Register Client Id: https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app
-        
-        After finishing the initial registration page, you will also need to add an additional redirect URI.
-        Click on "Add a Redirect URI" and check the https://login.microsoftonline.com/common/oauth2/nativeclient checkbox on that page. Then click "Save".
-    -->
-    <Interactivity:Interaction.Behaviors>
-        <!--<providers:InteractiveProviderBehavior ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read,Calendars.Read,Mail.Read,Group.Read.All,ChannelMessage.Read.All"/>-->
-        <providers:MockProviderBehavior />
-    </Interactivity:Interaction.Behaviors>
-
+    
     <Pivot>
         <Pivot.ItemContainerStyle>
             <Style TargetType="PivotItem">

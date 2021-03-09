@@ -9,14 +9,14 @@ namespace Microsoft.Toolkit.Graph.Providers
     /// <summary>
     /// <see cref="IProvider.StateChanged"/> event arguments.
     /// </summary>
-    public class StateChangedEventArgs : EventArgs
+    public class ProviderStateChangedEventArgs : EventArgs
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="StateChangedEventArgs"/> class.
+        /// Initializes a new instance of the <see cref="ProviderStateChangedEventArgs"/> class.
         /// </summary>
         /// <param name="oldState">Previous <see cref="ProviderState"/>.</param>
         /// <param name="newState">Current <see cref="ProviderState"/>.</param>
-        public StateChangedEventArgs(ProviderState oldState, ProviderState newState)
+        public ProviderStateChangedEventArgs(ProviderState oldState, ProviderState newState)
         {
             OldState = oldState;
             NewState = newState;

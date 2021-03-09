@@ -3,9 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-using System.ComponentModel;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Graph;
 
@@ -29,7 +26,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <summary>
         /// Event called when the login <see cref="State"/> changes.
         /// </summary>
-        event EventHandler<StateChangedEventArgs> StateChanged;
+        event EventHandler<ProviderStateChangedEventArgs> StateChanged;
 
         /// <summary>
         /// Login the user.

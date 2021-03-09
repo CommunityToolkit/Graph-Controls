@@ -160,6 +160,10 @@
       <Project>{42252ee8-7e68-428f-972b-6d2dd3aa12cc}</Project>
       <Name>Microsoft.Toolkit.Graph.Controls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Toolkit.Graph.Providers\Microsoft.Toolkit.Graph.Providers.csproj">
+      <Project>{788b4241-7ef0-4eae-ab9b-994d42885087}</Project>
+      <Name>Microsoft.Toolkit.Graph.Providers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj">
       <Project>{B2246169-0CD8-473C-AFF6-172310E2C3F6}</Project>
       <Name>Microsoft.Toolkit.Graph</Name>

@@ -2,32 +2,15 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-#if DOTNET
-using Microsoft.Xaml.Behaviors;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-#else
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-#endif
 
-#if DOTNET
-namespace Microsoft.Toolkit.Wpf.Graph.Providers
-#else
 namespace Microsoft.Toolkit.Graph.Providers
-#endif
 {
     /// <summary>
     /// Helper Class for XAML string Scope conversion.
     /// </summary>
-#if DOTNET
-    [TypeConverter(typeof(ScopeSetTypeConverter))]
-#else
     [Windows.Foundation.Metadata.CreateFromString(MethodName = "Microsoft.Toolkit.Graph.Providers.ScopeSet.ConvertToScopeArray")]
-#endif
     public class ScopeSet : Collection<string>
     {
         /// <summary>
@@ -47,7 +30,7 @@ namespace Microsoft.Toolkit.Graph.Providers
                 return new ScopeSet(rawString.Split(","));
             }
 
-            return ScopeSet.Empty;
+            return Empty;
         }
 
         /// <summary>
@@ -56,7 +39,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <param name="arr">Array to copy as ScopeSet.</param>
         public ScopeSet(string[] arr)
         {
-            this.AddRange(arr);
+            AddRange(arr);
         }
 
         /// <summary>
@@ -65,7 +48,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         /// <param name="list">List to copy as ScopeSet.</param>
         public ScopeSet(List<string> list)
         {
-            this.AddRange(list.ToArray());
+            AddRange(list.ToArray());
         }
 
         /// <summary>
@@ -83,7 +66,7 @@ namespace Microsoft.Toolkit.Graph.Providers
         {
             foreach (var item in items)
             {
-                this.Add(item);
+                Add(item);
             }
         }
     }
