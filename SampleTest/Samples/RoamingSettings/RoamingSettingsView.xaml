@@ -16,7 +16,7 @@
             <!-- Create -->
             <StackPanel>
                 <TextBlock Text="Creates a custom extension on your user object in Graph." />
-                <TextBlock Text="(com.custom.roamingSettings)" />
+                <TextBlock Text="(com.toolkit.roamingSettings.<application-user-model-id>)" />
                 <Button 
                     Click="CreateButton_Click"
                     Content="Create" />
