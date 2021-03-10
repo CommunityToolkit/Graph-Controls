@@ -5,6 +5,8 @@
 using Microsoft.Graph;
 using Microsoft.Toolkit.Graph.Providers;
 using Microsoft.Toolkit.Graph.RoamingSettings;
+using Microsoft.Toolkit.Uwp.Helpers;
+using SampleTest.Samples.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,7 +29,8 @@ namespace SampleTest.Samples.RoamingSettings
             set => Set(ref _errorText, value);
         }
 
-        private UserExtensionDataStore _roamingSettings;
+        private RoamingSettingsHelper _roamingSettings;
+        private UserExtensionDataStore _roamingSettingsDataStore => _roamingSettings.DataStore as UserExtensionDataStore;
 
         private ObservableCollection<KeyValuePair<string, object>> _additionalData;
         public ObservableCollection<KeyValuePair<string, object>> AdditionalData
@@ -63,7 +66,7 @@ namespace SampleTest.Samples.RoamingSettings
             CheckState();
         }
 
-        public async void GetValue()
+        public void GetValue()
         {
             try
             {
@@ -71,9 +74,9 @@ namespace SampleTest.Samples.RoamingSettings
                 ValueInputText = string.Empty;
 
                 string key = KeyInputText;
-                object value = await _roamingSettings.Get(key, false);
+                string value = _roamingSettings.Read<string>(key);
 
-                ValueInputText = value.ToString();
+                ValueInputText = value;
             }
             catch (Exception e)
             {
@@ -81,13 +84,13 @@ namespace SampleTest.Samples.RoamingSettings
             }
         }
 
-        public async void SetValue()
+        public void SetValue()
         {
             try
             {
                 ErrorText = string.Empty;
 
-                await _roamingSettings.Set(KeyInputText, ValueInputText);
+                _roamingSettings.Save(KeyInputText, ValueInputText);
 
                 SyncRoamingSettings();
             }
@@ -103,7 +106,7 @@ namespace SampleTest.Samples.RoamingSettings
             {
                 ErrorText = string.Empty;
 
-                var newExtension = await _roamingSettings.Create();
+                var newExtension = await _roamingSettingsDataStore.Create();
                 AdditionalData = new ObservableCollection<KeyValuePair<string, object>>(newExtension.AdditionalData);
 
                 KeyInputText = string.Empty;
@@ -121,7 +124,7 @@ namespace SampleTest.Samples.RoamingSettings
             {
                 ErrorText = string.Empty;
 
-                await _roamingSettings.Delete();
+                await _roamingSettingsDataStore.Delete();
 
                 AdditionalData?.Clear();
                 KeyInputText = string.Empty;
@@ -140,10 +143,10 @@ namespace SampleTest.Samples.RoamingSettings
                 ErrorText = string.Empty;
                 AdditionalData?.Clear();
 
-                await _roamingSettings.Sync();
-                if (_roamingSettings?.UserExtension?.AdditionalData != null)
+                await _roamingSettingsDataStore.Sync();
+                if (_roamingSettingsDataStore.Settings != null)
                 {
-                    AdditionalData = new ObservableCollection<KeyValuePair<string, object>>(_roamingSettings.UserExtension.AdditionalData);
+                    AdditionalData = new ObservableCollection<KeyValuePair<string, object>>(_roamingSettingsDataStore.Settings);
                 }
             }
             catch (Exception e)
@@ -171,7 +174,7 @@ namespace SampleTest.Samples.RoamingSettings
                 _me = await GlobalProvider.Graph.Me.Request().GetAsync();
                 string userId = _me.Id;
 
-                _roamingSettings = new CustomRoamingSettings(userId, true);
+                _roamingSettings = new RoamingSettingsHelper(new JsonObjectSerializer(), userId, RoamingDataStore.UserExtensions);
                 KeyInputText = string.Empty;
                 ValueInputText = string.Empty;
             }

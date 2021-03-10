@@ -1,9 +1,7 @@
-﻿using Microsoft.Toolkit.Uwp.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
 
 namespace Microsoft.Toolkit.Graph.RoamingSettings
@@ -24,14 +22,26 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
     /// </summary>
     public class RoamingSettingsHelper : IObjectStorageHelper
     {
-        private IObjectStorageHelper DataStore;
+        /// <summary>
+        /// Gets the internal data storage helper instance.
+        /// </summary>
+        public IObjectStorageHelper DataStore { get; private set; }
 
-        public RoamingSettingsHelper(RoamingDataStore dataStore)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RoamingSettingsHelper"/> class.
+        /// </summary>
+        /// <param name="serializer">An object serializer for serialization of objects in the data store.</param>
+        /// <param name="userId">The id of the target Graph User.</param>
+        /// <param name="dataStore">Which specific data store is being used.</param>
+        /// <param name="autoSync">Whether the values should immediately sync or not.</param>
+        public RoamingSettingsHelper(IObjectSerializer serializer, string userId, RoamingDataStore dataStore, bool autoSync = false)
         {
             switch (dataStore)
             {
                 case RoamingDataStore.UserExtensions:
-                    DataStore = new UserExtensionDataStore();
+                    // Determine the extension id value using app identity.
+                    string aumid = Windows.ApplicationModel.AppInfo.Current.AppUserModelId;
+                    DataStore = new UserExtensionDataStore(serializer, "com.toolkit.roamingSettings." + aumid, userId, autoSync);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dataStore));
@@ -42,27 +52,27 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
         public Task<bool> FileExistsAsync(string filePath) => DataStore.FileExistsAsync(filePath);
 
         /// <inheritdoc />
-        public bool KeyExists(string key) => KeyExists(key);
+        public bool KeyExists(string key) => DataStore.KeyExists(key);
 
         /// <inheritdoc />
-        public bool KeyExists(string compositeKey, string key) => KeyExists(compositeKey, key);
+        public bool KeyExists(string compositeKey, string key) => DataStore.KeyExists(compositeKey, key);
 
         /// <inheritdoc />
-        public T Read<T>(string key, T @default = default) => Read<T>(key, @default);
+        public T Read<T>(string key, T @default = default) => DataStore.Read<T>(key, @default);
 
         /// <inheritdoc />
-        public T Read<T>(string compositeKey, string key, T @default = default) => Read<T>(compositeKey, key, @default);
+        public T Read<T>(string compositeKey, string key, T @default = default) => DataStore.Read<T>(compositeKey, key, @default);
 
         /// <inheritdoc />
-        public Task<T> ReadFileAsync<T>(string filePath, T @default = default) => ReadFileAsync<T>(filePath, @default);
+        public Task<T> ReadFileAsync<T>(string filePath, T @default = default) => DataStore.ReadFileAsync<T>(filePath, @default);
 
         /// <inheritdoc />
-        public void Save<T>(string key, T value) => Save<T>(key, value);
+        public void Save<T>(string key, T value) => DataStore.Save<T>(key, value);
 
         /// <inheritdoc />
-        public void Save<T>(string compositeKey, IDictionary<string, T> values) => Save<T>(compositeKey, values);
+        public void Save<T>(string compositeKey, IDictionary<string, T> values) => DataStore.Save<T>(compositeKey, values);
 
         /// <inheritdoc />
-        public Task<StorageFile> SaveFileAsync<T>(string filePath, T value) => SaveFileAsync<T>(filePath, value);
+        public Task<StorageFile> SaveFileAsync<T>(string filePath, T value) => DataStore.SaveFileAsync<T>(filePath, value);
     }
 }

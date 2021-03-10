@@ -11,10 +11,19 @@ using Microsoft.Toolkit.Graph.Providers;
 
 namespace Microsoft.Toolkit.Graph.RoamingSettings
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class UserExtensionsDataSource
     {
         private static GraphServiceClient Graph => ProviderManager.Instance.GlobalProvider?.Graph;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="extensionId"></param>
+        /// <returns></returns>
         public static async Task<Extension> GetExtension(string userId, string extensionId)
         {
             if (string.IsNullOrWhiteSpace(extensionId))
@@ -31,6 +40,11 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
             return extension;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public static async Task<IList<Extension>> GetAllExtensions(string userId)
         {
             if (string.IsNullOrWhiteSpace(userId))
@@ -42,6 +56,12 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
             return extensions;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="extensionId"></param>
+        /// <returns></returns>
         public static async Task<Extension> CreateExtension(string userId, string extensionId)
         {
             if (string.IsNullOrWhiteSpace(extensionId))
@@ -76,6 +96,12 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="extensionId"></param>
+        /// <returns></returns>
         public static async Task DeleteExtension(string userId, string extensionId)
         {
             if (string.IsNullOrWhiteSpace(extensionId))
@@ -91,11 +117,24 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
             await Graph.Users[userId].Extensions[extensionId].Request().DeleteAsync();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="extension"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static T GetValue<T>(this Extension extension, string key)
         {
             return (T)GetValue(extension, key);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static object GetValue(this Extension extension, string key)
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -111,6 +150,14 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <param name="userId"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static async Task SetValue(this Extension extension, string userId, string key, object value)
         {
             if (string.IsNullOrWhiteSpace(userId))
