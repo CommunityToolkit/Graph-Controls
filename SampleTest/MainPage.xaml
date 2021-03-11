@@ -80,6 +80,7 @@
                             <wgt:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
                                                 OrderBy="start/dateTime"
+                                                RequestBuilder="{x:Bind local:MainPage.GetCalendarViewBuilder(), Mode=OneWay}"
                                                 ResponseType="graph:Event">
                                 <wgt:GraphPresenter.QueryOptions>
                                     <!--  Need to create separate Properties as multiple functions not supported in x:Bind see https://github.com/microsoft/microsoft-ui-xaml/issues/2407  -->
@@ -140,6 +141,7 @@
                             </StackPanel>
                             <wgt:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
+                                                RequestBuilder="{x:Bind local:MainPage.GetMessagesBuilder(), Mode=OneWay}"
                                                 ResponseType="graph:Message">
                                 <wgt:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
@@ -187,6 +189,7 @@
                             </StackPanel>
                             <wgt:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
+                                                RequestBuilder="{x:Bind local:MainPage.GetPlannerTasksBuilder(), Mode=OneWay}"
                                                 ResponseType="graph:PlannerTask">
                                 <wgt:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
@@ -233,7 +236,6 @@
                                                                 <Run>Due</Run>
                                                                 <Run Text="{x:Bind local:MainPage.ToLocalTime(DueDateTime), Mode=OneWay}" />
                                                             </TextBlock>
-
                                                         </Grid>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>

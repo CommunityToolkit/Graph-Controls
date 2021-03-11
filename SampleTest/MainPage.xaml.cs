@@ -51,6 +51,21 @@ namespace SampleTest
             return percentCompleted == 100;
         }
 
+        public static IBaseRequestBuilder GetCalendarViewBuilder()
+        {
+            return ProviderManager.Instance.GlobalProvider.Graph().Me.CalendarView;
+        }
+        
+        public static IBaseRequestBuilder GetMessagesBuilder()
+        {
+            return ProviderManager.Instance.GlobalProvider.Graph().Me.Messages;
+        }
+
+        public static IBaseRequestBuilder GetPlannerTasksBuilder()
+        {
+            return ProviderManager.Instance.GlobalProvider.Graph().Me.Planner.Tasks;
+        }
+
         public static IBaseRequestBuilder GetTeamsChannelMessagesBuilder(string team, string channel)
         {
             // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3064

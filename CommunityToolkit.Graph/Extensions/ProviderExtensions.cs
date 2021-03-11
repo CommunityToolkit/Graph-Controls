@@ -12,10 +12,7 @@ namespace CommunityToolkit.Graph.Extensions
     /// </summary>
     public static class ProviderExtensions
     {
-        /// <summary>
-        /// Gets the currently configured Graph service client, based on the active GlobalProvider instance.
-        /// </summary>
-        public static GraphServiceClient Client { get; private set; }
+        private static GraphServiceClient _client;
 
         static ProviderExtensions()
         {
@@ -24,9 +21,10 @@ namespace CommunityToolkit.Graph.Extensions
 
         private static void OnProviderUpdated(object sender, ProviderUpdatedEventArgs e)
         {
-            if (e.Reason == ProviderManagerChangedState.ProviderChanged)
+            var providerManager = sender as ProviderManager;
+            if (e.Reason == ProviderManagerChangedState.ProviderChanged || !(providerManager.GlobalProvider?.State == ProviderState.SignedIn))
             {
-                Client = null;
+                _client = null;
             }
         }
 
@@ -38,12 +36,12 @@ namespace CommunityToolkit.Graph.Extensions
         /// <returns>A GraphServiceClient instance.</returns>
         public static GraphServiceClient Graph(this IProvider provider)
         {
-            if (Client == null)
+            if (_client == null && provider.State == ProviderState.SignedIn)
             {
-                Client = provider != null ? new GraphServiceClient(provider) : null;
+                _client = provider != null ? new GraphServiceClient(provider) : null;
             }
 
-            return Client;
+            return _client;
         }
     }
 }
