@@ -17,10 +17,10 @@ namespace CommunityToolkit.Auth.Uwp
         }
 
         /// <summary>
-        /// 
+        /// Static helper method for creating a new MsalProvider instance from this config object.
         /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
+        /// <param name="config">The configuration for the provider.</param>
+        /// <returns>A new instance of the MsalProvider based on the provided config.</returns>
         public static MsalProvider Factory(MsalProviderConfig config)
         {
             return new MsalProvider(

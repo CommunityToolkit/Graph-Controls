@@ -3,11 +3,11 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
-using Microsoft.Toolkit.Graph.Extensions;
 using Windows.UI.Xaml.Data;
 
-namespace Microsoft.Toolkit.Graph.Converters
+namespace CommunityToolkit.Graph.Uwp.Converters
 {
     /// <summary>
     /// Converts a <see cref="User"/> to a <see cref="Person"/>.

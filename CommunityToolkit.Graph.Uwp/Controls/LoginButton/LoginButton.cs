@@ -7,11 +7,12 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using CommunityToolkit.Auth;
+using CommunityToolkit.Graph.Extensions;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 
-namespace Microsoft.Toolkit.Graph.Controls
+namespace CommunityToolkit.Graph.Uwp.Controls
 {
     /// <summary>
     /// The <see cref="LoginButton"/> control is a button which can be used to sign the user in or show them profile details.
@@ -114,7 +115,7 @@ namespace Microsoft.Toolkit.Graph.Controls
                 {
                     // https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-login/mgt-login.ts#L139
                     // TODO: Batch with photo request later? https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
-                    UserDetails = await provider.Graph.Me.Request().GetAsync();
+                    UserDetails = await provider.Graph().Me.Request().GetAsync();
                 }
                 catch (Exception e)
                 {

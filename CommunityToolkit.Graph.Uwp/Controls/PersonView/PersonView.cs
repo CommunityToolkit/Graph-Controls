@@ -6,14 +6,14 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CommunityToolkit.Auth;
+using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
-using Microsoft.Toolkit.Graph.Extensions;
-using Microsoft.Toolkit.Graph.Providers;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
 
-namespace Microsoft.Toolkit.Graph.Controls
+namespace CommunityToolkit.Graph.Uwp.Controls
 {
     /// <summary>
     /// The <see cref="PersonView"/> control displays a user photo and can display their name and e-mail.
@@ -138,7 +138,7 @@ namespace Microsoft.Toolkit.Graph.Controls
                     // TODO: Batch when API easier https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
                     try
                     {
-                        user = await provider.Graph.Users[UserId].Request().GetAsync();
+                        user = await provider.Graph().Users[UserId].Request().GetAsync();
                     }
                     catch
                     {
@@ -147,7 +147,7 @@ namespace Microsoft.Toolkit.Graph.Controls
                     try
                     {
                         // TODO: Move to LoadImage based on previous call?
-                        await DecodeStreamAsync(await provider.Graph.Users[UserId].Photo.Content.Request().GetAsync());
+                        await DecodeStreamAsync(await provider.Graph().Users[UserId].Photo.Content.Request().GetAsync());
                         _photoId = UserId;
                     }
                     catch
@@ -158,7 +158,7 @@ namespace Microsoft.Toolkit.Graph.Controls
                 {
                     try
                     {
-                        user = await provider.Graph.Me.Request().GetAsync();
+                        user = await provider.Graph().Me.Request().GetAsync();
                     }
                     catch
                     {
@@ -166,7 +166,7 @@ namespace Microsoft.Toolkit.Graph.Controls
 
                     try
                     {
-                        await DecodeStreamAsync(await provider.Graph.Me.Photo.Content.Request().GetAsync());
+                        await DecodeStreamAsync(await provider.Graph().Me.Photo.Content.Request().GetAsync());
                         _photoId = user.Id;
                     }
                     catch
@@ -181,7 +181,7 @@ namespace Microsoft.Toolkit.Graph.Controls
             }
             else if (PersonDetails == null && !string.IsNullOrWhiteSpace(PersonQuery))
             {
-                var people = await provider.Graph.FindPersonAsync(PersonQuery);
+                var people = await provider.Graph().FindPersonAsync(PersonQuery);
                 if (people != null && people.Count > 0)
                 {
                     var person = people.FirstOrDefault();
@@ -196,7 +196,7 @@ namespace Microsoft.Toolkit.Graph.Controls
             try
             {
                 // TODO: Better guarding
-                var graph = ProviderManager.Instance.GlobalProvider.Graph;
+                var graph = ProviderManager.Instance.GlobalProvider.Graph();
 
                 if (!string.IsNullOrWhiteSpace(person.UserPrincipalName))
                 {

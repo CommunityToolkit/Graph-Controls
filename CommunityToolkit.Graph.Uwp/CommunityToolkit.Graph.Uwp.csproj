@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>uap10.0.17763</TargetFramework>
-    <Title>Windows Community Toolkit Graph Controls</Title>
-    <PackageId>Microsoft.Toolkit.Graph.Controls</PackageId>
+    <Title>Community Toolkit Graph Uwp Controls and Helpers</Title>
+    <PackageId>CommunityToolkit.Graph.Uwp</PackageId>
     <Description>
-      This library provides Microsoft Graph XAML controls. It is part of the Windows Community Toolkit.
+      This library provides Microsoft Graph UWP XAML controls. It is part of the Windows Community Toolkit.
 
       Classes:
+      - GraphPresenter: 
       - LoginButton: The Login Control leverages MSAL libraries to support the sign-in processes for Microsoft Graph and beyond.
       - PersonView: The PersonView control displays a user photo and can display their name and e-mail.
       - PeoplePicker: The PeoplePicker Control is a simple control that allows for selection of one or more users.

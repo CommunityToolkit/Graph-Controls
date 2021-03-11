@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CommunityToolkit.Auth.Extensions;
@@ -13,20 +14,7 @@ namespace CommunityToolkit.Auth
     /// </summary>
     public class MockProvider : BaseProvider
     {
-        //private const string GRAPH_PROXY_URL = "https://proxy.apisandbox.msdn.microsoft.com/svc?url=";
-
-        /// <inheritdoc/>
-        //public override GraphServiceClient Graph => new GraphServiceClient(
-        //                new DelegateAuthenticationProvider((requestMessage) =>
-        //            {
-        //                var requestUri = requestMessage.RequestUri.ToString();
-
-        //                // Prepend Proxy Service URI to our request
-        //                requestMessage.RequestUri = new Uri(GRAPH_PROXY_URL + Uri.EscapeDataString(requestUri));
-
-        //                return this.AuthenticateRequestAsync(requestMessage);
-        //            }));
-
+        private const string GRAPH_PROXY_URL = "https://proxy.apisandbox.msdn.microsoft.com/svc?url=";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MockProvider"/> class.
@@ -40,9 +28,15 @@ namespace CommunityToolkit.Auth
         /// <inheritdoc/>
         public override Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
+            // Append the SDK version header
             AddSdkVersion(request);
 
+            // Append the token auth header
             request.AddMockProviderToken();
+
+            // Prepend Proxy Service URI
+            var requestUri = request.RequestUri.ToString();
+            request.RequestUri = new Uri(GRAPH_PROXY_URL + Uri.EscapeDataString(requestUri));
 
             return Task.FromResult(0);
         }

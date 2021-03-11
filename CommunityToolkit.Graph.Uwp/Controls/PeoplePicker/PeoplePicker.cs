@@ -6,15 +6,15 @@ using System;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
+using CommunityToolkit.Auth;
+using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
-using Microsoft.Toolkit.Graph.Extensions;
-using Microsoft.Toolkit.Graph.Providers;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Microsoft.Toolkit.Uwp.UI.Extensions;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace Microsoft.Toolkit.Graph.Controls
+namespace CommunityToolkit.Graph.Uwp.Controls
 {
     /// <summary>
     /// Control which allows user to search for a person or contact within Microsoft Graph. Built on top of <see cref="TokenizingTextBox"/>.
@@ -41,7 +41,7 @@ namespace Microsoft.Toolkit.Graph.Controls
             using (args.GetDeferral())
             {
                 // Try and convert typed text to people
-                var graph = ProviderManager.Instance.GlobalProvider.Graph;
+                var graph = ProviderManager.Instance.GlobalProvider.Graph();
                 if (graph != null)
                 {
                     args.Item = (await graph.FindPersonAsync(args.TokenText)).CurrentPage.FirstOrDefault();
@@ -74,7 +74,7 @@ namespace Microsoft.Toolkit.Graph.Controls
                     _typeTimer.Debounce(
                     async () =>
                     {
-                        var graph = ProviderManager.Instance.GlobalProvider.Graph;
+                        var graph = ProviderManager.Instance.GlobalProvider.Graph();
                         if (graph != null)
                         {
                             // If empty, will clear out

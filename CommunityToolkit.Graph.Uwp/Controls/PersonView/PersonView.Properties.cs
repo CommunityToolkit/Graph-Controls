@@ -11,7 +11,7 @@ using Microsoft.Graph;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media.Imaging;
 
-namespace Microsoft.Toolkit.Graph.Controls
+namespace CommunityToolkit.Graph.Uwp.Controls
 {
     /// <summary>
     /// The <see cref="PersonView"/> control displays a user photo and can display their name and e-mail.

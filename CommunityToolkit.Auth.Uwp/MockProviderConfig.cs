@@ -15,10 +15,10 @@ namespace CommunityToolkit.Auth.Uwp
         }
 
         /// <summary>
-        /// 
+        /// Static helper method for creating a new MockProvider instance from this config object.
         /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
+        /// <param name="config">The configuration for the provider.</param>
+        /// <returns>A new instance of the MockProvider based on the provided config.</returns>
         public static MockProvider Factory(MockProviderConfig config)
         {
             return new MockProvider(config.SignedIn);

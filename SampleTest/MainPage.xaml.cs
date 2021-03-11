@@ -2,9 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using CommunityToolkit.Auth;
+using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
 using Microsoft.Graph.Extensions;
-using Microsoft.Toolkit.Graph.Providers;
 using System;
 using System.Text.RegularExpressions;
 using Windows.UI.Xaml.Controls;
@@ -53,7 +54,7 @@ namespace SampleTest
         public static IBaseRequestBuilder GetTeamsChannelMessagesBuilder(string team, string channel)
         {
             // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3064
-            return ProviderManager.Instance.GlobalProvider.Graph.Teams[team].Channels[channel].Messages;
+            return ProviderManager.Instance.GlobalProvider.Graph().Teams[team].Channels[channel].Messages;
         }
     }
 }

@@ -1,17 +1,21 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
-    <TargetFrameworks>uap10.0.17763;netstandard2.0</TargetFrameworks>
-    <Title>Windows Community Toolkit .NET Standard Graph Services</Title>
+    <TargetFramework>uap10.0.17763</TargetFramework>
+    <Title>Community Toolkit Uwp Auth Services</Title>
+    <PackageId>CommunityToolkit.Auth.Uwp</PackageId>
     <Description>
-      This package includes .NET Standard code helpers such as:
-      - GraphExtensions: Helpers for common tasks related to the Microsoft Graph used by the Microsoft.Toolkit.Graph.Controls.
-      - GlobalProvider: A shared provider instance used by the Microsoft.Toolkit.Graph.Controls.
+      This package includes helpers for configuring the global authenticaion provider from UWP XAML, such as:
+      - GlobalProvider: 
+      - IProviderConfig:
+      - MockProviderConfig:
+      - MsalProviderConfig:
+      - ScopeSet:
     </Description>
-    <PackageTags>UWP Graph Toolkit Windows Provider extensions helpers</PackageTags>
-
-    <!-- This is a temporary workaround for https://github.com/dotnet/sdk/issues/955 -->
-    <DebugType>Full</DebugType>
+    <PackageTags>UWP Graph Toolkit Windows Controls Extensions Helpers</PackageTags>
+    <SignAssembly>false</SignAssembly>
+    <GenerateLibraryLayout>true</GenerateLibraryLayout>
+    <LangVersion>8.0</LangVersion>
     <Configurations>Debug;Release;CI</Configurations>
     <Platforms>AnyCPU;ARM;ARM64;x64;x86</Platforms>
   </PropertyGroup>

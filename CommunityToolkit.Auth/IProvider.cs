@@ -19,11 +19,6 @@ namespace CommunityToolkit.Auth
         ProviderState State { get; }
 
         /// <summary>
-        /// Gets the <see cref="GraphServiceClient"/> object to access the Microsoft Graph APIs.
-        /// </summary>
-        //GraphServiceClient Graph { get; }
-
-        /// <summary>
         /// Event called when the login <see cref="State"/> changes.
         /// </summary>
         event EventHandler<ProviderStateChangedEventArgs> StateChanged;

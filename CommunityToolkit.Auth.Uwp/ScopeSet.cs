@@ -5,12 +5,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace CommunityToolkit.Auth
+namespace CommunityToolkit.Auth.Uwp
 {
     /// <summary>
     /// Helper Class for XAML string Scope conversion.
     /// </summary>
-    [Windows.Foundation.Metadata.CreateFromString(MethodName = "Microsoft.Toolkit.Graph.Providers.ScopeSet.ConvertToScopeArray")]
+    [Windows.Foundation.Metadata.CreateFromString(MethodName = "CommunityToolkit.Auth.Uwp.ScopeSet.ConvertToScopeArray")]
     public class ScopeSet : Collection<string>
     {
         /// <summary>

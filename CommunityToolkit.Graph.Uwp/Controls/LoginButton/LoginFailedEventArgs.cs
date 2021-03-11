@@ -4,7 +4,7 @@
 
 using System;
 
-namespace Microsoft.Toolkit.Graph.Controls
+namespace CommunityToolkit.Graph.Uwp.Controls
 {
     /// <summary>
     /// <see cref="EventArgs"/> for <see cref="LoginButton.LoginFailed"/> event.

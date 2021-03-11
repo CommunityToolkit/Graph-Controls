@@ -50,7 +50,6 @@ namespace CommunityToolkit.Auth
 
             Client = client;
             Provider = new InteractiveAuthenticationProvider(client, scopes);
-            //Graph = new GraphServiceClient(this);
 
             _ = TrySilentSignInAsync();
         }

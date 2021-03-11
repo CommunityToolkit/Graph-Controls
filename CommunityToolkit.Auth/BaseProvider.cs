@@ -38,11 +38,6 @@ namespace CommunityToolkit.Auth
         public event EventHandler<ProviderStateChangedEventArgs> StateChanged;
 
         /// <summary>
-        /// Gets or sets the service client instance for making Graph calls.
-        /// </summary>
-        //public virtual GraphServiceClient Graph { get; protected set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="BaseProvider"/> class.
         /// </summary>
         public BaseProvider()

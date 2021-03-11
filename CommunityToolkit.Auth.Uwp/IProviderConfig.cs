@@ -4,6 +4,9 @@
 
 namespace CommunityToolkit.Auth
 {
+    /// <summary>
+    /// An interface for building provider config objects for consumption from XAML.
+    /// </summary>
     public interface IProviderConfig
     {
     }
