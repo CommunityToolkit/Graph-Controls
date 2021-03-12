@@ -88,7 +88,6 @@ namespace Microsoft.Toolkit.Graph.Providers
         {
             State = ProviderState.Loading;
             await Task.Delay(3000);
-
             State = ProviderState.SignedIn;
         }
 
