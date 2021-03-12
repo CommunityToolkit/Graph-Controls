@@ -10,12 +10,12 @@ using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
 
-namespace Microsoft.Toolkit.Graph.RoamingSettings
+namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
-    /// An ObjectStorageHelper implementation using open extensions on the Graph User for storing key/value pairs.
+    /// An IObjectStorageHelper implementation using open extensions on the Graph User for storing key/value pairs.
     /// </summary>
-    public class UserExtensionDataStore : IObjectStorageHelper
+    public class UserExtensionDataStore : IRoamingSettingsDataStore
     {
         /// <summary>
         /// Retrieve the value from Graph User extensions and cast the response to the provided type.
@@ -132,30 +132,12 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
         }
 
         /// <summary>
-        /// An indexer for accessing the Settings values.
-        /// </summary>
-        /// <param name="key">The key for the desired value.</param>
-        /// <returns>The value for the provided key.</returns>
-        public object this[string key]
-        {
-            get => Settings[key];
-            set
-            {
-                if (Settings != null)
-                {
-                    Settings[key] = value;
-                }
-            }
-        }
-
-        /// <summary>
         /// Creates a new roaming settings extension on the Graph User.
         /// </summary>
         /// <returns>The newly created Extension object.</returns>
-        public async Task<Extension> Create()
+        public async Task Create()
         {
             UserExtension = await Create(ExtensionId, UserId);
-            return UserExtension;
         }
 
         /// <summary>
@@ -172,10 +154,9 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
         /// Update the cached user extension.
         /// </summary>
         /// <returns>The freshly synced user extension.</returns>
-        public async Task<Extension> Sync()
+        public async Task Sync()
         {
             UserExtension = await GetExtensionForUser(ExtensionId, UserId);
-            return UserExtension;
         }
 
         /// <inheritdoc />

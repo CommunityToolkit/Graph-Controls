@@ -9,21 +9,21 @@ using System.Threading.Tasks;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Graph.Providers;
 
-namespace Microsoft.Toolkit.Graph.RoamingSettings
+namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
-    /// 
+    /// Manages Graph interaction with open extensions on the user.
     /// </summary>
-    public static class UserExtensionsDataSource
+    internal static class UserExtensionsDataSource
     {
         private static GraphServiceClient Graph => ProviderManager.Instance.GlobalProvider?.Graph;
 
         /// <summary>
-        /// 
+        /// Retrieve an extension object for a user.
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="extensionId"></param>
-        /// <returns></returns>
+        /// <param name="userId">The user to access.</param>
+        /// <param name="extensionId">The extension to retrieve.</param>
+        /// <returns>The extension result.</returns>
         public static async Task<Extension> GetExtension(string userId, string extensionId)
         {
             if (string.IsNullOrWhiteSpace(extensionId))
@@ -41,10 +41,10 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
         }
 
         /// <summary>
-        /// 
+        /// Get all extension objects for a user.
         /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
+        /// <param name="userId">The user to access.</param>
+        /// <returns>All extension results.</returns>
         public static async Task<IList<Extension>> GetAllExtensions(string userId)
         {
             if (string.IsNullOrWhiteSpace(userId))
@@ -57,11 +57,11 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
         }
 
         /// <summary>
-        /// 
+        /// Create a new extension object on a user.
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="extensionId"></param>
-        /// <returns></returns>
+        /// <param name="userId">The user to access.</param>
+        /// <param name="extensionId">The id of the new extension.</param>
+        /// <returns>The newly created extension.</returns>
         public static async Task<Extension> CreateExtension(string userId, string extensionId)
         {
             if (string.IsNullOrWhiteSpace(extensionId))
@@ -97,11 +97,11 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
         }
 
         /// <summary>
-        /// 
+        /// Delete a user extension by id.
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="extensionId"></param>
-        /// <returns></returns>
+        /// <param name="userId">The user to access.</param>
+        /// <param name="extensionId">The id of the extension to delete.</param>
+        /// <returns>A task.</returns>
         public static async Task DeleteExtension(string userId, string extensionId)
         {
             if (string.IsNullOrWhiteSpace(extensionId))
@@ -118,23 +118,23 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
         }
 
         /// <summary>
-        /// 
+        /// Get a value from an extension by key.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="extension"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of object to return.</typeparam>
+        /// <param name="extension">The target extension.</param>
+        /// <param name="key">The key for the desired value.</param>
+        /// <returns>The value for the provided key.</returns>
         public static T GetValue<T>(this Extension extension, string key)
         {
             return (T)GetValue(extension, key);
         }
 
         /// <summary>
-        /// 
+        /// Get a value from a user extension by key.
         /// </summary>
-        /// <param name="extension"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
+        /// <param name="extension">The target extension.</param>
+        /// <param name="key">The key for the desired value.</param>
+        /// <returns>The value for the provided key.</returns>
         public static object GetValue(this Extension extension, string key)
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -151,13 +151,13 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
         }
 
         /// <summary>
-        /// 
+        /// Sets a user extension value at the specified key.
         /// </summary>
-        /// <param name="extension"></param>
-        /// <param name="userId"></param>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="extension">The target extension.</param>
+        /// <param name="userId">The user to access.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="value">The value to set.</param>
+        /// <returns>A task.</returns>
         public static async Task SetValue(this Extension extension, string userId, string key, object value)
         {
             if (string.IsNullOrWhiteSpace(userId))

@@ -1,10 +1,15 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Toolkit.Graph.Controls.Common;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
 
-namespace Microsoft.Toolkit.Graph.RoamingSettings
+namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
     /// An enumeration of the available data storage methods for roaming data.
@@ -20,31 +25,57 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
     /// <summary>
     /// A helper class for syncing data to roaming data store.
     /// </summary>
-    public class RoamingSettingsHelper : IObjectStorageHelper
+    public class RoamingSettingsHelper : IRoamingSettingsDataStore
     {
         /// <summary>
         /// Gets the internal data storage helper instance.
         /// </summary>
-        public IObjectStorageHelper DataStore { get; private set; }
+        public IRoamingSettingsDataStore DataStore { get; private set; }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> Settings => DataStore?.Settings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RoamingSettingsHelper"/> class.
         /// </summary>
-        /// <param name="serializer">An object serializer for serialization of objects in the data store.</param>
         /// <param name="userId">The id of the target Graph User.</param>
         /// <param name="dataStore">Which specific data store is being used.</param>
         /// <param name="autoSync">Whether the values should immediately sync or not.</param>
-        public RoamingSettingsHelper(IObjectSerializer serializer, string userId, RoamingDataStore dataStore, bool autoSync = false)
+        /// <param name="serializer">An object serializer for serialization of objects in the data store.</param>
+        public RoamingSettingsHelper(string userId, RoamingDataStore dataStore = RoamingDataStore.UserExtensions, bool autoSync = true, IObjectSerializer serializer = null)
         {
+            if (serializer == null)
+            {
+                serializer = new JsonObjectSerializer();
+            }
+
             switch (dataStore)
             {
                 case RoamingDataStore.UserExtensions:
                     // Determine the extension id value using app identity.
                     string aumid = Windows.ApplicationModel.AppInfo.Current.AppUserModelId;
-                    DataStore = new UserExtensionDataStore(serializer, "com.toolkit.roamingSettings." + aumid, userId, autoSync);
+                    var extensionId = "com.toolkit.roamingSettings." + aumid;
+                    DataStore = new UserExtensionDataStore(serializer, extensionId, userId, autoSync);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dataStore));
+            }
+        }
+
+        /// <summary>
+        /// An indexer for easily accessing key values.
+        /// </summary>
+        /// <param name="key">The key for the desired value.</param>
+        /// <returns>The value found for the provided key.</returns>
+        public object this[string key]
+        {
+            get => DataStore.Read<object>(key);
+            set
+            {
+                if (DataStore.KeyExists(key))
+                {
+                    DataStore.Save(key, value);
+                }
             }
         }
 
@@ -74,5 +105,23 @@ namespace Microsoft.Toolkit.Graph.RoamingSettings
 
         /// <inheritdoc />
         public Task<StorageFile> SaveFileAsync<T>(string filePath, T value) => DataStore.SaveFileAsync<T>(filePath, value);
+
+        /// <summary>
+        /// Create a new storage container.
+        /// </summary>
+        /// <returns>A Task.</returns>
+        public Task Create() => DataStore.Create();
+
+        /// <summary>
+        /// Delete the existing storage container.
+        /// </summary>
+        /// <returns>A Task.</returns>
+        public Task Delete() => DataStore.Delete();
+
+        /// <summary>
+        /// Syncronize the internal cache with the remote storage endpoint.
+        /// </summary>
+        /// <returns>A Task.</returns>
+        public Task Sync() => DataStore.Sync();
     }
 }
