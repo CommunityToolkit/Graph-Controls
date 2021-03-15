@@ -32,9 +32,9 @@ namespace CommunityToolkit.Auth.Uwp
         /// <returns>
         /// The value of the property on the target.
         /// </returns>
-        public static IProviderConfig GetConfig(ResourceDictionary target)
+        public static object GetConfig(ResourceDictionary target)
         {
-            return (IProviderConfig)target.GetValue(ConfigProperty);
+            return (object)target.GetValue(ConfigProperty);
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace CommunityToolkit.Auth.Uwp
         /// <param name="value">
         /// The value to apply to the target property.
         /// </param>
-        public static void SetConfig(ResourceDictionary target, IProviderConfig value)
+        public static void SetConfig(ResourceDictionary target, object value)
         {
             target.SetValue(ConfigProperty, value);
         }
@@ -58,13 +58,13 @@ namespace CommunityToolkit.Auth.Uwp
         /// The identifier for the Config dependency property.
         /// </returns>
         public static readonly DependencyProperty ConfigProperty =
-            DependencyProperty.RegisterAttached("Config", typeof(IProviderConfig), typeof(GlobalProvider), new PropertyMetadata(null, OnConfigChanged));
+            DependencyProperty.RegisterAttached("Config", typeof(object), typeof(GlobalProvider), new PropertyMetadata(null, OnConfigChanged));
 
         private static void OnConfigChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
             if (sender is ResourceDictionary rd)
             {
-                IProviderConfig config = GetConfig(rd);
+                object config = GetConfig(rd);
 
                 Type configType = config.GetType();
                 if (_providers.ContainsKey(configType))
@@ -79,30 +79,52 @@ namespace CommunityToolkit.Auth.Uwp
             }
         }
 
-        private static readonly Dictionary<Type, Func<IProviderConfig, IProvider>> _providers = new Dictionary<Type, Func<IProviderConfig, IProvider>>();
+        private static readonly Dictionary<Type, Func<object, IProvider>> _providers = new Dictionary<Type, Func<object, IProvider>>();
 
         /// <summary>
-        /// Register a provider to be available for declaration in XAML using the ConfigProperty.
-        /// Use in the static constructor of an IGraphConfig implementation.
+        /// Registers a provider to be available for declaration in XAML using the ConfigProperty.
         /// </summary>
         /// <code>
-        /// static MsalConfig()
+        /// //Put this in the static constructor of the config object.
+        /// static MyConfig()
         /// {
-        ///     Graph.RegisterConfig(typeof(MsalConfig), (c) => MsalProvider.Create(c as MsalConfig));
+        ///     Graph.RegisterConfig(typeof(MyConfig), (c) => MyProvider.Create(c as MyConfig));
         /// }.
         /// </code>
         /// <param name="configType">
-        /// The Type of the IGraphConfig implementation associated with provider.
+        /// The Type of the config object associated with provider.
         /// </param>
         /// <param name="providerFactory">
         /// A factory function for creating a new instance of the IProvider implementation.
         /// </param>
-        public static void RegisterConfig(Type configType, Func<IProviderConfig, IProvider> providerFactory)
+        public static void RegisterConfig(Type configType, Func<object, IProvider> providerFactory)
         {
             if (!_providers.ContainsKey(configType))
             {
                 _providers.Add(configType, providerFactory);
             }
+        }
+
+
+        /// <summary>
+        /// Registers a provider to be available for declaration in XAML using the ConfigProperty.
+        /// </summary>
+        /// <code>
+        /// //Put this in the static constructor of the config object.
+        /// static MyConfig()
+        /// {
+        ///     Graph.RegisterConfig(typeof(MyConfig), (c) => MyProvider.Create(c as MyConfig));
+        /// }.
+        /// </code>
+        /// <typeparam name="T">
+        /// The Type of the config object associated with provider.
+        /// </typeparam>
+        /// <param name="providerFactory">
+        /// A factory function for creating a new instance of the IProvider implementation.
+        /// </param>
+        public static void RegisterConfig<T>(Func<object, IProvider> providerFactory)
+        {
+            RegisterConfig(typeof(T), providerFactory);
         }
     }
 }

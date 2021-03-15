@@ -9,7 +9,7 @@ namespace CommunityToolkit.Auth.Uwp
     /// <summary>
     /// Configuration values for initializing the MsalProvider.
     /// </summary>
-    public class MsalProviderConfig : IProviderConfig
+    public class MsalProviderConfig
     {
         static MsalProviderConfig()
         {

@@ -7,7 +7,7 @@ namespace CommunityToolkit.Auth.Uwp
     /// <summary>
     /// The configuration for the MockProvider.
     /// </summary>
-    public class MockProviderConfig : IProviderConfig
+    public class MockProviderConfig
     {
         static MockProviderConfig()
         {
