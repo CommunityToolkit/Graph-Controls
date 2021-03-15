@@ -11,7 +11,7 @@ namespace CommunityToolkit.Auth.Uwp
     {
         static MockProviderConfig()
         {
-            GlobalProvider.RegisterConfig(typeof(MockProviderConfig), (c) => Factory(c as MockProviderConfig));
+            GlobalProvider.RegisterConfig<MockProviderConfig>((c) => Factory(c as MockProviderConfig));
         }
 
         /// <summary>

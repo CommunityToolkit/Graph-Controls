@@ -113,7 +113,7 @@ namespace CommunityToolkit.Auth.Uwp
         /// //Put this in the static constructor of the config object.
         /// static MyConfig()
         /// {
-        ///     Graph.RegisterConfig(typeof(MyConfig), (c) => MyProvider.Create(c as MyConfig));
+        ///     Graph.RegisterConfig&lt;MyConfig&gt;((c) => MyProvider.Create(c as MyConfig));
         /// }.
         /// </code>
         /// <typeparam name="T">

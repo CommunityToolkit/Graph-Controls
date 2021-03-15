@@ -13,7 +13,7 @@ namespace CommunityToolkit.Auth.Uwp
     {
         static MsalProviderConfig()
         {
-            GlobalProvider.RegisterConfig(typeof(MsalProviderConfig), (c) => Factory(c as MsalProviderConfig));
+            GlobalProvider.RegisterConfig<MsalProviderConfig>((c) => Factory(c as MsalProviderConfig));
         }
 
         /// <summary>
