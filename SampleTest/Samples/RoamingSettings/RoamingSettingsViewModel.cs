@@ -165,8 +165,7 @@ namespace SampleTest.Samples.RoamingSettings
         {
             try
             {
-                var me = await GlobalProvider.Graph.Me.Request().GetAsync();
-                _roamingSettings = new RoamingSettingsHelper(me.Id);
+                _roamingSettings = await RoamingSettingsHelper.CreateForCurrentUser();
 
                 KeyInputText = string.Empty;
                 ValueInputText = string.Empty;

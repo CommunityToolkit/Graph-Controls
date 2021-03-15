@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Graph.Controls.Common;
+using Microsoft.Toolkit.Graph.Providers;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
 
@@ -34,6 +35,25 @@ namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
 
         /// <inheritdoc />
         public IDictionary<string, object> Settings => DataStore?.Settings;
+
+        /// <summary>
+        /// Creates a new RoamingSettingsHelper instance for the currently signed in user.
+        /// </summary>
+        /// <param name="dataStore">Which specific data store is being used.</param>
+        /// <param name="autoSync">Whether the values should immediately sync or not.</param>
+        /// <param name="serializer">An object serializer for serialization of objects in the data store.</param>
+        /// <returns>A new instance of the RoamingSettingsHelper configured for the current user.</returns>
+        public static async Task<RoamingSettingsHelper> CreateForCurrentUser(RoamingDataStore dataStore = RoamingDataStore.UserExtensions, bool autoSync = true, IObjectSerializer serializer = null)
+        {
+            var provider = ProviderManager.Instance.GlobalProvider;
+            if (provider == null || provider.State != ProviderState.SignedIn)
+            {
+                throw new InvalidOperationException("The GlobalProvider must be set and signed in to create a new RoamingSettingsHelper for the current user.");
+            }
+
+            var me = await provider.Graph.Me.Request().GetAsync();
+            return new RoamingSettingsHelper(me.Id, dataStore, autoSync, serializer);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RoamingSettingsHelper"/> class.
