@@ -105,7 +105,6 @@ namespace CommunityToolkit.Auth.Uwp
             }
         }
 
-
         /// <summary>
         /// Registers a provider to be available for declaration in XAML using the ConfigProperty.
         /// </summary>
