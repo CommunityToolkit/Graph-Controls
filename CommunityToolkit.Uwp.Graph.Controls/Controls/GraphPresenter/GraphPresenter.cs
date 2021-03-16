@@ -13,7 +13,7 @@ using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace CommunityToolkit.Uwp.Graph.UI.Controls
+namespace CommunityToolkit.Uwp.Graph.Controls
 {
     /// <summary>
     /// Specialized <see cref="ContentPresenter"/> to fetch and display data from the Microsoft Graph.

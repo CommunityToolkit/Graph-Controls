@@ -14,7 +14,7 @@ using Microsoft.Toolkit.Uwp.UI.Extensions;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace CommunityToolkit.Uwp.Graph.UI.Controls
+namespace CommunityToolkit.Uwp.Graph.Controls
 {
     /// <summary>
     /// Control which allows user to search for a person or contact within Microsoft Graph. Built on top of <see cref="TokenizingTextBox"/>.

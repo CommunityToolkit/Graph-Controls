@@ -7,7 +7,7 @@ using CommunityToolkit.Net.Graph.Extensions;
 using Microsoft.Graph;
 using Windows.UI.Xaml.Data;
 
-namespace CommunityToolkit.Uwp.Graph.UI.Converters
+namespace CommunityToolkit.Uwp.Graph.Controls.Converters
 {
     /// <summary>
     /// Converts a <see cref="User"/> to a <see cref="Person"/>.

@@ -5,7 +5,7 @@
 using System;
 using System.ComponentModel;
 
-namespace CommunityToolkit.Uwp.Graph.UI.Controls
+namespace CommunityToolkit.Uwp.Graph.Controls
 {
     /// <summary>
     /// The <see cref="LoginButton"/> control is a button which can be used to sign the user in or show them profile details.

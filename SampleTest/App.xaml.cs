@@ -29,12 +29,19 @@ namespace SampleTest
         }
 
 
+        // Which provider should be used for authentication?
+        private readonly ProviderType _providerType = ProviderType.Mock;
+
+        // List of available authentication providers.
         private enum ProviderType
         {
             Mock,
             Msal
         }
 
+        /// <summary>
+        /// Initialize the global authentication provider.
+        /// </summary>
         private void InitializeGlobalProvider()
         {
             if (ProviderManager.Instance.GlobalProvider != null)
@@ -42,15 +49,12 @@ namespace SampleTest
                 return;
             }
 
-            // Which provider should be used?
-            ProviderType providerType = ProviderType.Mock;
-
             // Provider config
             string clientId = "YOUR_CLIENT_ID_HERE";
             string redirectUri = null;
             string[] scopes = { "User.Read", "User.ReadBasic.All", "People.Read", "Calendars.Read", "Mail.Read", "Group.Read.All", "ChannelMessage.Read.All" };
 
-            switch(providerType)
+            switch(_providerType)
             {
                 // Mock provider
                 case ProviderType.Mock:
