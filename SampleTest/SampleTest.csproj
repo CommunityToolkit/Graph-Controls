@@ -156,21 +156,17 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CommunityToolkit.Auth.Uwp\CommunityToolkit.Auth.Uwp.csproj">
-      <Project>{eee4c6ca-5e3e-4281-a985-a2fc7eb350b0}</Project>
-      <Name>CommunityToolkit.Auth.Uwp</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CommunityToolkit.Auth\CommunityToolkit.Auth.csproj">
+    <ProjectReference Include="..\CommunityToolkit.Net.Authentication\CommunityToolkit.Net.Authentication.csproj">
       <Project>{B323A2E1-66EF-4037-95B7-2DEFA051B4B1}</Project>
-      <Name>CommunityToolkit.Auth</Name>
+      <Name>CommunityToolkit.Net.Authentication</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CommunityToolkit.Graph.Uwp\CommunityToolkit.Graph.Uwp.csproj">
+    <ProjectReference Include="..\CommunityToolkit.Uwp.Graph.UI\CommunityToolkit.Uwp.Graph.UI.csproj">
       <Project>{42252ee8-7e68-428f-972b-6d2dd3aa12cc}</Project>
-      <Name>CommunityToolkit.Graph.Uwp</Name>
+      <Name>CommunityToolkit.Uwp.Graph.UI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CommunityToolkit.Graph\CommunityToolkit.Graph.csproj">
+    <ProjectReference Include="..\CommunityToolkit.Net.Graph\CommunityToolkit.Net.Graph.csproj">
       <Project>{b2246169-0cd8-473c-aff6-172310e2c3f6}</Project>
-      <Name>CommunityToolkit.Graph</Name>
+      <Name>CommunityToolkit.Net.Graph</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

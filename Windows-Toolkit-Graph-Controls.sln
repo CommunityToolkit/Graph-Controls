@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29230.61
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Graph", "CommunityToolkit.Graph\CommunityToolkit.Graph.csproj", "{B2246169-0CD8-473C-AFF6-172310E2C3F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Net.Graph", "CommunityToolkit.Net.Graph\CommunityToolkit.Net.Graph.csproj", "{B2246169-0CD8-473C-AFF6-172310E2C3F6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Graph.Uwp", "CommunityToolkit.Graph.Uwp\CommunityToolkit.Graph.Uwp.csproj", "{42252EE8-7E68-428F-972B-6D2DD3AA12CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Uwp.Graph.UI", "CommunityToolkit.Uwp.Graph.UI\CommunityToolkit.Uwp.Graph.UI.csproj", "{42252EE8-7E68-428F-972B-6D2DD3AA12CC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build Config", "Build Config", "{B7903632-1BFF-4BA6-BD7A-9F8A897F7542}"
 	ProjectSection(SolutionItems) = preProject
@@ -26,9 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build Config", "Build Confi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleTest", "SampleTest\SampleTest.csproj", "{26F5807A-25B5-4E09-8C72-1749C4C59591}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Auth", "CommunityToolkit.Auth\CommunityToolkit.Auth.csproj", "{B323A2E1-66EF-4037-95B7-2DEFA051B4B1}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Auth.Uwp", "CommunityToolkit.Auth.Uwp\CommunityToolkit.Auth.Uwp.csproj", "{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Net.Authentication", "CommunityToolkit.Net.Authentication\CommunityToolkit.Net.Authentication.csproj", "{B323A2E1-66EF-4037-95B7-2DEFA051B4B1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -212,46 +210,6 @@ Global
 		{B323A2E1-66EF-4037-95B7-2DEFA051B4B1}.Release|x64.Build.0 = Release|x64
 		{B323A2E1-66EF-4037-95B7-2DEFA051B4B1}.Release|x86.ActiveCfg = Release|x86
 		{B323A2E1-66EF-4037-95B7-2DEFA051B4B1}.Release|x86.Build.0 = Release|x86
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.CI|Any CPU.ActiveCfg = CI|Any CPU
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.CI|Any CPU.Build.0 = CI|Any CPU
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.CI|ARM.ActiveCfg = CI|ARM
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.CI|ARM.Build.0 = CI|ARM
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.CI|ARM64.ActiveCfg = CI|ARM64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.CI|ARM64.Build.0 = CI|ARM64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.CI|x64.ActiveCfg = CI|x64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.CI|x64.Build.0 = CI|x64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.CI|x86.ActiveCfg = CI|x86
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.CI|x86.Build.0 = CI|x86
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Debug|ARM.ActiveCfg = Debug|ARM
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Debug|ARM.Build.0 = Debug|ARM
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Debug|ARM64.ActiveCfg = Debug|ARM64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Debug|ARM64.Build.0 = Debug|ARM64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Debug|x64.ActiveCfg = Debug|x64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Debug|x64.Build.0 = Debug|x64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Debug|x86.ActiveCfg = Debug|x86
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Debug|x86.Build.0 = Debug|x86
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Native|Any CPU.ActiveCfg = Debug|Any CPU
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Native|Any CPU.Build.0 = Debug|Any CPU
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Native|ARM.ActiveCfg = Debug|ARM
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Native|ARM.Build.0 = Debug|ARM
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Native|ARM64.ActiveCfg = Debug|ARM64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Native|ARM64.Build.0 = Debug|ARM64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Native|x64.ActiveCfg = Debug|x64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Native|x64.Build.0 = Debug|x64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Native|x86.ActiveCfg = Debug|x86
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Native|x86.Build.0 = Debug|x86
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Release|ARM.ActiveCfg = Release|ARM
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Release|ARM.Build.0 = Release|ARM
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Release|ARM64.ActiveCfg = Release|ARM64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Release|ARM64.Build.0 = Release|ARM64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Release|x64.ActiveCfg = Release|x64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Release|x64.Build.0 = Release|x64
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Release|x86.ActiveCfg = Release|x86
-		{EEE4C6CA-5E3E-4281-A985-A2FC7EB350B0}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,21 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using CommunityToolkit.Net.Authentication;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace SampleTest
@@ -36,6 +28,42 @@ namespace SampleTest
             this.Suspending += OnSuspending;
         }
 
+
+        private enum ProviderType
+        {
+            Mock,
+            Msal
+        }
+
+        private void InitializeGlobalProvider()
+        {
+            if (ProviderManager.Instance.GlobalProvider != null)
+            {
+                return;
+            }
+
+            // Which provider should be used?
+            ProviderType providerType = ProviderType.Mock;
+
+            // Provider config
+            string clientId = "YOUR_CLIENT_ID_HERE";
+            string redirectUri = null;
+            string[] scopes = { "User.Read", "User.ReadBasic.All", "People.Read", "Calendars.Read", "Mail.Read", "Group.Read.All", "ChannelMessage.Read.All" };
+
+            switch(providerType)
+            {
+                // Mock provider
+                case ProviderType.Mock:
+                    ProviderManager.Instance.GlobalProvider = new MockProvider(signedIn: true);
+                    break;
+
+                //Msal provider
+                case ProviderType.Msal:
+                    ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, redirectUri, scopes);
+                    break;
+            }
+        }
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
@@ -43,6 +71,8 @@ namespace SampleTest
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
+            Task.Run(InitializeGlobalProvider);
+
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,

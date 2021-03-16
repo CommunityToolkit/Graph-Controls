@@ -7,9 +7,7 @@
       xmlns:graph="using:Microsoft.Graph"
       xmlns:local="using:SampleTest"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:auth="using:CommunityToolkit.Auth"
-      xmlns:graphX="using:CommunityToolkit.Graph.Extensions"
-      xmlns:wgt="using:CommunityToolkit.Graph.Uwp.Controls"
+      xmlns:wgt="using:CommunityToolkit.Uwp.Graph.UI.Controls"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
       mc:Ignorable="d">
     
