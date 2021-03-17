@@ -1,7 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Title>Community Toolkit .NET Standard Auth Services</Title>
     <Description>
         This package includes .NET Standard authentication helpers such as:
@@ -21,10 +21,6 @@
     <DebugType>Full</DebugType>
     <Configurations>Debug;Release;CI</Configurations>
     <Platforms>AnyCPU;ARM;ARM64;x64;x86</Platforms>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0.17763'">
-    <DefineConstants Condition="'$(DisableImplicitFrameworkDefines)' != 'true'">$(DefineConstants);WINRT</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
