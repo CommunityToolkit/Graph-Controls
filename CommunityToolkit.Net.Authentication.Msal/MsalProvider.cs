@@ -11,7 +11,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Identity.Client;
 
-namespace CommunityToolkit.Net.Authentication.Msal
+namespace CommunityToolkit.Net.Authentication
 {
     /// <summary>
     /// <a href="https://github.com/AzureAD/microsoft-authentication-library-for-dotnet">MSAL.NET</a> provider helper for tracking authentication state.
