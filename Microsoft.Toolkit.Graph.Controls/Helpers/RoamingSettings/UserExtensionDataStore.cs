@@ -4,9 +4,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Graph;
+using Microsoft.Toolkit.Graph.Controls.Common;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
 
@@ -93,11 +93,6 @@ namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
         }
 
         /// <summary>
-        /// Gets the id of the Graph User extension.
-        /// </summary>
-        public string ExtensionId { get; }
-
-        /// <summary>
         /// Gets the id of the Graph User.
         /// </summary>
         public string UserId { get; }
@@ -112,22 +107,22 @@ namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
         /// </summary>
         public IDictionary<string, object> Settings => UserExtension?.AdditionalData;
 
+        private readonly string _extensionId;
         private readonly IObjectSerializer _serializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserExtensionDataStore"/> class.
         /// </summary>
-        public UserExtensionDataStore(IObjectSerializer objectSerializer, string extensionId, string userId, bool autoSync = false)
+        public UserExtensionDataStore(string extensionId, string userId, IObjectSerializer objectSerializer = null, bool autoSync = false)
         {
-            _serializer = objectSerializer ?? throw new ArgumentNullException(nameof(objectSerializer));
-
-            ExtensionId = extensionId;
+            _serializer = objectSerializer ?? new JsonObjectSerializer();
+            _extensionId = extensionId;
             UserId = userId;
             UserExtension = null;
 
             if (autoSync)
             {
-                _ = Sync();
+                Task.Run(Sync);
             }
         }
 
@@ -137,7 +132,7 @@ namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
         /// <returns>The newly created Extension object.</returns>
         public async Task Create()
         {
-            UserExtension = await Create(ExtensionId, UserId);
+            UserExtension = await Create(_extensionId, UserId);
         }
 
         /// <summary>
@@ -146,7 +141,7 @@ namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
         /// <returns>A void task.</returns>
         public async Task Delete()
         {
-            await Delete(ExtensionId, UserId);
+            await Delete(_extensionId, UserId);
             UserExtension = null;
         }
 
@@ -156,13 +151,13 @@ namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
         /// <returns>The freshly synced user extension.</returns>
         public async Task Sync()
         {
-            UserExtension = await GetExtensionForUser(ExtensionId, UserId);
+            UserExtension = await GetExtensionForUser(_extensionId, UserId);
         }
 
         /// <inheritdoc />
-        public bool KeyExists(string key)
+        public virtual bool KeyExists(string key)
         {
-            return UserExtension.AdditionalData.ContainsKey(key);
+            return Settings.ContainsKey(key);
         }
 
         /// <inheritdoc />
@@ -210,10 +205,11 @@ namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public void Save<T>(string key, T value)
         {
-            var type = typeof(T);
-            var typeInfo = type.GetTypeInfo();
-
+            // Set the local cache
             Settings[key] = _serializer.Serialize(value);
+
+            // Send an update to the remote.
+            Task.Run(() => Set(_extensionId, UserId, key, value));
         }
 
         /// <inheritdoc />
@@ -234,6 +230,9 @@ namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
                         composite.Add(setting.Key, _serializer.Serialize(setting.Value));
                     }
                 }
+
+                Settings[compositeKey] = composite;
+                Task.Run(() => Set(_extensionId, UserId, compositeKey, composite));
             }
             else
             {
@@ -244,6 +243,7 @@ namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
                 }
 
                 Settings[compositeKey] = composite;
+                Task.Run(() => Set(_extensionId, UserId, compositeKey, composite));
             }
         }
 
@@ -261,6 +261,12 @@ namespace Microsoft.Toolkit.Graph.Helpers.RoamingSettings
 
         /// <inheritdoc />
         public Task<StorageFile> SaveFileAsync<T>(string filePath, T value)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public Task<string> ReadFileAsync(string filePath, string @default = null)
         {
             throw new NotImplementedException();
         }
