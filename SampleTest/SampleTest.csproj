@@ -156,6 +156,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommunityToolkit.Net.Authentication.Msal\CommunityToolkit.Net.Authentication.Msal.csproj">
+      <Project>{CA4042D2-33A2-450B-8B9D-C286B9F3F3F4}</Project>
+      <Name>CommunityToolkit.Net.Authentication.Msal</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CommunityToolkit.Net.Authentication\CommunityToolkit.Net.Authentication.csproj">
       <Project>{B323A2E1-66EF-4037-95B7-2DEFA051B4B1}</Project>
       <Name>CommunityToolkit.Net.Authentication</Name>

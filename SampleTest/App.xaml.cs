@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Net.Authentication;
+using CommunityToolkit.Net.Authentication.Msal;
 using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -51,7 +52,6 @@ namespace SampleTest
 
             // Provider config
             string clientId = "YOUR_CLIENT_ID_HERE";
-            string redirectUri = null;
             string[] scopes = { "User.Read", "User.ReadBasic.All", "People.Read", "Calendars.Read", "Mail.Read", "Group.Read.All", "ChannelMessage.Read.All" };
 
             switch(_providerType)
@@ -63,7 +63,7 @@ namespace SampleTest
 
                 //Msal provider
                 case ProviderType.Msal:
-                    ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, redirectUri, scopes);
+                    ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId: clientId, scopes: scopes);
                     break;
             }
         }

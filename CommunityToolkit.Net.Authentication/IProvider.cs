@@ -3,15 +3,15 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Graph;
 
 namespace CommunityToolkit.Net.Authentication
 {
     /// <summary>
-    /// <see cref="IAuthenticationProvider"/> helper wrapper to expose more states around the authentication process for graph controls.
+    /// Authentication provider to expose more states around the authentication process for graph controls.
     /// </summary>
-    public interface IProvider : IAuthenticationProvider
+    public interface IProvider
     {
         /// <summary>
         /// Gets the current login state of the provider.
@@ -22,6 +22,13 @@ namespace CommunityToolkit.Net.Authentication
         /// Event called when the login <see cref="State"/> changes.
         /// </summary>
         event EventHandler<ProviderStateChangedEventArgs> StateChanged;
+
+        /// <summary>
+        /// Authenticate an outgoing request.
+        /// </summary>
+        /// <param name="request">The request to authenticate.</param>
+        /// <returns>A task upon completion.</returns>
+        Task AuthenticateRequestAsync(HttpRequestMessage request);
 
         /// <summary>
         /// Login the user.

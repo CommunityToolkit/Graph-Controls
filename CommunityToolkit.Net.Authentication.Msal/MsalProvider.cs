@@ -3,18 +3,18 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.Graph;
-using Microsoft.Graph.Auth;
 using Microsoft.Identity.Client;
 
-namespace CommunityToolkit.Net.Authentication
+namespace CommunityToolkit.Net.Authentication.Msal
 {
     /// <summary>
-    /// <a href="https://github.com/AzureAD/microsoft-authentication-library-for-dotnet">MSAL.NET</a> provider helper for tracking authentication state using an <see cref="IAuthenticationProvider"/> class.
+    /// <a href="https://github.com/AzureAD/microsoft-authentication-library-for-dotnet">MSAL.NET</a> provider helper for tracking authentication state.
     /// </summary>
     public class MsalProvider : BaseProvider
     {
@@ -24,32 +24,28 @@ namespace CommunityToolkit.Net.Authentication
         protected IPublicClientApplication Client { get; private set; }
 
         /// <summary>
-        /// Gets the provider used by the graph to manage requests.
+        /// Gets an array of scopes to use for accessing Graph resources.
         /// </summary>
-        protected IAuthenticationProvider Provider { get; private set; }
+        protected string[] Scopes { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MsalProvider"/> class.
         /// </summary>
-        /// <param name="clientid">Registered ClientId.</param>
+        /// <param name="clientId">Registered ClientId.</param>
         /// <param name="redirectUri">RedirectUri for auth response.</param>
         /// <param name="scopes">List of Scopes to initially request.</param>
-        public MsalProvider(string clientid, string redirectUri = "https://login.microsoftonline.com/common/oauth2/nativeclient", string[] scopes = null)
+        public MsalProvider(string clientId, string redirectUri = "https://login.microsoftonline.com/common/oauth2/nativeclient", string[] scopes = null)
         {
-            var client = PublicClientApplicationBuilder.Create(clientid)
+            var client = PublicClientApplicationBuilder.Create(clientId)
                 .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
                 .WithRedirectUri(redirectUri)
                 .WithClientName(ProviderManager.ClientName)
                 .WithClientVersion(Assembly.GetExecutingAssembly().GetName().Version.ToString())
                 .Build();
 
-            if (scopes == null)
-            {
-                scopes = new string[] { string.Empty };
-            }
+            Scopes = scopes ?? new string[] { string.Empty };
 
             Client = client;
-            Provider = new InteractiveAuthenticationProvider(client, scopes);
 
             _ = TrySilentSignInAsync();
         }
@@ -57,19 +53,23 @@ namespace CommunityToolkit.Net.Authentication
         /// <inheritdoc/>
         public override async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
-            AddSdkVersion(request);
+            IEnumerable<IAccount> accounts = await Client.GetAccountsAsync();
+            AuthenticationResult authResult;
 
             try
             {
-                await Provider.AuthenticateRequestAsync(request);
+                authResult = await Client.AcquireTokenSilent(Scopes, accounts.FirstOrDefault()).ExecuteAsync();
             }
-            catch (Exception)
+            catch (MsalUiRequiredException)
             {
-                // TODO: Catch different types of errors and try and re-auth? Should be handled by Graph Auth Providers.
-                // Assume we're signed-out on error?
-                State = ProviderState.SignedOut;
+                authResult = await Client.AcquireTokenInteractive(Scopes).ExecuteAsync();
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
+            }
 
-                return;
+            if (authResult != null)
+            {
+                AddSdkVersion(request);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
             }
 
             // Check state after request to see if we're now signed-in.

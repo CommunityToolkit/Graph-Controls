@@ -23,9 +23,35 @@ namespace SampleTest
         // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/2407
         public DateTime ThreeDaysFromNow => Today.AddDays(3);
 
+        public IBaseRequestBuilder CalendarViewBuilder;
+        public IBaseRequestBuilder MessagesBuilder;
+        public IBaseRequestBuilder PlannerTasksBuilder;
+        public IBaseRequestBuilder TeamsChannelMessagesBuilder;
+
         public MainPage()
         {
             this.InitializeComponent();
+
+            ProviderManager.Instance.ProviderUpdated += this.OnProviderUpdated;
+        }
+
+        private void OnProviderUpdated(object sender, ProviderUpdatedEventArgs e)
+        {
+            if (e.Reason == ProviderManagerChangedState.ProviderStateChanged 
+                && sender is ProviderManager pm 
+                && pm.GlobalProvider.State == ProviderState.SignedIn)
+            {
+                CalendarViewBuilder = ProviderManager.Instance.GlobalProvider.Graph().Me.CalendarView;
+                MessagesBuilder = ProviderManager.Instance.GlobalProvider.Graph().Me.Messages;
+                PlannerTasksBuilder = ProviderManager.Instance.GlobalProvider.Graph().Me.Planner.Tasks;
+                TeamsChannelMessagesBuilder = ProviderManager.Instance.GlobalProvider.Graph().Teams["02bd9fd6-8f93-4758-87c3-1fb73740a315"].Channels["19:d0bba23c2fc8413991125a43a54cc30e@thread.skype"].Messages;
+            }
+            else
+            {
+                CalendarViewBuilder = null;
+                MessagesBuilder = null;
+                PlannerTasksBuilder = null;
+            }
         }
 
         public static string ToLocalTime(DateTimeTimeZone value)
@@ -49,27 +75,6 @@ namespace SampleTest
         public static bool IsTaskCompleted(int? percentCompleted)
         {
             return percentCompleted == 100;
-        }
-
-        public static IBaseRequestBuilder GetCalendarViewBuilder()
-        {
-            return ProviderManager.Instance.GlobalProvider.Graph().Me.CalendarView;
-        }
-        
-        public static IBaseRequestBuilder GetMessagesBuilder()
-        {
-            return ProviderManager.Instance.GlobalProvider.Graph().Me.Messages;
-        }
-
-        public static IBaseRequestBuilder GetPlannerTasksBuilder()
-        {
-            return ProviderManager.Instance.GlobalProvider.Graph().Me.Planner.Tasks;
-        }
-
-        public static IBaseRequestBuilder GetTeamsChannelMessagesBuilder(string team, string channel)
-        {
-            // Workaround for https://github.com/microsoft/microsoft-ui-xaml/issues/3064
-            return ProviderManager.Instance.GlobalProvider.Graph().Teams[team].Channels[channel].Messages;
         }
     }
 }

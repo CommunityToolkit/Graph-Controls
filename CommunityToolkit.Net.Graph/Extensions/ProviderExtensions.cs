@@ -36,9 +36,12 @@ namespace CommunityToolkit.Net.Graph.Extensions
         /// <returns>A GraphServiceClient instance.</returns>
         public static GraphServiceClient Graph(this IProvider provider)
         {
-            if (_client == null && provider.State == ProviderState.SignedIn)
+            if (_client == null && provider?.State == ProviderState.SignedIn)
             {
-                _client = provider != null ? new GraphServiceClient(provider) : null;
+                _client = new GraphServiceClient(new DelegateAuthenticationProvider(async (requestMessage) =>
+                {
+                    await provider.AuthenticateRequestAsync(requestMessage);
+                }));
             }
 
             return _client;

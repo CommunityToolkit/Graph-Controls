@@ -78,7 +78,7 @@
                             <wgt:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
                                                 OrderBy="start/dateTime"
-                                                RequestBuilder="{x:Bind local:MainPage.GetCalendarViewBuilder(), Mode=OneWay}"
+                                                RequestBuilder="{x:Bind CalendarViewBuilder, Mode=OneWay}"
                                                 ResponseType="graph:Event">
                                 <wgt:GraphPresenter.QueryOptions>
                                     <!--  Need to create separate Properties as multiple functions not supported in x:Bind see https://github.com/microsoft/microsoft-ui-xaml/issues/2407  -->
@@ -139,7 +139,7 @@
                             </StackPanel>
                             <wgt:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
-                                                RequestBuilder="{x:Bind local:MainPage.GetMessagesBuilder(), Mode=OneWay}"
+                                                RequestBuilder="{x:Bind MessagesBuilder, Mode=OneWay}"
                                                 ResponseType="graph:Message">
                                 <wgt:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
@@ -187,7 +187,7 @@
                             </StackPanel>
                             <wgt:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
-                                                RequestBuilder="{x:Bind local:MainPage.GetPlannerTasksBuilder(), Mode=OneWay}"
+                                                RequestBuilder="{x:Bind PlannerTasksBuilder, Mode=OneWay}"
                                                 ResponseType="graph:PlannerTask">
                                 <wgt:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
@@ -264,7 +264,7 @@
                             </StackPanel>
                             <wgt:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
-                                                RequestBuilder="{x:Bind local:MainPage.GetTeamsChannelMessagesBuilder('02bd9fd6-8f93-4758-87c3-1fb73740a315', '19:d0bba23c2fc8413991125a43a54cc30e@thread.skype'), Mode=OneWay}"
+                                                RequestBuilder="{x:Bind TeamsChannelMessagesBuilder, Mode=OneWay}"
                                                 ResponseType="graph:ChatMessage">
                                 <wgt:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
