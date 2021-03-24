@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>uap10.0.17763</TargetFramework>
-    <Title>Community Toolkit Graph Uwp Controls and Helpers</Title>
+    <Title>Windows Community Toolkit Graph Uwp Controls and Helpers</Title>
     <PackageId>CommunityToolkit.Uwp.Graph.Controls</PackageId>
     <Description>
       This library provides Microsoft Graph UWP XAML controls. It is part of the Windows Community Toolkit.
