@@ -1,70 +1,57 @@
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using CommunityToolkit.Net.Authentication;
 using System;
-using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.ApplicationModel.Core;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
-namespace SampleTest
+namespace UnitTests.UWP
 {
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
-    sealed partial class App : Application
+    public partial class App : Application
     {
+        // Holder for test content to abstract Window.Current.Content
+        public static FrameworkElement ContentRoot
+        {
+            get
+            {
+                var rootFrame = Window.Current.Content as Frame;
+                return rootFrame.Content as FrameworkElement;
+            }
+
+            set
+            {
+                var rootFrame = Window.Current.Content as Frame;
+                rootFrame.Content = value;
+            }
+        }
+
+        // Abstract CoreApplication.MainView.DispatcherQueue
+        public static DispatcherQueue DispatcherQueue
+        {
+            get
+            {
+                return CoreApplication.MainView.DispatcherQueue;
+            }
+        }
+
         /// <summary>
+        /// Initializes a new instance of the <see cref="App"/> class.
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
         public App()
         {
-            this.InitializeComponent();
-            this.Suspending += OnSuspending;
-        }
-
-
-        // Which provider should be used for authentication?
-        private readonly ProviderType _providerType = ProviderType.Mock;
-
-        // List of available authentication providers.
-        private enum ProviderType
-        {
-            Mock,
-            Msal
-        }
-
-        /// <summary>
-        /// Initialize the global authentication provider.
-        /// </summary>
-        private void InitializeGlobalProvider()
-        {
-            if (ProviderManager.Instance.GlobalProvider != null)
-            {
-                return;
-            }
-
-            // Provider config
-            string clientId = "YOUR_CLIENT_ID_HERE";
-            string[] scopes = { "User.Read", "User.ReadBasic.All", "People.Read", "Calendars.Read", "Mail.Read", "Group.Read.All", "ChannelMessage.Read.All" };
-
-            switch(_providerType)
-            {
-                // Mock provider
-                case ProviderType.Mock:
-                    ProviderManager.Instance.GlobalProvider = new MockProvider(signedIn: true);
-                    break;
-
-                //Msal provider
-                case ProviderType.Msal:
-                    ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, scopes);
-                    break;
-            }
+            InitializeComponent();
+            Suspending += OnSuspending;
         }
 
         /// <summary>
@@ -74,7 +61,13 @@ namespace SampleTest
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            Task.Run(InitializeGlobalProvider);
+#if DEBUG
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                DebugSettings.EnableFrameRateCounter = true;
+            }
+
+#endif
 
             Frame rootFrame = Window.Current.Content as Frame;
 
@@ -83,31 +76,28 @@ namespace SampleTest
             if (rootFrame == null)
             {
                 // Create a Frame to act as the navigation context and navigate to the first page
-                rootFrame = new Frame();
+                rootFrame = new Frame()
+                {
+                    CacheSize = 0 // Prevent any test pages from being cached
+                };
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                    //TODO: Load state from previously suspended application
+                    // TODO: Load state from previously suspended application
                 }
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
             }
 
-            if (e.PrelaunchActivated == false)
-            {
-                if (rootFrame.Content == null)
-                {
-                    // When the navigation stack isn't restored navigate to the first page,
-                    // configuring the new page by passing required information as a navigation
-                    // parameter
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
-                }
-                // Ensure the current window is active
-                Window.Current.Activate();
-            }
+            Microsoft.VisualStudio.TestPlatform.TestExecutor.UnitTestClient.CreateDefaultUI();
+
+            // Ensure the current window is active
+            Window.Current.Activate();
+
+            Microsoft.VisualStudio.TestPlatform.TestExecutor.UnitTestClient.Run(e.Arguments);
         }
 
         /// <summary>
@@ -115,7 +105,7 @@ namespace SampleTest
         /// </summary>
         /// <param name="sender">The Frame which failed navigation</param>
         /// <param name="e">Details about the navigation failure</param>
-        void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+        private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
@@ -130,7 +120,8 @@ namespace SampleTest
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
-            //TODO: Save application state and stop any background activity
+
+            // TODO: Save application state and stop any background activity
             deferral.Complete();
         }
     }
