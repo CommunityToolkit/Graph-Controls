@@ -1,0 +1,28 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>Windows Community Toolkit .NET Standard Graph Services</Title>
+    <PackageId>CommunityToolkit.Net.Graph</PackageId>
+    <Description>
+      This package includes .NET Standard code helpers such as:
+      - GraphExtensions: Helpers for common tasks related to the Microsoft Graph used by the Microsoft.Toolkit.Graph.Controls.
+      - ProviderExtensions: Extension on IProvider for accessing a pre-configured GraphServiceClient instance.
+    </Description>
+    <PackageTags>Windows Community Toolkit Graph Provider Extensions</PackageTags>
+    <SignAssembly>false</SignAssembly>
+    <GenerateLibraryLayout>true</GenerateLibraryLayout>
+    <LangVersion>8.0</LangVersion>
+    <Configurations>Debug;Release;CI</Configurations>
+    <Platforms>AnyCPU;ARM;ARM64;x64;x86</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Graph.Beta" Version="0.39.0-preview" />
+    <PackageReference Include="Microsoft.Graph.Core" Version="2.0.0-preview.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CommunityToolkit.Net.Authentication\CommunityToolkit.Net.Authentication.csproj" />
+  </ItemGroup>
+</Project>

@@ -2,16 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using CommunityToolkit.Net.Authentication;
+using CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Microsoft.Toolkit.Graph.Helpers.RoamingSettings;
-using Microsoft.Toolkit.Graph.Providers;
 
-namespace SampleTest.Samples.RoamingSettings
+namespace SampleTest.Samples
 {
     public class RoamingSettingsViewModel : INotifyPropertyChanged
     {
@@ -165,10 +165,9 @@ namespace SampleTest.Samples.RoamingSettings
         {
             try
             {
-                _roamingSettings = await RoamingSettingsHelper.CreateForCurrentUser();
+                ClearState();
 
-                KeyInputText = string.Empty;
-                ValueInputText = string.Empty;
+                _roamingSettings = await RoamingSettingsHelper.CreateForCurrentUser(RoamingDataStore.UserExtensions, false);
             }
             catch (Exception e)
             {

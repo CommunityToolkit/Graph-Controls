@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+      
+    <Title>Windows Community Toolkit .NET Standard Auth Services</Title>
+    <Description>
+        This package includes .NET Standard authentication helpers such as:
+        - BaseProvider:
+        - IProvider:
+        - MockPRovider:
+        - ProviderManager:
+        - ProviderManagerChangedState:
+        - ProviderState:
+        - ProviderStateChangedEventArgs:
+        - ProviderUpdatedEventArgs:
+    </Description>
+    <PackageTags>Community Toolkit Provider Authentication Auth</PackageTags>
+  </PropertyGroup>
+</Project>

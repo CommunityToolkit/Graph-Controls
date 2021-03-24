@@ -1,0 +1,8 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ms-appx:///CommunityToolkit.Uwp.Graph.Controls/Controls/LoginButton/LoginButton.xaml" />
+        <ResourceDictionary Source="ms-appx:///CommunityToolkit.Uwp.Graph.Controls/Controls/PeoplePicker/PeoplePicker.xaml" />
+        <ResourceDictionary Source="ms-appx:///CommunityToolkit.Uwp.Graph.Controls/Controls/PersonView/PersonView.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

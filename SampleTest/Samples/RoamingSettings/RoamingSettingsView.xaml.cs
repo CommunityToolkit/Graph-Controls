@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using Windows.UI.Xaml.Controls;
 
-namespace SampleTest.Samples.RoamingSettings
+namespace SampleTest.Samples
 {
     /// <summary>
     /// A sample for demonstrating features in the RoamingSettings namespace.
