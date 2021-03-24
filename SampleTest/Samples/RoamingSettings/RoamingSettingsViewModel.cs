@@ -167,7 +167,7 @@ namespace SampleTest.Samples
             {
                 ClearState();
 
-                _roamingSettings = await RoamingSettingsHelper.CreateForCurrentUser(RoamingDataStore.UserExtensions, false);
+                _roamingSettings = await RoamingSettingsHelper.CreateForCurrentUser();
             }
             catch (Exception e)
             {

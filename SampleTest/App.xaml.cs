@@ -30,7 +30,7 @@ namespace SampleTest
 
 
         // Which provider should be used for authentication?
-        private readonly ProviderType _providerType = ProviderType.Mock;
+        private readonly ProviderType _providerType = ProviderType.Msal;
 
         // List of available authentication providers.
         private enum ProviderType
@@ -50,7 +50,7 @@ namespace SampleTest
             }
 
             // Provider config
-            string clientId = "YOUR_CLIENT_ID_HERE";
+            string clientId = "a974dfa0-9f57-49b9-95db-90f04ce2111a";
             string[] scopes = { "User.Read", "User.ReadBasic.All", "People.Read", "Calendars.Read", "Mail.Read", "Group.Read.All", "ChannelMessage.Read.All" };
 
             switch(_providerType)
@@ -74,8 +74,6 @@ namespace SampleTest
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            Task.Run(InitializeGlobalProvider);
-
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -107,6 +105,8 @@ namespace SampleTest
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
+
+                InitializeGlobalProvider();
             }
         }
 

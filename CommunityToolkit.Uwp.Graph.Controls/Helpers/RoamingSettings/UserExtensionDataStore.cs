@@ -178,12 +178,20 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public T Read<T>(string key, T @default = default)
         {
-            if (!Settings.TryGetValue(key, out object value) || value == null)
+            if (Settings.TryGetValue(key, out object value) || value == null)
             {
-                return @default;
+                try
+                {
+                    return _serializer.Deserialize<T>((string)value);
+                }
+                catch
+                {
+                    // Primitive types can't be deserialized.
+                    return (T)Convert.ChangeType(value, typeof(T));
+                }
             }
 
-            return _serializer.Deserialize<T>((string)value);
+            return @default;
         }
 
         /// <inheritdoc />
@@ -192,10 +200,18 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Settings[compositeKey];
             if (composite != null)
             {
-                string value = (string)composite[key];
+                object value = composite[key];
                 if (value != null)
                 {
-                    return _serializer.Deserialize<T>(value);
+                    try
+                    {
+                        return _serializer.Deserialize<T>((string)value);
+                    }
+                    catch
+                    {
+                        // Primitive types can't be deserialized.
+                        return (T)Convert.ChangeType(value, typeof(T));
+                    }
                 }
             }
 
@@ -261,12 +277,6 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
 
         /// <inheritdoc />
         public Task<StorageFile> SaveFileAsync<T>(string filePath, T value)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        public Task<string> ReadFileAsync(string filePath, string @default = null)
         {
             throw new NotImplementedException();
         }
