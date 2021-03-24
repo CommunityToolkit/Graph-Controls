@@ -1,31 +1,16 @@
 ﻿<Page x:Class="SampleTest.MainPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
-      xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:ex="using:Microsoft.Toolkit.Extensions"
       xmlns:global="using:System.Globalization"
       xmlns:graph="using:Microsoft.Graph"
       xmlns:local="using:SampleTest"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:providers="using:Microsoft.Toolkit.Graph.Providers"
-      xmlns:wgt="using:Microsoft.Toolkit.Graph.Controls"
+      xmlns:wgt="using:CommunityToolkit.Uwp.Graph.Controls"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
       mc:Ignorable="d">
-    <!--
-        Initialize Graph Provider On Page Load
-        
-        Register Client Id: https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app
-        
-        After finishing the initial registration page, you will also need to add an additional redirect URI.
-        Click on "Add a Redirect URI" and check the https://login.microsoftonline.com/common/oauth2/nativeclient checkbox on that page. Then click "Save".
-    -->
-    <Interactivity:Interaction.Behaviors>
-        <!--<providers:InteractiveProviderBehavior ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read,Calendars.Read,Mail.Read,Group.Read.All,ChannelMessage.Read.All"/>-->
-        <providers:MockProviderBehavior />
-    </Interactivity:Interaction.Behaviors>
-
+    
     <Pivot>
         <Pivot.ItemContainerStyle>
             <Style TargetType="PivotItem">
@@ -93,7 +78,7 @@
                             <wgt:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
                                                 OrderBy="start/dateTime"
-                                                RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.CalendarView, Mode=OneWay}"
+                                                RequestBuilder="{x:Bind CalendarViewBuilder, Mode=OneWay}"
                                                 ResponseType="graph:Event">
                                 <wgt:GraphPresenter.QueryOptions>
                                     <!--  Need to create separate Properties as multiple functions not supported in x:Bind see https://github.com/microsoft/microsoft-ui-xaml/issues/2407  -->
@@ -154,7 +139,7 @@
                             </StackPanel>
                             <wgt:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
-                                                RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.Messages, Mode=OneWay}"
+                                                RequestBuilder="{x:Bind MessagesBuilder, Mode=OneWay}"
                                                 ResponseType="graph:Message">
                                 <wgt:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
@@ -202,7 +187,7 @@
                             </StackPanel>
                             <wgt:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
-                                                RequestBuilder="{x:Bind providers:ProviderManager.Instance.GlobalProvider.Graph.Me.Planner.Tasks, Mode=OneWay}"
+                                                RequestBuilder="{x:Bind PlannerTasksBuilder, Mode=OneWay}"
                                                 ResponseType="graph:PlannerTask">
                                 <wgt:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
@@ -249,7 +234,6 @@
                                                                 <Run>Due</Run>
                                                                 <Run Text="{x:Bind local:MainPage.ToLocalTime(DueDateTime), Mode=OneWay}" />
                                                             </TextBlock>
-
                                                         </Grid>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
@@ -280,7 +264,7 @@
                             </StackPanel>
                             <wgt:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
-                                                RequestBuilder="{x:Bind local:MainPage.GetTeamsChannelMessagesBuilder('02bd9fd6-8f93-4758-87c3-1fb73740a315', '19:d0bba23c2fc8413991125a43a54cc30e@thread.skype'), Mode=OneWay}"
+                                                RequestBuilder="{x:Bind TeamsChannelMessagesBuilder, Mode=OneWay}"
                                                 ResponseType="graph:ChatMessage">
                                 <wgt:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
