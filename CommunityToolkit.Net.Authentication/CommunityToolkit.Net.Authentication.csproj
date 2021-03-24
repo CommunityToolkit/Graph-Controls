@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
       
-    <Title>Community Toolkit .NET Standard Auth Services</Title>
+    <Title>Windows Community Toolkit .NET Standard Auth Services</Title>
     <Description>
         This package includes .NET Standard authentication helpers such as:
         - BaseProvider:
