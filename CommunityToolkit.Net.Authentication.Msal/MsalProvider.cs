@@ -34,7 +34,7 @@ namespace CommunityToolkit.Net.Authentication
         /// <param name="clientId">Registered ClientId.</param>
         /// <param name="redirectUri">RedirectUri for auth response.</param>
         /// <param name="scopes">List of Scopes to initially request.</param>
-        public MsalProvider(string clientId, string redirectUri = "https://login.microsoftonline.com/common/oauth2/nativeclient", string[] scopes = null)
+        public MsalProvider(string clientId, string[] scopes = null, string redirectUri = "https://login.microsoftonline.com/common/oauth2/nativeclient")
         {
             var client = PublicClientApplicationBuilder.Create(clientId)
                 .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)

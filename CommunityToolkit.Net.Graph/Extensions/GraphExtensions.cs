@@ -5,7 +5,6 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Graph;
-using Microsoft.Graph.Auth;
 
 namespace CommunityToolkit.Net.Graph.Extensions
 {

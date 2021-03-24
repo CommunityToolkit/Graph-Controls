@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Net.Authentication;
-using CommunityToolkit.Net.Authentication.Msal;
 using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -63,7 +62,7 @@ namespace SampleTest
 
                 //Msal provider
                 case ProviderType.Msal:
-                    ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId: clientId, scopes: scopes);
+                    ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, scopes);
                     break;
             }
         }
