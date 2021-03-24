@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Net.Authentication;
-using CommunityToolkit.Net.Authentication.Msal;
 using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
