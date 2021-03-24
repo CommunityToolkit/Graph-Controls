@@ -50,7 +50,7 @@ namespace SampleTest
             }
 
             // Provider config
-            string clientId = "a974dfa0-9f57-49b9-95db-90f04ce2111a";
+            string clientId = "YOUR_CLIENT_ID_HERE";
             string[] scopes = { "User.Read", "User.ReadBasic.All", "People.Read", "Calendars.Read", "Mail.Read", "Group.Read.All", "ChannelMessage.Read.All" };
 
             switch(_providerType)
