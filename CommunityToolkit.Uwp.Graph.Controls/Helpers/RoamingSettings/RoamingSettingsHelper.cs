@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CommunityToolkit.Net.Authentication;
 using CommunityToolkit.Net.Graph.Extensions;
+using CommunityToolkit.Uwp.Graph.Common;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
 
@@ -66,6 +67,11 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         {
             // TODO: Infuse unique identifier from Graph registration into the storage name.
             string dataStoreName = "communityToolkit.roamingSettings";
+
+            if (serializer == null)
+            {
+                serializer = new JsonObjectSerializer();
+            }
 
             switch (dataStore)
             {

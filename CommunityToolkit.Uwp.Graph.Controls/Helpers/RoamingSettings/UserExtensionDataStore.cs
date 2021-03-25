@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CommunityToolkit.Uwp.Graph.Common;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
@@ -113,7 +112,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <summary>
         /// Initializes a new instance of the <see cref="UserExtensionDataStore"/> class.
         /// </summary>
-        public UserExtensionDataStore(string extensionId, string userId, IObjectSerializer objectSerializer = null)
+        public UserExtensionDataStore(string extensionId, string userId, IObjectSerializer objectSerializer)
         {
             _extensionId = extensionId;
             _serializer = objectSerializer;
