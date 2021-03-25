@@ -113,17 +113,13 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <summary>
         /// Initializes a new instance of the <see cref="UserExtensionDataStore"/> class.
         /// </summary>
-        public UserExtensionDataStore(string extensionId, string userId, IObjectSerializer objectSerializer = null, bool autoSync = false)
+        public UserExtensionDataStore(string extensionId, string userId, IObjectSerializer objectSerializer = null)
         {
-            _serializer = objectSerializer ?? new JsonObjectSerializer();
             _extensionId = extensionId;
+            _serializer = objectSerializer;
+
             UserId = userId;
             UserExtension = null;
-
-            if (autoSync)
-            {
-                Task.Run(Sync);
-            }
         }
 
         /// <summary>
