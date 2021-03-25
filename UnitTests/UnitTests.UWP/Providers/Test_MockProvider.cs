@@ -2,13 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using Microsoft.Toolkit.Graph.Providers;
+using CommunityToolkit.Net.Authentication;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace UnitTests.UWP.Providers
+namespace UnitTests.UWP.Authentication
 {
     [TestClass]
     public class Test_MockProvider
@@ -150,7 +150,7 @@ namespace UnitTests.UWP.Providers
             IProvider provider = new MockProvider(true);
 
             // Create an empty message to authenticate.
-            var message = new HttpRequestMessage();
+            var message = new HttpRequestMessage(HttpMethod.Get, new Uri("https://graph.microsoft.com/v1/me"));
 
             // Use the provider to authenticate the message.
             await provider.AuthenticateRequestAsync(message);

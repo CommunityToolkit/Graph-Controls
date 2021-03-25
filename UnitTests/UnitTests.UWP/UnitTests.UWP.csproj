@@ -186,9 +186,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Microsoft.Toolkit.Graph\Microsoft.Toolkit.Graph.csproj">
-      <Project>{B2246169-0CD8-473C-AFF6-172310E2C3F6}</Project>
-      <Name>Microsoft.Toolkit.Graph</Name>
+    <ProjectReference Include="..\..\CommunityToolkit.Net.Authentication\CommunityToolkit.Net.Authentication.csproj">
+      <Project>{b323a2e1-66ef-4037-95b7-2defa051b4b1}</Project>
+      <Name>CommunityToolkit.Net.Authentication</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
