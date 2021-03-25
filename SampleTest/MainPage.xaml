@@ -6,6 +6,7 @@
       xmlns:global="using:System.Globalization"
       xmlns:graph="using:Microsoft.Graph"
       xmlns:local="using:SampleTest"
+      xmlns:samples="using:SampleTest.Samples"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:wgt="using:CommunityToolkit.Uwp.Graph.Controls"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
@@ -25,6 +26,9 @@
                     The `LoginButton` above allows your user and application to easily connect to the Microsoft Graph. They can then also easily logout from the drop-down menu.
                 </TextBlock>
             </StackPanel>
+        </PivotItem>
+        <PivotItem Header="RoamingSettings">
+            <samples:RoamingSettingsView />
         </PivotItem>
         <PivotItem Header="PeoplePicker">
             <StackPanel>
