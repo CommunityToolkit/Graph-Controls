@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Net.Authentication;
+using Microsoft.Toolkit.Graph.Providers.Uwp;
 using System;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -36,7 +37,8 @@ namespace SampleTest
         private enum ProviderType
         {
             Mock,
-            Msal
+            Msal,
+            Windows
         }
 
         /// <summary>
@@ -60,9 +62,14 @@ namespace SampleTest
                     ProviderManager.Instance.GlobalProvider = new MockProvider(signedIn: true);
                     break;
 
-                //Msal provider
+                // Msal provider
                 case ProviderType.Msal:
                     ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, scopes);
+                    break;
+
+                // Windows provider
+                case ProviderType.Windows:
+                    ProviderManager.Instance.GlobalProvider = new WindowsProvider(clientId, scopes);
                     break;
             }
         }
