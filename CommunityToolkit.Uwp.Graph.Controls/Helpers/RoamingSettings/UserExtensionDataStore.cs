@@ -53,7 +53,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         public static async Task Set(string extensionId, string userId, string key, object value)
         {
             var userExtension = await GetExtensionForUser(extensionId, userId);
-            await userExtension.SetValue(userId, key, value);
+            await UserExtensionsDataSource.SetValue(userExtension, userId, key, value);
         }
 
         /// <summary>
@@ -91,20 +91,18 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             return userExtension;
         }
 
+        /// <inheritdoc />
+        public bool AutoSync { get; }
+
         /// <summary>
         /// Gets the id of the Graph User.
         /// </summary>
         public string UserId { get; }
 
         /// <summary>
-        /// Gets or sets the cached Extension object.
+        /// Gets the cached key value pairs.
         /// </summary>
-        public Extension UserExtension { get; protected set; }
-
-        /// <summary>
-        /// Gets the cached key value pairs from the internal data store.
-        /// </summary>
-        public IDictionary<string, object> Settings => UserExtension?.AdditionalData;
+        public IDictionary<string, object> Cache { get; private set; }
 
         private readonly string _extensionId;
         private readonly IObjectSerializer _serializer;
@@ -112,13 +110,15 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <summary>
         /// Initializes a new instance of the <see cref="UserExtensionDataStore"/> class.
         /// </summary>
-        public UserExtensionDataStore(string extensionId, string userId, IObjectSerializer objectSerializer)
+        public UserExtensionDataStore(string extensionId, string userId, IObjectSerializer objectSerializer, bool autoSync = true)
         {
             _extensionId = extensionId;
             _serializer = objectSerializer;
 
+            AutoSync = autoSync;
             UserId = userId;
-            UserExtension = null;
+
+            Cache = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <returns>The newly created Extension object.</returns>
         public async Task Create()
         {
-            UserExtension = await Create(_extensionId, UserId);
+            await Create(_extensionId, UserId);
         }
 
         /// <summary>
@@ -136,23 +136,43 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <returns>A void task.</returns>
         public async Task Delete()
         {
+            // Delete the remote.
             await Delete(_extensionId, UserId);
-            UserExtension = null;
+
+            // Clear the cache
+            Cache.Clear();
         }
 
         /// <summary>
-        /// Update the cached user extension.
+        /// Update the remote extension to match the local cache and retrieve any new keys. Any existing remote values are replaced.
         /// </summary>
         /// <returns>The freshly synced user extension.</returns>
         public async Task Sync()
         {
-            UserExtension = await GetExtensionForUser(_extensionId, UserId);
+            // Get the remote
+            Extension extension = await GetExtensionForUser(_extensionId, UserId);
+
+            // Send updates for all local values, overwriting the remote.
+            foreach (string key in Cache.Keys)
+            {
+                Save(key, Cache[key]);
+            }
+
+            // Update local cache with additions from remote
+            IDictionary<string, object> remoteData = extension.AdditionalData;
+            foreach (string key in remoteData.Keys)
+            {
+                if (!Cache.ContainsKey(key))
+                {
+                    Cache.Add(key, remoteData[key]);
+                }
+            }
         }
 
         /// <inheritdoc />
         public virtual bool KeyExists(string key)
         {
-            return Settings.ContainsKey(key);
+            return Cache.ContainsKey(key);
         }
 
         /// <inheritdoc />
@@ -160,7 +180,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         {
             if (KeyExists(compositeKey))
             {
-                ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Settings[compositeKey];
+                ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
                 if (composite != null)
                 {
                     return composite.ContainsKey(key);
@@ -173,7 +193,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public T Read<T>(string key, T @default = default)
         {
-            if (Settings.TryGetValue(key, out object value) || value == null)
+            if (Cache.TryGetValue(key, out object value) || value == null)
             {
                 try
                 {
@@ -192,7 +212,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public T Read<T>(string compositeKey, string key, T @default = default)
         {
-            ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Settings[compositeKey];
+            ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
             if (composite != null)
             {
                 object value = composite[key];
@@ -216,11 +236,14 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public void Save<T>(string key, T value)
         {
-            // Set the local cache
-            Settings[key] = _serializer.Serialize(value);
+            // Update the cache
+            Cache[key] = _serializer.Serialize(value);
 
-            // Send an update to the remote.
-            Task.Run(() => Set(_extensionId, UserId, key, value));
+            if (AutoSync)
+            {
+                // Update the remote
+                Task.Run(() => Set(_extensionId, UserId, key, value));
+            }
         }
 
         /// <inheritdoc />
@@ -228,7 +251,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         {
             if (KeyExists(compositeKey))
             {
-                ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Settings[compositeKey];
+                ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
 
                 foreach (KeyValuePair<string, T> setting in values)
                 {
@@ -242,8 +265,14 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                     }
                 }
 
-                Settings[compositeKey] = composite;
-                Task.Run(() => Set(_extensionId, UserId, compositeKey, composite));
+                // Update the cache
+                Cache[compositeKey] = composite;
+
+                if (AutoSync)
+                {
+                    // Update the remote
+                    Task.Run(() => Set(_extensionId, UserId, compositeKey, composite));
+                }
             }
             else
             {
@@ -253,8 +282,14 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                     composite.Add(setting.Key, _serializer.Serialize(setting.Value));
                 }
 
-                Settings[compositeKey] = composite;
-                Task.Run(() => Set(_extensionId, UserId, compositeKey, composite));
+                // Update the cache
+                Cache[compositeKey] = composite;
+
+                if (AutoSync)
+                {
+                    // Update the remote
+                    Task.Run(() => Set(_extensionId, UserId, compositeKey, composite));
+                }
             }
         }
 

@@ -29,13 +29,16 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
     /// </summary>
     public class RoamingSettingsHelper : IRoamingSettingsDataStore
     {
+        /// <inheritdoc/>
+        public bool AutoSync { get; set; }
+
         /// <summary>
-        /// Gets the internal data storage helper instance.
+        /// Gets the internal data store instance.
         /// </summary>
         public IRoamingSettingsDataStore DataStore { get; private set; }
 
         /// <inheritdoc />
-        public IDictionary<string, object> Settings => DataStore?.Settings;
+        public IDictionary<string, object> Cache => DataStore?.Cache;
 
         /// <summary>
         /// Creates a new RoamingSettingsHelper instance for the currently signed in user.
@@ -53,7 +56,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             }
 
             var me = await provider.Graph().Me.Request().GetAsync();
-            return new RoamingSettingsHelper(me.Id, dataStore, autoSync, serializer);
+            return new RoamingSettingsHelper(me.Id, dataStore, autoSync);
         }
 
         /// <summary>
@@ -61,9 +64,10 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// </summary>
         /// <param name="userId">The id of the target Graph User.</param>
         /// <param name="dataStore">Which specific data store is being used.</param>
-        /// <param name="autoSync">Whether the values should immediately sync or not.</param>
+        /// <param name="syncOnInit">Whether the values should immediately sync or not.</param>
+        /// <param name="autoSync">Determines if we sync on every change or only when explicitly synced.</param>
         /// <param name="serializer">An object serializer for serialization of objects in the data store.</param>
-        public RoamingSettingsHelper(string userId, RoamingDataStore dataStore = RoamingDataStore.UserExtensions, bool autoSync = true, IObjectSerializer serializer = null)
+        public RoamingSettingsHelper(string userId, RoamingDataStore dataStore = RoamingDataStore.UserExtensions, bool syncOnInit = true, bool autoSync = true, IObjectSerializer serializer = null)
         {
             // TODO: Infuse unique identifier from Graph registration into the storage name.
             string dataStoreName = "communityToolkit.roamingSettings";
@@ -83,16 +87,11 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                     throw new ArgumentOutOfRangeException(nameof(dataStore));
             }
 
-            if (autoSync)
+            AutoSync = autoSync;
+
+            if (syncOnInit)
             {
-                try
-                {
-                    DataStore.Sync();
-                }
-                catch
-                {
-                    // Sync may fail if the storage container does not yet exist.
-                }
+                _ = Sync();
             }
         }
 
@@ -156,6 +155,18 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// Syncronize the internal cache with the remote storage endpoint.
         /// </summary>
         /// <returns>A Task.</returns>
-        public Task Sync() => DataStore.Sync();
+        public async Task Sync()
+        {
+            try
+            {
+                await DataStore.Sync();
+            }
+            catch
+            {
+                // Sync may fail if the storage container does not yet exist.
+                await DataStore.Create();
+                await DataStore.Sync();
+            }
+        }
     }
 }

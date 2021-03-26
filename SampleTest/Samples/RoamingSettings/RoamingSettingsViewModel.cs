@@ -101,7 +101,7 @@ namespace SampleTest.Samples
 
                 await _roamingSettings.Create();
                 
-                AdditionalData = new ObservableCollection<KeyValuePair<string, object>>(_roamingSettings.DataStore.Settings);
+                AdditionalData = new ObservableCollection<KeyValuePair<string, object>>(_roamingSettings.Cache);
 
                 KeyInputText = string.Empty;
                 ValueInputText = string.Empty;
@@ -138,9 +138,9 @@ namespace SampleTest.Samples
                 AdditionalData?.Clear();
 
                 await _roamingSettings.Sync();
-                if (_roamingSettings.DataStore.Settings != null)
+                if (_roamingSettings.Cache != null)
                 {
-                    AdditionalData = new ObservableCollection<KeyValuePair<string, object>>(_roamingSettings.DataStore.Settings);
+                    AdditionalData = new ObservableCollection<KeyValuePair<string, object>>(_roamingSettings.Cache);
                 }
             }
             catch (Exception e)

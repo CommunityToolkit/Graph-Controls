@@ -14,9 +14,14 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
     public interface IRoamingSettingsDataStore : IObjectStorageHelper
     {
         /// <summary>
+        /// Gets a value indicating whether the values should immediately sync or not.
+        /// </summary>
+        bool AutoSync { get; }
+
+        /// <summary>
         /// Gets access to the key/value pairs cache directly.
         /// </summary>
-        IDictionary<string, object> Settings { get; }
+        IDictionary<string, object> Cache { get; }
 
         /// <summary>
         /// Create a new storage container.
