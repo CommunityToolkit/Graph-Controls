@@ -91,6 +91,8 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             return userExtension;
         }
 
+        private static readonly IList<string> ReservedKeys = new List<string> { "responseHeaders", "statusCode", "@odata.context" };
+
         /// <inheritdoc />
         public bool AutoSync { get; }
 
@@ -151,15 +153,23 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         {
             // Get the remote
             Extension extension = await GetExtensionForUser(_extensionId, UserId);
+            IDictionary<string, object> remoteData = extension.AdditionalData;
 
             // Send updates for all local values, overwriting the remote.
             foreach (string key in Cache.Keys)
             {
-                Save(key, Cache[key]);
+                if (ReservedKeys.Contains(key))
+                {
+                    continue;
+                }
+
+                if (!remoteData.ContainsKey(key) || !EqualityComparer<object>.Default.Equals(remoteData[key], Cache[key]))
+                {
+                    Save(key, Cache[key]);
+                }
             }
 
             // Update local cache with additions from remote
-            IDictionary<string, object> remoteData = extension.AdditionalData;
             foreach (string key in remoteData.Keys)
             {
                 if (!Cache.ContainsKey(key))
