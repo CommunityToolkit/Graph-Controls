@@ -44,10 +44,11 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// Creates a new RoamingSettingsHelper instance for the currently signed in user.
         /// </summary>
         /// <param name="dataStore">Which specific data store is being used.</param>
-        /// <param name="autoSync">Whether the values should immediately sync or not.</param>
+        /// <param name="syncOnInit">Whether the values should immediately sync or not.</param>
+        /// <param name="autoSync">Whether the values should immediately sync on change or wait until Sync is called explicitly.</param>
         /// <param name="serializer">An object serializer for serialization of objects in the data store.</param>
         /// <returns>A new instance of the RoamingSettingsHelper configured for the current user.</returns>
-        public static async Task<RoamingSettingsHelper> CreateForCurrentUser(RoamingDataStore dataStore = RoamingDataStore.UserExtensions, bool autoSync = true, IObjectSerializer serializer = null)
+        public static async Task<RoamingSettingsHelper> CreateForCurrentUser(RoamingDataStore dataStore = RoamingDataStore.UserExtensions, bool syncOnInit = true, bool autoSync = true, IObjectSerializer serializer = null)
         {
             var provider = ProviderManager.Instance.GlobalProvider;
             if (provider == null || provider.State != ProviderState.SignedIn)
@@ -56,7 +57,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             }
 
             var me = await provider.Graph().Me.Request().GetAsync();
-            return new RoamingSettingsHelper(me.Id, dataStore, autoSync);
+            return new RoamingSettingsHelper(me.Id, dataStore, syncOnInit, autoSync, serializer);
         }
 
         /// <summary>
@@ -65,7 +66,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <param name="userId">The id of the target Graph User.</param>
         /// <param name="dataStore">Which specific data store is being used.</param>
         /// <param name="syncOnInit">Whether the values should immediately sync or not.</param>
-        /// <param name="autoSync">Determines if we sync on every change or only when explicitly synced.</param>
+        /// <param name="autoSync">Whether the values should immediately sync on change or wait until Sync is called explicitly.</param>
         /// <param name="serializer">An object serializer for serialization of objects in the data store.</param>
         public RoamingSettingsHelper(string userId, RoamingDataStore dataStore = RoamingDataStore.UserExtensions, bool syncOnInit = true, bool autoSync = true, IObjectSerializer serializer = null)
         {
