@@ -161,7 +161,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             {
                 await DataStore.Sync();
             }
-            catch (Exception e)
+            catch
             {
                 // Sync may fail if the storage container does not yet exist.
                 await DataStore.Create();
