@@ -75,6 +75,15 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 throw new ArgumentNullException(nameof(userId));
             }
 
+            try
+            {
+                // Try to see if the extension already exists.
+               return await GetExtension(userId, extensionId);
+            }
+            catch
+            {
+            }
+
             string requestUrl = Graph.Users[userId].Extensions.Request().RequestUrl;
 
             string json = "{" +
@@ -113,6 +122,16 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             if (string.IsNullOrWhiteSpace(userId))
             {
                 throw new ArgumentNullException(nameof(userId));
+            }
+
+            try
+            {
+                await GetExtension(userId, extensionId);
+            }
+            catch
+            {
+                // If we can't retrieve the extension, it must not exist.
+                return;
             }
 
             await Graph.Users[userId].Extensions[extensionId].Request().DeleteAsync();

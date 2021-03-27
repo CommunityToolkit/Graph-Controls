@@ -120,7 +120,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             AutoSync = autoSync;
             UserId = userId;
 
-            Cache = new Dictionary<string, object>();
+            Cache = null;
         }
 
         /// <summary>
@@ -129,7 +129,12 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <returns>The newly created Extension object.</returns>
         public async Task Create()
         {
-            await Create(_extensionId, UserId);
+            InitCache();
+
+            if (AutoSync)
+            {
+                await Create(_extensionId, UserId);
+            }
         }
 
         /// <summary>
@@ -138,11 +143,14 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <returns>A void task.</returns>
         public async Task Delete()
         {
-            // Delete the remote.
-            await Delete(_extensionId, UserId);
-
             // Clear the cache
-            Cache.Clear();
+            Cache = null;
+
+            if (AutoSync)
+            {
+                // Delete the remote.
+                await Delete(_extensionId, UserId);
+            }
         }
 
         /// <summary>
@@ -155,18 +163,26 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             Extension extension = await GetExtensionForUser(_extensionId, UserId);
             IDictionary<string, object> remoteData = extension.AdditionalData;
 
-            // Send updates for all local values, overwriting the remote.
-            foreach (string key in Cache.Keys.ToList())
+            if (Cache != null)
             {
-                if (ReservedKeys.Contains(key))
+                // Send updates for all local values, overwriting the remote.
+                foreach (string key in Cache.Keys.ToList())
                 {
-                    continue;
-                }
+                    if (ReservedKeys.Contains(key))
+                    {
+                        continue;
+                    }
 
-                if (!remoteData.ContainsKey(key) || !EqualityComparer<object>.Default.Equals(remoteData[key], Cache[key]))
-                {
-                    Save(key, Cache[key]);
+                    if (!remoteData.ContainsKey(key) || !EqualityComparer<object>.Default.Equals(remoteData[key], Cache[key]))
+                    {
+                        Save(key, Cache[key]);
+                    }
                 }
+            }
+
+            if (remoteData.Keys.Count > 0)
+            {
+                InitCache();
             }
 
             // Update local cache with additions from remote
@@ -182,13 +198,13 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public virtual bool KeyExists(string key)
         {
-            return Cache.ContainsKey(key);
+            return Cache != null && Cache.ContainsKey(key);
         }
 
         /// <inheritdoc />
         public bool KeyExists(string compositeKey, string key)
         {
-            if (KeyExists(compositeKey))
+            if (Cache != null && KeyExists(compositeKey))
             {
                 ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
                 if (composite != null)
@@ -203,7 +219,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public T Read<T>(string key, T @default = default)
         {
-            if (Cache.TryGetValue(key, out object value) || value == null)
+            if (Cache != null && Cache.TryGetValue(key, out object value))
             {
                 try
                 {
@@ -222,20 +238,23 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public T Read<T>(string compositeKey, string key, T @default = default)
         {
-            ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
-            if (composite != null)
+            if (Cache != null)
             {
-                object value = composite[key];
-                if (value != null)
+                ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
+                if (composite != null)
                 {
-                    try
+                    object value = composite[key];
+                    if (value != null)
                     {
-                        return _serializer.Deserialize<T>((string)value);
-                    }
-                    catch
-                    {
-                        // Primitive types can't be deserialized.
-                        return (T)Convert.ChangeType(value, typeof(T));
+                        try
+                        {
+                            return _serializer.Deserialize<T>((string)value);
+                        }
+                        catch
+                        {
+                            // Primitive types can't be deserialized.
+                            return (T)Convert.ChangeType(value, typeof(T));
+                        }
                     }
                 }
             }
@@ -246,6 +265,8 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public void Save<T>(string key, T value)
         {
+            InitCache();
+
             // Skip serialization for primitives.
             if (typeof(T) == typeof(object) || Type.GetTypeCode(typeof(T)) != TypeCode.Object)
             {
@@ -268,6 +289,8 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public void Save<T>(string compositeKey, IDictionary<string, T> values)
         {
+            InitCache();
+
             if (KeyExists(compositeKey))
             {
                 ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
@@ -328,6 +351,14 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         public Task<StorageFile> SaveFileAsync<T>(string filePath, T value)
         {
             throw new NotImplementedException();
+        }
+
+        private void InitCache()
+        {
+            if (Cache == null)
+            {
+                Cache = new Dictionary<string, object>();
+            }
         }
     }
 }
