@@ -154,12 +154,12 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <summary>
         /// Sets a user extension value at the specified key.
         /// </summary>
-        /// <param name="extension">The target extension.</param>
+        /// <param name="extensionId">The id of the target extension.</param>
         /// <param name="userId">The user to access.</param>
         /// <param name="key">The key.</param>
         /// <param name="value">The value to set.</param>
         /// <returns>A task.</returns>
-        public static async Task SetValue(this Extension extension, string userId, string key, object value)
+        public static async Task SetValue(string extensionId, string userId, string key, object value)
         {
             if (string.IsNullOrWhiteSpace(userId))
             {
@@ -174,7 +174,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             var extensionToUpdate = (Extension)Activator.CreateInstance(typeof(Extension), true);
             extensionToUpdate.AdditionalData = new Dictionary<string, object>() { { key, value } };
 
-            await Graph.Users[userId].Extensions[extension.Id].Request().UpdateAsync(extensionToUpdate);
+            await Graph.Users[userId].Extensions[extensionId].Request().UpdateAsync(extensionToUpdate);
         }
     }
 }

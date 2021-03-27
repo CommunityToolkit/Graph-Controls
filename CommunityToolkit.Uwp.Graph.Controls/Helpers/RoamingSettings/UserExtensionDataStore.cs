@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp.Helpers;
@@ -52,8 +53,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <returns>A task upon completion.</returns>
         public static async Task Set(string extensionId, string userId, string key, object value)
         {
-            var userExtension = await GetExtensionForUser(extensionId, userId);
-            await UserExtensionsDataSource.SetValue(userExtension, userId, key, value);
+            await UserExtensionsDataSource.SetValue(extensionId, userId, key, value);
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             IDictionary<string, object> remoteData = extension.AdditionalData;
 
             // Send updates for all local values, overwriting the remote.
-            foreach (string key in Cache.Keys)
+            foreach (string key in Cache.Keys.ToList())
             {
                 if (ReservedKeys.Contains(key))
                 {
@@ -170,7 +170,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             }
 
             // Update local cache with additions from remote
-            foreach (string key in remoteData.Keys)
+            foreach (string key in remoteData.Keys.ToList())
             {
                 if (!Cache.ContainsKey(key))
                 {
@@ -246,8 +246,17 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public void Save<T>(string key, T value)
         {
-            // Update the cache
-            Cache[key] = _serializer.Serialize(value);
+            // Skip serialization for primitives.
+            if (typeof(T) == typeof(object) || Type.GetTypeCode(typeof(T)) != TypeCode.Object)
+            {
+                // Update the cache
+                Cache[key] = value;
+            }
+            else
+            {
+                // Update the cache
+                Cache[key] = _serializer.Serialize(value);
+            }
 
             if (AutoSync)
             {
@@ -263,7 +272,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             {
                 ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
 
-                foreach (KeyValuePair<string, T> setting in values)
+                foreach (KeyValuePair<string, T> setting in values.ToList())
                 {
                     if (composite.ContainsKey(setting.Key))
                     {
@@ -287,7 +296,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             else
             {
                 ApplicationDataCompositeValue composite = new ApplicationDataCompositeValue();
-                foreach (KeyValuePair<string, T> setting in values)
+                foreach (KeyValuePair<string, T> setting in values.ToList())
                 {
                     composite.Add(setting.Key, _serializer.Serialize(setting.Value));
                 }
