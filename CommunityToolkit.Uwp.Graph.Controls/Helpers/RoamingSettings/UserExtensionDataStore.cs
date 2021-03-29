@@ -46,23 +46,23 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <summary>
         /// Set a value by key in a Graph User's extension.
         /// </summary>
-        /// <param name="extensionId">The id of the user extension.</param>
         /// <param name="userId">The id of the user.</param>
+        /// <param name="extensionId">The id of the user extension.</param>
         /// <param name="key">The key for the target value.</param>
         /// <param name="value">The value to set.</param>
         /// <returns>A task upon completion.</returns>
-        public static async Task Set(string extensionId, string userId, string key, object value)
+        public static async Task Set(string userId, string extensionId, string key, object value)
         {
-            await UserExtensionsDataSource.SetValue(extensionId, userId, key, value);
+            await UserExtensionsDataSource.SetValue(userId, extensionId, key, value);
         }
 
         /// <summary>
         /// Creates a new roaming settings extension on a Graph User.
         /// </summary>
-        /// <param name="extensionId">The id of the user extension.</param>
         /// <param name="userId">The id of the user.</param>
+        /// <param name="extensionId">The id of the user extension.</param>
         /// <returns>The newly created user extension.</returns>
-        public static async Task<Extension> Create(string extensionId, string userId)
+        public static async Task<Extension> Create(string userId, string extensionId)
         {
             var userExtension = await UserExtensionsDataSource.CreateExtension(userId, extensionId);
             return userExtension;
@@ -71,10 +71,10 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <summary>
         /// Deletes an extension by id on a Graph User.
         /// </summary>
-        /// <param name="extensionId">The id of the user extension.</param>
         /// <param name="userId">The id of the user.</param>
+        /// <param name="extensionId">The id of the user extension.</param>
         /// <returns>A task upon completion.</returns>
-        public static async Task Delete(string extensionId, string userId)
+        public static async Task Delete(string userId, string extensionId)
         {
             await UserExtensionsDataSource.DeleteExtension(userId, extensionId);
         }
@@ -82,10 +82,10 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <summary>
         /// Retrieves a user extension.
         /// </summary>
-        /// <param name="extensionId">The id of the user extension.</param>
         /// <param name="userId">The id of the user.</param>
+        /// <param name="extensionId">The id of the user extension.</param>
         /// <returns>The target extension.</returns>
-        public static async Task<Extension> GetExtensionForUser(string extensionId, string userId)
+        public static async Task<Extension> GetExtensionForUser(string userId, string extensionId)
         {
             var userExtension = await UserExtensionsDataSource.GetExtension(userId, extensionId);
             return userExtension;
@@ -112,13 +112,12 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <summary>
         /// Initializes a new instance of the <see cref="UserExtensionDataStore"/> class.
         /// </summary>
-        public UserExtensionDataStore(string extensionId, string userId, IObjectSerializer objectSerializer, bool autoSync = true)
+        public UserExtensionDataStore(string userId, string extensionId, IObjectSerializer objectSerializer, bool autoSync = true)
         {
+            UserId = userId;
             _extensionId = extensionId;
             _serializer = objectSerializer;
-
             AutoSync = autoSync;
-            UserId = userId;
 
             Cache = null;
         }
@@ -133,7 +132,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
 
             if (AutoSync)
             {
-                await Create(_extensionId, UserId);
+                await Create(UserId, _extensionId);
             }
         }
 
@@ -149,7 +148,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             if (AutoSync)
             {
                 // Delete the remote.
-                await Delete(_extensionId, UserId);
+                await Delete(UserId, _extensionId);
             }
         }
 
@@ -160,7 +159,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         public async Task Sync()
         {
             // Get the remote
-            Extension extension = await GetExtensionForUser(_extensionId, UserId);
+            Extension extension = await GetExtensionForUser(UserId, _extensionId);
             IDictionary<string, object> remoteData = extension.AdditionalData;
 
             if (Cache != null)
@@ -204,7 +203,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public bool KeyExists(string compositeKey, string key)
         {
-            if (Cache != null && KeyExists(compositeKey))
+            if (KeyExists(compositeKey))
             {
                 ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
                 if (composite != null)
@@ -282,7 +281,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             if (AutoSync)
             {
                 // Update the remote
-                Task.Run(() => Set(_extensionId, UserId, key, value));
+                Task.Run(() => Set(UserId, _extensionId, key, value));
             }
         }
 
@@ -313,7 +312,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 if (AutoSync)
                 {
                     // Update the remote
-                    Task.Run(() => Set(_extensionId, UserId, compositeKey, composite));
+                    Task.Run(() => Set(UserId, _extensionId, compositeKey, composite));
                 }
             }
             else
@@ -330,7 +329,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 if (AutoSync)
                 {
                     // Update the remote
-                    Task.Run(() => Set(_extensionId, UserId, compositeKey, composite));
+                    Task.Run(() => Set(UserId, _extensionId, compositeKey, composite));
                 }
             }
         }

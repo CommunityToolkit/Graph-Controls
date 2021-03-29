@@ -173,16 +173,21 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <summary>
         /// Sets a user extension value at the specified key.
         /// </summary>
-        /// <param name="extensionId">The id of the target extension.</param>
         /// <param name="userId">The user to access.</param>
+        /// <param name="extensionId">The id of the target extension.</param>
         /// <param name="key">The key.</param>
         /// <param name="value">The value to set.</param>
         /// <returns>A task.</returns>
-        public static async Task SetValue(string extensionId, string userId, string key, object value)
+        public static async Task SetValue(string userId, string extensionId, string key, object value)
         {
             if (string.IsNullOrWhiteSpace(userId))
             {
                 throw new ArgumentNullException(nameof(userId));
+            }
+
+            if (string.IsNullOrWhiteSpace(extensionId))
+            {
+                throw new ArgumentNullException(nameof(extensionId));
             }
 
             if (string.IsNullOrWhiteSpace(key))

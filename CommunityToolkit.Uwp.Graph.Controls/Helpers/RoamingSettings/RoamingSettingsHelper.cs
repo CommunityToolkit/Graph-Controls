@@ -29,16 +29,16 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
     /// </summary>
     public class RoamingSettingsHelper : IRoamingSettingsDataStore
     {
-        /// <inheritdoc/>
-        public bool AutoSync { get; set; }
-
         /// <summary>
         /// Gets the internal data store instance.
         /// </summary>
         public IRoamingSettingsDataStore DataStore { get; private set; }
 
+        /// <inheritdoc/>
+        public bool AutoSync => DataStore.AutoSync;
+
         /// <inheritdoc />
-        public IDictionary<string, object> Cache => DataStore?.Cache;
+        public IDictionary<string, object> Cache => DataStore.Cache;
 
         /// <summary>
         /// Creates a new RoamingSettingsHelper instance for the currently signed in user.
@@ -81,18 +81,22 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             switch (dataStore)
             {
                 case RoamingDataStore.UserExtensions:
-                    DataStore = new UserExtensionDataStore(dataStoreName, userId, serializer);
+                    DataStore = new UserExtensionDataStore(userId, dataStoreName, serializer, autoSync);
                     break;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dataStore));
             }
 
-            AutoSync = autoSync;
-
             if (syncOnInit)
             {
-                _ = Sync();
+                try
+                {
+                    _ = Sync();
+                }
+                catch
+                {
+                }
             }
         }
 
