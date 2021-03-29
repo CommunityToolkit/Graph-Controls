@@ -9,9 +9,9 @@ using System.Linq;
 using CommunityToolkit.Net.Authentication;
 using CommunityToolkit.Net.Graph.Extensions;
 using Microsoft.Graph;
+using Microsoft.Toolkit.Uwp.UI;
 using Microsoft.Toolkit.Uwp.UI.Controls;
-using Microsoft.Toolkit.Uwp.UI.Extensions;
-using Windows.UI.Xaml;
+using Windows.System;
 using Windows.UI.Xaml.Controls;
 
 namespace CommunityToolkit.Uwp.Graph.Controls
@@ -21,7 +21,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
     /// </summary>
     public partial class PeoplePicker : TokenizingTextBox
     {
-        private DispatcherTimer _typeTimer = new DispatcherTimer();
+        private DispatcherQueueTimer _typeTimer = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PeoplePicker"/> class.
@@ -34,6 +34,8 @@ namespace CommunityToolkit.Uwp.Graph.Controls
 
             TextChanged += TokenBox_TextChanged;
             TokenItemAdding += TokenBox_TokenItemTokenItemAdding;
+
+            _typeTimer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         }
 
         private async void TokenBox_TokenItemTokenItemAdding(TokenizingTextBox sender, TokenItemAddingEventArgs args)
