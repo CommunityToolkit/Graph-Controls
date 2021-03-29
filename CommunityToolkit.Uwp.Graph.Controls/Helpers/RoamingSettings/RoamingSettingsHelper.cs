@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CommunityToolkit.Net.Authentication;
 using CommunityToolkit.Net.Graph.Extensions;
-using CommunityToolkit.Uwp.Graph.Common;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
 
@@ -75,7 +74,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
 
             if (serializer == null)
             {
-                serializer = new JsonObjectSerializer();
+                serializer = new SystemSerializer();
             }
 
             switch (dataStore)
@@ -90,13 +89,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
 
             if (syncOnInit)
             {
-                try
-                {
-                    _ = Sync();
-                }
-                catch
-                {
-                }
+                _ = Sync();
             }
         }
 
