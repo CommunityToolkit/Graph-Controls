@@ -21,25 +21,25 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// Retrieve the value from Graph User extensions and cast the response to the provided type.
         /// </summary>
         /// <typeparam name="T">The type to cast the return result to.</typeparam>
-        /// <param name="extensionId">The id of the user extension.</param>
         /// <param name="userId">The id of the user.</param>
+        /// <param name="extensionId">The id of the user extension.</param>
         /// <param name="key">The key for the desired value.</param>
         /// <returns>The value from the data store.</returns>
-        public static async Task<T> Get<T>(string extensionId, string userId, string key)
+        public static async Task<T> Get<T>(string userId, string extensionId, string key)
         {
-            return (T)await Get(extensionId, userId, key);
+            return (T)await Get(userId, extensionId, key);
         }
 
         /// <summary>
         /// Retrieve the value from Graph User extensions by extensionId, userId, and key.
         /// </summary>
-        /// <param name="extensionId">The id of the user extension.</param>
         /// <param name="userId">The id of the user.</param>
+        /// <param name="extensionId">The id of the user extension.</param>
         /// <param name="key">The key for the desired value.</param>
         /// <returns>The value from the data store.</returns>
-        public static async Task<object> Get(string extensionId, string userId, string key)
+        public static async Task<object> Get(string userId, string extensionId, string key)
         {
-            var userExtension = await GetExtensionForUser(extensionId, userId);
+            var userExtension = await GetExtensionForUser(userId, extensionId);
             return userExtension.AdditionalData[key];
         }
 
@@ -94,19 +94,23 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         private static readonly IList<string> ReservedKeys = new List<string> { "responseHeaders", "statusCode", "@odata.context" };
 
         /// <inheritdoc />
+        public EventHandler SyncCompleted { get; set; }
+
+        /// <inheritdoc />
+        public EventHandler SyncFailed { get; set; }
+
+        /// <inheritdoc />
         public bool AutoSync { get; }
 
-        /// <summary>
-        /// Gets the id of the Graph User.
-        /// </summary>
+        /// <inheritdoc />
+        public string Id { get; }
+
+        /// <inheritdoc />
         public string UserId { get; }
 
-        /// <summary>
-        /// Gets the cached key value pairs.
-        /// </summary>
+        /// <inheritdoc />
         public IDictionary<string, object> Cache { get; private set; }
 
-        private readonly string _extensionId;
         private readonly IObjectSerializer _serializer;
 
         /// <summary>
@@ -114,10 +118,10 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// </summary>
         public UserExtensionDataStore(string userId, string extensionId, IObjectSerializer objectSerializer, bool autoSync = true)
         {
-            UserId = userId;
-            _extensionId = extensionId;
-            _serializer = objectSerializer;
             AutoSync = autoSync;
+            Id = extensionId;
+            UserId = userId;
+            _serializer = objectSerializer;
 
             Cache = null;
         }
@@ -132,7 +136,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
 
             if (AutoSync)
             {
-                await Create(UserId, _extensionId);
+                await Create(UserId, Id);
             }
         }
 
@@ -148,7 +152,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             if (AutoSync)
             {
                 // Delete the remote.
-                await Delete(UserId, _extensionId);
+                await Delete(UserId, Id);
             }
         }
 
@@ -158,39 +162,48 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <returns>The freshly synced user extension.</returns>
         public async Task Sync()
         {
-            // Get the remote
-            Extension extension = await GetExtensionForUser(UserId, _extensionId);
-            IDictionary<string, object> remoteData = extension.AdditionalData;
-
-            if (Cache != null)
+            try
             {
-                // Send updates for all local values, overwriting the remote.
-                foreach (string key in Cache.Keys.ToList())
-                {
-                    if (ReservedKeys.Contains(key))
-                    {
-                        continue;
-                    }
+                // Get the remote
+                Extension extension = await GetExtensionForUser(UserId, Id);
+                IDictionary<string, object> remoteData = extension.AdditionalData;
 
-                    if (!remoteData.ContainsKey(key) || !EqualityComparer<object>.Default.Equals(remoteData[key], Cache[key]))
+                if (Cache != null)
+                {
+                    // Send updates for all local values, overwriting the remote.
+                    foreach (string key in Cache.Keys.ToList())
                     {
-                        Save(key, Cache[key]);
+                        if (ReservedKeys.Contains(key))
+                        {
+                            continue;
+                        }
+
+                        if (!remoteData.ContainsKey(key) || !EqualityComparer<object>.Default.Equals(remoteData[key], Cache[key]))
+                        {
+                            Save(key, Cache[key]);
+                        }
                     }
                 }
-            }
 
-            if (remoteData.Keys.Count > 0)
-            {
-                InitCache();
-            }
-
-            // Update local cache with additions from remote
-            foreach (string key in remoteData.Keys.ToList())
-            {
-                if (!Cache.ContainsKey(key))
+                if (remoteData.Keys.Count > 0)
                 {
-                    Cache.Add(key, remoteData[key]);
+                    InitCache();
                 }
+
+                // Update local cache with additions from remote
+                foreach (string key in remoteData.Keys.ToList())
+                {
+                    if (!Cache.ContainsKey(key))
+                    {
+                        Cache.Add(key, remoteData[key]);
+                    }
+                }
+
+                SyncCompleted?.Invoke(this, new EventArgs());
+            }
+            catch
+            {
+                SyncFailed?.Invoke(this, new EventArgs());
             }
         }
 
@@ -281,7 +294,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             if (AutoSync)
             {
                 // Update the remote
-                Task.Run(() => Set(UserId, _extensionId, key, value));
+                Task.Run(() => Set(UserId, Id, key, value));
             }
         }
 
@@ -312,7 +325,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 if (AutoSync)
                 {
                     // Update the remote
-                    Task.Run(() => Set(UserId, _extensionId, compositeKey, composite));
+                    Task.Run(() => Set(UserId, Id, compositeKey, composite));
                 }
             }
             else
@@ -329,7 +342,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 if (AutoSync)
                 {
                     // Update the remote
-                    Task.Run(() => Set(UserId, _extensionId, compositeKey, composite));
+                    Task.Run(() => Set(UserId, Id, compositeKey, composite));
                 }
             }
         }

@@ -33,11 +33,23 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// </summary>
         public IRoamingSettingsDataStore DataStore { get; private set; }
 
+        /// <inheritdoc />
+        public EventHandler SyncCompleted { get; set; }
+
+        /// <inheritdoc />
+        public EventHandler SyncFailed { get; set; }
+
         /// <inheritdoc/>
         public bool AutoSync => DataStore.AutoSync;
 
         /// <inheritdoc />
         public IDictionary<string, object> Cache => DataStore.Cache;
+
+        /// <inheritdoc />
+        public string Id => DataStore.Id;
+
+        /// <inheritdoc />
+        public string UserId => DataStore.UserId;
 
         /// <summary>
         /// Creates a new RoamingSettingsHelper instance for the currently signed in user.
@@ -86,6 +98,9 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dataStore));
             }
+
+            DataStore.SyncCompleted += (s, e) => SyncCompleted?.Invoke(this, e);
+            DataStore.SyncFailed += (s, e) => SyncFailed?.Invoke(this, e);
 
             if (syncOnInit)
             {
