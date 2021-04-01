@@ -1,206 +1,283 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using System;
-using System.Diagnostics;
-using System.Linq;
+﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using CommunityToolkit.Net.Authentication;
+using Windows.Networking.Connectivity;
 using Windows.Security.Authentication.Web;
 using Windows.Security.Authentication.Web.Core;
+using Windows.Security.Credentials;
+using Windows.Storage;
 using Windows.UI.ApplicationSettings;
 
-namespace Microsoft.Toolkit.Graph.Providers.Uwp
+namespace CommunityToolkit.Uwp.Authentication
 {
     /// <summary>
-    /// A provider for leveraging Windows system authentication.
+    /// 
     /// </summary>
     public class WindowsProvider : BaseProvider
     {
-        private struct AuthenticatedUser
-        {
-            public Windows.Security.Credentials.PasswordCredential TokenCredential { get; private set; }
-
-            public string GetUserName()
-            {
-                return TokenCredential?.UserName;
-            }
-
-            public string GetToken()
-            {
-                return TokenCredential?.Password;
-            }
-
-            public AuthenticatedUser(Windows.Security.Credentials.PasswordCredential tokenCredential)
-            {
-                TokenCredential = tokenCredential;
-            }
-        }
-
-        private const string TokenCredentialResourceName = "WindowsProviderToken";
-        private const string WebAccountProviderId = "https://login.microsoft.com";
-        private static readonly string[] DefaultScopes = new string[] { "user.read" };
-        private static readonly string GraphResourceProperty = "https://graph.microsoft.com";
-
         /// <summary>
         /// Gets the redirect uri value based on the current app callback uri.
         /// </summary>
         public static string RedirectUri => string.Format("ms-appx-web://Microsoft.AAD.BrokerPlugIn/{0}", WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper());
 
-        private AccountsSettingsPane _currentPane;
-        private AuthenticatedUser? _currentUser;
-        private string[] _scopes;
+        private const string AzureADAuthority = "organizations";
+        private const string MicrosoftAccountProviderId = "https://login.windows.net";
+        private const string GraphResourceProperty = "https://graph.microsoft.com";
+        private const string WebAccountProviderId = "https://login.microsoft.com";
+        private const string SettingsKeyWamAccountId = "WamAccountId";
+        private const string SettingsKeyWamProviderId = "WamProviderId";
+
+        private static readonly string[] DefaultScopes =
+        {
+            "User.Read",
+        };
+
+        private ApplicationDataContainer _appSettings;
         private string _clientId;
+        private string[] _scopes;
+        private WebAccount _webAccount;
+        private WebAccountProvider _webAccountProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WindowsProvider"/> class.
         /// </summary>
-        /// <param name="clientId">The clientId for the app registration.</param>
-        /// <param name="scopes">The security scopes used to access specific workloads.</param>
-        public WindowsProvider(string clientId, string[] scopes = null)
+        /// <param name="clientId"></param>
+        /// <param name="scopes"></param>
+        public WindowsProvider (string clientId, string[] scopes = null)
         {
-            _clientId = clientId ?? throw new ArgumentNullException(nameof(clientId));
-            _currentPane = null;
-            _currentUser = null;
+            _appSettings = ApplicationData.Current.LocalSettings;
+            _clientId = clientId;
             _scopes = scopes ?? DefaultScopes;
+            _webAccount = null;
 
             State = ProviderState.SignedOut;
-
-            _ = TrySilentSignInAsync();
-        }
-
-        /// <summary>
-        /// Attempts to sign in the logged in user automatically.
-        /// </summary>
-        /// <returns>Success boolean.</returns>
-        public async Task<bool> TrySilentSignInAsync()
-        {
-            if (State == ProviderState.SignedIn)
-            {
-                return false;
-            }
-
-            State = ProviderState.Loading;
-
-            var tokenCredential = GetCredentialFromLocker();
-            if (tokenCredential == null)
-            {
-                // There is no credential stored in the locker.
-                State = ProviderState.SignedOut;
-                return false;
-            }
-
-            // Populate the password (aka token).
-            tokenCredential.RetrievePassword();
-
-            // Log the user in by storing the credential in memory.
-            _currentUser = new AuthenticatedUser(tokenCredential);
-
-            try
-            {
-                var testRequest = new HttpRequestMessage(HttpMethod.Get, "https://graph.microsoft.com/v1/me");
-                await AuthenticateRequestAsync(testRequest);
-                await new HttpClient().SendAsync(testRequest);
-
-                // Update the state to be signed in.
-                State = ProviderState.SignedIn;
-                return true;
-            }
-            catch
-            {
-                // Update the state to be signed in.
-                State = ProviderState.SignedOut;
-                return false;
-            }
         }
 
         /// <inheritdoc />
-        public override Task LoginAsync()
+        public override async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
-            if (State == ProviderState.SignedIn)
-            {
-                return Task.CompletedTask;
-            }
-
-            State = ProviderState.Loading;
-
-            if (_currentPane != null)
-            {
-                _currentPane.AccountCommandsRequested -= BuildPaneAsync;
-            }
-
-            _currentPane = AccountsSettingsPane.GetForCurrentView();
-            _currentPane.AccountCommandsRequested += BuildPaneAsync;
-
-            AccountsSettingsPane.Show();
-            return Task.CompletedTask;
-        }
-
-        /// <inheritdoc />
-        public override Task LogoutAsync()
-        {
-            if (State == ProviderState.SignedOut)
-            {
-                return Task.CompletedTask;
-            }
-
-            State = ProviderState.Loading;
-
-            if (_currentPane != null)
-            {
-                _currentPane.AccountCommandsRequested -= BuildPaneAsync;
-                _currentPane = null;
-            }
-
-            if (_currentUser != null)
-            {
-                // Remove the user info from the PaasswordVault
-                var vault = new Windows.Security.Credentials.PasswordVault();
-                vault.Remove(_currentUser?.TokenCredential);
-
-                _currentUser = null;
-            }
-
-            State = ProviderState.SignedOut;
-            return Task.CompletedTask;
-        }
-
-        /// <inheritdoc />
-        public override Task AuthenticateRequestAsync(HttpRequestMessage request)
-        {
-            // Append the token to the authorization header of any outgoing Graph requests.
-            var token = _currentUser?.GetToken();
+            string token = await GetTokenAsync();
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// https://docs.microsoft.com/en-us/windows/uwp/security/web-account-manager#build-the-account-settings-pane.
-        /// </summary>
-        private async void BuildPaneAsync(AccountsSettingsPane sender, AccountsSettingsPaneCommandsRequestedEventArgs args)
+        /// <inheritdoc />
+        public override async Task LoginAsync()
         {
-            var deferral = args.GetDeferral();
-
-            try
+            if (_webAccount != null || State != ProviderState.SignedOut)
             {
-                // Providing nothing shows all accounts, providing authority shows only aad
-                var msaProvider = await WebAuthenticationCoreManager.FindAccountProviderAsync(WebAccountProviderId);
+                await LogoutAsync();
+            }
 
-                if (msaProvider == null)
+            // The state will get updated as part of the auth flow.
+            var token = await GetTokenAsync();
+
+            if (token == null)
+            {
+                await LogoutAsync();
+            }
+        }
+
+        /// <inheritdoc />
+        public override async Task LogoutAsync()
+        {
+            _appSettings.Values.Remove(SettingsKeyWamAccountId);
+            _appSettings.Values.Remove(SettingsKeyWamProviderId);
+
+            if (_webAccount != null)
+            {
+                try
                 {
-                    State = ProviderState.SignedOut;
-                    return;
+                    await _webAccount.SignOutAsync();
+                }
+                catch
+                {
+                    // Failed to remove an account.
                 }
 
-                var command = new WebAccountProviderCommand(msaProvider, GetTokenAsync);
-                args.WebAccountProviderCommands.Add(command);
+                _webAccount = null;
+            }
+
+            State = ProviderState.SignedOut;
+        }
+
+        private async Task<string> GetTokenAsync(bool silentOnly = false)
+        {
+            var internetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
+            if (internetConnectionProfile == null)
+            {
+                // We are not online, no token for you.
+                // TODO: Is there anything special to do when we go offline?
+                return null;
+            }
+
+            try
+            {
+                if (State == ProviderState.SignedOut)
+                {
+                    State = ProviderState.Loading;
+                }
+
+                // Attempt to authenticate silently.
+                var authResult = await AuthenticateSilentAsync();
+
+                if (authResult?.ResponseStatus != WebTokenRequestStatus.Success && !silentOnly)
+                {
+                    // Attempt to authenticate interactively.
+                    authResult = await AuthenticateInteractiveAsync();
+                }
+
+                if (authResult?.ResponseStatus == WebTokenRequestStatus.Success)
+                {
+                    var account = _webAccount;
+                    var newAccount = authResult.ResponseData[0].WebAccount;
+
+                    if (account == null || account.Id != newAccount.Id)
+                    {
+                        // Account was switched, update the active account.
+                        await SetAccountAsync(newAccount);
+                    }
+
+                    var authToken = authResult.ResponseData[0].Token;
+                    return authToken;
+                }
+                else if (authResult?.ResponseError != null)
+                {
+                    throw new Exception(authResult.ResponseError.ErrorCode + ": " + authResult.ResponseError.ErrorMessage);
+                }
+            }
+            catch (Exception e)
+            {
+            }
+
+            return null;
+        }
+
+        private async Task SetAccountAsync(WebAccount account)
+        {
+            if (account == null)
+            {
+                if (_webAccount != null)
+                {
+                    await LogoutAsync();
+                }
+                else
+                {
+                    State = ProviderState.SignedOut;
+                }
+
+                return;
+            }
+
+            if (account.Id == _webAccount?.Id)
+            {
+                // no change
+                return;
+            }
+
+            // Save off the account ids.
+            _webAccount = account;
+            _appSettings.Values[SettingsKeyWamAccountId] = account.Id;
+            _appSettings.Values[SettingsKeyWamProviderId] = account.WebAccountProvider.Id;
+
+            State = ProviderState.SignedIn;
+        }
+
+        private async Task<WebTokenRequestResult> AuthenticateSilentAsync()
+        {
+            var account = _webAccount;
+            if (account != null)
+            {
+                // Prepare a request to get a token.
+                var webTokenRequest = GetWebTokenRequest(account.WebAccountProvider);
+
+                try
+                {
+                    WebTokenRequestResult authResult = await WebAuthenticationCoreManager.GetTokenSilentlyAsync(webTokenRequest, account);
+                    return authResult;
+                }
+                catch (HttpRequestException)
+                {
+                    throw; /* probably offline, no point continuing to interactive auth */
+                }
+            }
+
+            return null;
+        }
+
+        private async Task<WebTokenRequestResult> AuthenticateInteractiveAsync()
+        {
+            var pane = AccountsSettingsPane.GetForCurrentView();
+            pane.AccountCommandsRequested += OnAccountCommandsRequested;
+
+            try
+            {
+                WebTokenRequestResult authResult = null;
+
+                var account = _webAccount;
+                if (account == null)
+                {
+                    await AccountsSettingsPane.ShowAddAccountAsync();
+
+                    // _webAccountProvider will be set once the user has selected an account.
+                    if (_webAccountProvider != null)
+                    {
+                        var webTokenRequest = GetWebTokenRequest(_webAccountProvider);
+
+                        // The webAccountProvider may need to come from the commands event instead.
+
+                        // If we reached here, then WebAccountProviderCommandInvoked
+                        // was called and a new _webTokenRequest was generated based
+                        // on the user's selection in the dialog.
+                        authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest);
+                    }
+                }
+                else
+                {
+                    var webTokenRequest = GetWebTokenRequest(account.WebAccountProvider);
+                    authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest, account);
+                }
+
+                return authResult;
+            }
+            catch (HttpRequestException)
+            {
+                throw; /* probably offline, no point continuing to interactive auth */
+            }
+            finally
+            {
+                pane.AccountCommandsRequested -= OnAccountCommandsRequested;
+            }
+        }
+
+        private async void OnAccountCommandsRequested(AccountsSettingsPane sender, AccountsSettingsPaneCommandsRequestedEventArgs e)
+        {
+            void WebAccountProviderCommandInvoked(WebAccountProviderCommand command)
+            {
+                _webAccountProvider = command.WebAccountProvider;
+            }
+
+            var deferral = e.GetDeferral();
+
+            try
+            {
+                WebAccountProvider webAccountProvider = await GetWebAccountProvider();
+
+                var providerCommand = new WebAccountProviderCommand(webAccountProvider, WebAccountProviderCommandInvoked);
+                e.WebAccountProviderCommands.Add(providerCommand);
+
+                // e.HeaderText = _resourceLoader.GetString("WAMTitle");
+
+                // We only show the privacy link if the debugger is not attached because it throws internally as part of
+                // parsing the string (CSettingsCommandFactory::CreateSettingsCommand first tries to parse the string as a guid
+                // and uses exceptions in determining it is not a guid :( ).
+                // if (!Debugger.IsAttached)
+                //    e.Commands.Add(new SettingsCommand("privacypolicy", "Privacy policy", PrivacyPolicyInvoked));
             }
             catch
             {
-                State = ProviderState.SignedOut;
+                await LogoutAsync();
             }
             finally
             {
@@ -208,69 +285,25 @@ namespace Microsoft.Toolkit.Graph.Providers.Uwp
             }
         }
 
-        private async void GetTokenAsync(WebAccountProviderCommand command)
+        /// <summary>
+        /// Create a token request. Executing the request will prompt the authentication flow to begin.
+        /// </summary>
+        private WebTokenRequest GetWebTokenRequest(WebAccountProvider provider)
         {
-            // Build the token request
-            WebTokenRequest request = new WebTokenRequest(command.WebAccountProvider, string.Join(',', _scopes), _clientId);
-            request.Properties.Add("resource", GraphResourceProperty);
+            var webTokenRequest = new WebTokenRequest(provider, string.Join(',', _scopes), _clientId);
+            webTokenRequest.Properties.Add("resource", GraphResourceProperty);
 
-            // Get the results
-            WebTokenRequestResult result = await WebAuthenticationCoreManager.RequestTokenAsync(request);
-
-            // Handle user cancellation
-            if (result.ResponseStatus == WebTokenRequestStatus.UserCancel)
-            {
-                State = ProviderState.SignedOut;
-                return;
-            }
-
-            // Handle any errors
-            if (result.ResponseStatus != WebTokenRequestStatus.Success)
-            {
-                Debug.WriteLine(result.ResponseError.ErrorMessage);
-                State = ProviderState.SignedOut;
-                return;
-            }
-
-            // Extract values from the results
-            var token = result.ResponseData[0].Token;
-            var account = result.ResponseData[0].WebAccount;
-
-            // The UserName value may be null, but the Id is always present.
-            var userName = account.Id;
-
-            // Save the user info to the PaasswordVault
-            var vault = new Windows.Security.Credentials.PasswordVault();
-            var tokenCredential = new Windows.Security.Credentials.PasswordCredential(TokenCredentialResourceName, userName, token);
-            vault.Add(tokenCredential);
-
-            // Set the current user object
-            _currentUser = new AuthenticatedUser(tokenCredential);
-
-            // Update the state to be signed in.
-            State = ProviderState.SignedIn;
+            return webTokenRequest;
         }
 
-        private Windows.Security.Credentials.PasswordCredential GetCredentialFromLocker()
+        private async Task<WebAccountProvider> GetWebAccountProvider()
         {
-            Windows.Security.Credentials.PasswordCredential credential = null;
+            // Find the provider for general MSA login.
+            // Org accounts will work out of the box, but MSA's won't work unless the app is associated with the store.
+            return await WebAuthenticationCoreManager.FindAccountProviderAsync(WebAccountProviderId);
 
-            try
-            {
-                var vault = new Windows.Security.Credentials.PasswordVault();
-                var credentialList = vault.FindAllByResource(TokenCredentialResourceName);
-                if (credentialList.Count > 0)
-                {
-                    // We delete the credential upon logout, so only one user can be stored in the vault at a time.
-                    credential = credentialList.First();
-                }
-            }
-            catch
-            {
-                // FindAllByResource will throw an exception if the resource isn't found.
-            }
-
-            return credential;
+            // Find the provider for org account login.
+            // return await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftAccountProviderId, AzureADAuthority);
         }
     }
 }
