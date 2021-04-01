@@ -13,7 +13,7 @@ using Windows.UI.ApplicationSettings;
 namespace CommunityToolkit.Uwp.Authentication
 {
     /// <summary>
-    /// 
+    /// An authentication provider based on the native AccountSettingsPane in Windows.
     /// </summary>
     public class WindowsProvider : BaseProvider
     {
@@ -22,10 +22,10 @@ namespace CommunityToolkit.Uwp.Authentication
         /// </summary>
         public static string RedirectUri => string.Format("ms-appx-web://Microsoft.AAD.BrokerPlugIn/{0}", WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper());
 
-        private const string AzureADAuthority = "organizations";
-        private const string MicrosoftAccountProviderId = "https://login.windows.net";
         private const string GraphResourceProperty = "https://graph.microsoft.com";
-        private const string WebAccountProviderId = "https://login.microsoft.com";
+        private const string MicrosoftProviderId = "https://login.microsoft.com";
+        private const string AzureActiveDirectoryAuthority = "organizations";
+        private const string MicrosoftAccountAuthority = "consumers";
         private const string SettingsKeyWamAccountId = "WamAccountId";
         private const string SettingsKeyWamProviderId = "WamProviderId";
 
@@ -38,7 +38,6 @@ namespace CommunityToolkit.Uwp.Authentication
         private string _clientId;
         private string[] _scopes;
         private WebAccount _webAccount;
-        private WebAccountProvider _webAccountProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WindowsProvider"/> class.
@@ -149,6 +148,7 @@ namespace CommunityToolkit.Uwp.Authentication
             }
             catch (Exception e)
             {
+                System.Diagnostics.Debug.WriteLine(e.Message);
             }
 
             return null;
@@ -186,57 +186,16 @@ namespace CommunityToolkit.Uwp.Authentication
 
         private async Task<WebTokenRequestResult> AuthenticateSilentAsync()
         {
-            var account = _webAccount;
-            if (account != null)
-            {
-                // Prepare a request to get a token.
-                var webTokenRequest = GetWebTokenRequest(account.WebAccountProvider);
-
-                try
-                {
-                    WebTokenRequestResult authResult = await WebAuthenticationCoreManager.GetTokenSilentlyAsync(webTokenRequest, account);
-                    return authResult;
-                }
-                catch (HttpRequestException)
-                {
-                    throw; /* probably offline, no point continuing to interactive auth */
-                }
-            }
-
-            return null;
-        }
-
-        private async Task<WebTokenRequestResult> AuthenticateInteractiveAsync()
-        {
-            var pane = AccountsSettingsPane.GetForCurrentView();
-            pane.AccountCommandsRequested += OnAccountCommandsRequested;
-
             try
             {
                 WebTokenRequestResult authResult = null;
 
                 var account = _webAccount;
-                if (account == null)
+                if (account != null)
                 {
-                    await AccountsSettingsPane.ShowAddAccountAsync();
-
-                    // _webAccountProvider will be set once the user has selected an account.
-                    if (_webAccountProvider != null)
-                    {
-                        var webTokenRequest = GetWebTokenRequest(_webAccountProvider);
-
-                        // The webAccountProvider may need to come from the commands event instead.
-
-                        // If we reached here, then WebAccountProviderCommandInvoked
-                        // was called and a new _webTokenRequest was generated based
-                        // on the user's selection in the dialog.
-                        authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest);
-                    }
-                }
-                else
-                {
+                    // Prepare a request to get a token.
                     var webTokenRequest = GetWebTokenRequest(account.WebAccountProvider);
-                    authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest, account);
+                    authResult = await WebAuthenticationCoreManager.GetTokenSilentlyAsync(webTokenRequest, account);
                 }
 
                 return authResult;
@@ -245,49 +204,84 @@ namespace CommunityToolkit.Uwp.Authentication
             {
                 throw; /* probably offline, no point continuing to interactive auth */
             }
+        }
+
+        private async Task<WebTokenRequestResult> AuthenticateInteractiveAsync()
+        {
+            try
+            {
+                WebTokenRequestResult authResult = null;
+
+                var account = _webAccount;
+                if (account != null)
+                {
+                    var webTokenRequest = GetWebTokenRequest(account.WebAccountProvider);
+                    authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest, account);
+                }
+                else
+                {
+                    authResult = await ShowAddAccountAndGetResultAsync();
+                }
+
+                return authResult;
+            }
+            catch (HttpRequestException)
+            {
+                throw; /* probably offline, no point continuing to interactive auth */
+            }
+        }
+
+        private async Task<WebTokenRequestResult> ShowAddAccountAndGetResultAsync()
+        {
+            var addAccountTaskCompletionSource = new TaskCompletionSource<WebTokenRequestResult>();
+
+            async void WebAccountProviderCommandInvoked(WebAccountProviderCommand command)
+            {
+                var webTokenRequest = GetWebTokenRequest(command.WebAccountProvider);
+
+                var authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest);
+                addAccountTaskCompletionSource.SetResult(authResult);
+            }
+
+            async void OnAccountCommandsRequested(AccountsSettingsPane sender, AccountsSettingsPaneCommandsRequestedEventArgs e)
+            {
+                var deferral = e.GetDeferral();
+
+                try
+                {
+                    WebAccountProvider webAccountProvider = await GetWebAccountProvider();
+
+                    var providerCommand = new WebAccountProviderCommand(webAccountProvider, WebAccountProviderCommandInvoked);
+                    e.WebAccountProviderCommands.Add(providerCommand);
+
+                    // TODO: Expose configuration so developers can have some control over the popup.
+                }
+                catch
+                {
+                    await LogoutAsync();
+                }
+                finally
+                {
+                    deferral.Complete();
+                }
+            }
+
+            var pane = AccountsSettingsPane.GetForCurrentView();
+            pane.AccountCommandsRequested += OnAccountCommandsRequested;
+
+            try
+            {
+                await AccountsSettingsPane.ShowAddAccountAsync();
+
+                var authResult = await addAccountTaskCompletionSource.Task;
+                return authResult;
+            }
             finally
             {
                 pane.AccountCommandsRequested -= OnAccountCommandsRequested;
             }
         }
 
-        private async void OnAccountCommandsRequested(AccountsSettingsPane sender, AccountsSettingsPaneCommandsRequestedEventArgs e)
-        {
-            void WebAccountProviderCommandInvoked(WebAccountProviderCommand command)
-            {
-                _webAccountProvider = command.WebAccountProvider;
-            }
-
-            var deferral = e.GetDeferral();
-
-            try
-            {
-                WebAccountProvider webAccountProvider = await GetWebAccountProvider();
-
-                var providerCommand = new WebAccountProviderCommand(webAccountProvider, WebAccountProviderCommandInvoked);
-                e.WebAccountProviderCommands.Add(providerCommand);
-
-                // e.HeaderText = _resourceLoader.GetString("WAMTitle");
-
-                // We only show the privacy link if the debugger is not attached because it throws internally as part of
-                // parsing the string (CSettingsCommandFactory::CreateSettingsCommand first tries to parse the string as a guid
-                // and uses exceptions in determining it is not a guid :( ).
-                // if (!Debugger.IsAttached)
-                //    e.Commands.Add(new SettingsCommand("privacypolicy", "Privacy policy", PrivacyPolicyInvoked));
-            }
-            catch
-            {
-                await LogoutAsync();
-            }
-            finally
-            {
-                deferral.Complete();
-            }
-        }
-
-        /// <summary>
-        /// Create a token request. Executing the request will prompt the authentication flow to begin.
-        /// </summary>
         private WebTokenRequest GetWebTokenRequest(WebAccountProvider provider)
         {
             var webTokenRequest = new WebTokenRequest(provider, string.Join(',', _scopes), _clientId);
@@ -298,12 +292,16 @@ namespace CommunityToolkit.Uwp.Authentication
 
         private async Task<WebAccountProvider> GetWebAccountProvider()
         {
-            // Find the provider for general MSA login.
-            // Org accounts will work out of the box, but MSA's won't work unless the app is associated with the store.
-            return await WebAuthenticationCoreManager.FindAccountProviderAsync(WebAccountProviderId);
+            // TODO: Enable devs to turn on/off which account sources they wish to integrate with.
 
-            // Find the provider for org account login.
-            // return await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftAccountProviderId, AzureADAuthority);
+            // MSA - Works
+            // return await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority);
+
+            // AAD - Fails complaining about 'client_assertion' or 'client_secret'
+            // return await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, AzureActiveDirectoryAuthority);
+
+            // Both
+            return await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId);
         }
     }
 }
