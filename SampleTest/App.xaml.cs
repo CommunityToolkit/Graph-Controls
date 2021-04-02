@@ -28,7 +28,6 @@ namespace SampleTest
             this.Suspending += OnSuspending;
         }
 
-
         // Which provider should be used for authentication?
         private readonly ProviderType _providerType = ProviderType.Mock;
 
