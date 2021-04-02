@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -26,15 +27,27 @@ namespace CommunityToolkit.Uwp.Authentication
         private const string MicrosoftProviderId = "https://login.microsoft.com";
         private const string AzureActiveDirectoryAuthority = "organizations";
         private const string MicrosoftAccountAuthority = "consumers";
-        private const string SettingsKeyWamAccountId = "WamAccountId";
-        private const string SettingsKeyWamProviderId = "WamProviderId";
 
         private static readonly string[] DefaultScopes =
         {
             "User.Read",
         };
 
-        private ApplicationDataContainer _appSettings;
+        /// <summary>
+        /// Gets a cache of important values for the signed in user.
+        /// </summary>
+        protected IDictionary<string, object> Settings => ApplicationData.Current.LocalSettings.Values;
+
+        /// <summary>
+        /// The settings key for the active account id.
+        /// </summary>
+        protected const string SettingsKeyWamAccountId = "WamAccountId";
+
+        /// <summary>
+        /// The settings key for the active provider id.
+        /// </summary>
+        protected const string SettingsKeyWamProviderId = "WamProviderId";
+
         private string _clientId;
         private string[] _scopes;
         private WebAccount _webAccount;
@@ -46,7 +59,6 @@ namespace CommunityToolkit.Uwp.Authentication
         /// <param name="scopes"></param>
         public WindowsProvider (string clientId, string[] scopes = null)
         {
-            _appSettings = ApplicationData.Current.LocalSettings;
             _clientId = clientId;
             _scopes = scopes ?? DefaultScopes;
             _webAccount = null;
@@ -78,11 +90,31 @@ namespace CommunityToolkit.Uwp.Authentication
             }
         }
 
+        /// <summary>
+        /// Try logging in silently.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public async Task TryLoginSilentAsync()
+        {
+            if (_webAccount != null || State != ProviderState.SignedOut)
+            {
+                return;
+            }
+
+            // The state will get updated as part of the auth flow.
+            var token = await GetTokenAsync(true);
+
+            if (token == null)
+            {
+                await LogoutAsync();
+            }
+        }
+
         /// <inheritdoc />
         public override async Task LogoutAsync()
         {
-            _appSettings.Values.Remove(SettingsKeyWamAccountId);
-            _appSettings.Values.Remove(SettingsKeyWamProviderId);
+            Settings.Remove(SettingsKeyWamAccountId);
+            Settings.Remove(SettingsKeyWamProviderId);
 
             if (_webAccount != null)
             {
@@ -178,8 +210,8 @@ namespace CommunityToolkit.Uwp.Authentication
 
             // Save off the account ids.
             _webAccount = account;
-            _appSettings.Values[SettingsKeyWamAccountId] = account.Id;
-            _appSettings.Values[SettingsKeyWamProviderId] = account.WebAccountProvider.Id;
+            Settings[SettingsKeyWamAccountId] = account.Id;
+            Settings[SettingsKeyWamProviderId] = account.WebAccountProvider.Id;
 
             State = ProviderState.SignedIn;
         }
@@ -191,6 +223,21 @@ namespace CommunityToolkit.Uwp.Authentication
                 WebTokenRequestResult authResult = null;
 
                 var account = _webAccount;
+                if (account == null)
+                {
+                    // Check the cache for an existing user
+                    if (Settings[SettingsKeyWamAccountId] is string savedAccountId)
+                    {
+                        var savedProvider = await GetWebAccountProviderAsync();
+                        if (Settings[SettingsKeyWamProviderId] is string savedProviderId)
+                        {
+                            savedProvider = await WebAuthenticationCoreManager.FindAccountProviderAsync(savedProviderId);
+                        }
+
+                        account = await WebAuthenticationCoreManager.FindAccountAsync(savedProvider, savedAccountId);
+                    }
+                }
+
                 if (account != null)
                 {
                     // Prepare a request to get a token.
@@ -249,7 +296,7 @@ namespace CommunityToolkit.Uwp.Authentication
 
                 try
                 {
-                    WebAccountProvider webAccountProvider = await GetWebAccountProvider();
+                    WebAccountProvider webAccountProvider = await GetWebAccountProviderAsync();
 
                     var providerCommand = new WebAccountProviderCommand(webAccountProvider, WebAccountProviderCommandInvoked);
                     e.WebAccountProviderCommands.Add(providerCommand);
@@ -290,7 +337,7 @@ namespace CommunityToolkit.Uwp.Authentication
             return webTokenRequest;
         }
 
-        private async Task<WebAccountProvider> GetWebAccountProvider()
+        private async Task<WebAccountProvider> GetWebAccountProviderAsync()
         {
             // TODO: Enable devs to turn on/off which account sources they wish to integrate with.
 
