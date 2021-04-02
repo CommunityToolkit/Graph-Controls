@@ -25,8 +25,10 @@ namespace CommunityToolkit.Uwp.Authentication
 
         private const string GraphResourceProperty = "https://graph.microsoft.com";
         private const string MicrosoftProviderId = "https://login.microsoft.com";
-        private const string AzureActiveDirectoryAuthority = "organizations";
-        private const string MicrosoftAccountAuthority = "consumers";
+        //// private const string AzureActiveDirectoryAuthority = "organizations";
+        //// private const string MicrosoftAccountAuthority = "consumers";
+        //// private const string MicrosoftAccountClientId = "none";
+        //// private const string MicrosoftAccountScopeRequested = "wl.basic";
 
         private static readonly string[] DefaultScopes =
         {
@@ -55,9 +57,9 @@ namespace CommunityToolkit.Uwp.Authentication
         /// <summary>
         /// Initializes a new instance of the <see cref="WindowsProvider"/> class.
         /// </summary>
-        /// <param name="clientId"></param>
-        /// <param name="scopes"></param>
-        public WindowsProvider (string clientId, string[] scopes = null)
+        /// <param name="clientId">Registered ClientId.</param>
+        /// <param name="scopes">List of Scopes to initially request.</param>
+        public WindowsProvider(string clientId, string[] scopes = null)
         {
             _clientId = clientId;
             _scopes = scopes ?? DefaultScopes;
@@ -94,7 +96,7 @@ namespace CommunityToolkit.Uwp.Authentication
         /// Try logging in silently.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task TryLoginSilentAsync()
+        public async Task TrySilentLoginAsync()
         {
             if (_webAccount != null || State != ProviderState.SignedOut)
             {
@@ -130,7 +132,7 @@ namespace CommunityToolkit.Uwp.Authentication
                 _webAccount = null;
             }
 
-            State = ProviderState.SignedOut;
+            SetState(ProviderState.SignedOut);
         }
 
         private async Task<string> GetTokenAsync(bool silentOnly = false)
@@ -147,14 +149,21 @@ namespace CommunityToolkit.Uwp.Authentication
             {
                 if (State == ProviderState.SignedOut)
                 {
-                    State = ProviderState.Loading;
+                    SetState(ProviderState.Loading);
                 }
 
                 // Attempt to authenticate silently.
                 var authResult = await AuthenticateSilentAsync();
 
-                if (authResult?.ResponseStatus != WebTokenRequestStatus.Success && !silentOnly)
+                // Authenticate with user interaction as appropriate.
+                if (authResult?.ResponseStatus != WebTokenRequestStatus.Success)
                 {
+                    if (silentOnly)
+                    {
+                        // Silent login may fail if we don't have a cached account, and that's ok.
+                        return null;
+                    }
+
                     // Attempt to authenticate interactively.
                     authResult = await AuthenticateInteractiveAsync();
                 }
@@ -173,14 +182,24 @@ namespace CommunityToolkit.Uwp.Authentication
                     var authToken = authResult.ResponseData[0].Token;
                     return authToken;
                 }
+                else if (authResult?.ResponseStatus == WebTokenRequestStatus.UserCancel)
+                {
+                    return null;
+                }
                 else if (authResult?.ResponseError != null)
                 {
                     throw new Exception(authResult.ResponseError.ErrorCode + ": " + authResult.ResponseError.ErrorMessage);
+                }
+                else
+                {
+                    // Authentication response was not successful or cancelled, but is also missing a ResponseError.
+                    throw new Exception("Authentication response was not successful, but is also missing a ResponseError.");
                 }
             }
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e.Message);
+                await LogoutAsync();
             }
 
             return null;
@@ -190,21 +209,13 @@ namespace CommunityToolkit.Uwp.Authentication
         {
             if (account == null)
             {
-                if (_webAccount != null)
-                {
-                    await LogoutAsync();
-                }
-                else
-                {
-                    State = ProviderState.SignedOut;
-                }
-
-                return;
+                // Clear account
+                 await LogoutAsync();
+                 return;
             }
-
-            if (account.Id == _webAccount?.Id)
+            else if (account.Id == _webAccount?.Id)
             {
-                // no change
+                // No change
                 return;
             }
 
@@ -213,7 +224,7 @@ namespace CommunityToolkit.Uwp.Authentication
             Settings[SettingsKeyWamAccountId] = account.Id;
             Settings[SettingsKeyWamProviderId] = account.WebAccountProvider.Id;
 
-            State = ProviderState.SignedIn;
+            SetState(ProviderState.SignedIn);
         }
 
         private async Task<WebTokenRequestResult> AuthenticateSilentAsync()
@@ -226,14 +237,10 @@ namespace CommunityToolkit.Uwp.Authentication
                 if (account == null)
                 {
                     // Check the cache for an existing user
-                    if (Settings[SettingsKeyWamAccountId] is string savedAccountId)
+                    if (Settings[SettingsKeyWamAccountId] is string savedAccountId &&
+                        Settings[SettingsKeyWamProviderId] is string savedProviderId)
                     {
-                        var savedProvider = await GetWebAccountProviderAsync();
-                        if (Settings[SettingsKeyWamProviderId] is string savedProviderId)
-                        {
-                            savedProvider = await WebAuthenticationCoreManager.FindAccountProviderAsync(savedProviderId);
-                        }
-
+                        var savedProvider = await WebAuthenticationCoreManager.FindAccountProviderAsync(savedProviderId);
                         account = await WebAuthenticationCoreManager.FindAccountAsync(savedProvider, savedAccountId);
                     }
                 }
@@ -278,34 +285,54 @@ namespace CommunityToolkit.Uwp.Authentication
             }
         }
 
+        /// <summary>
+        /// Show the AccountSettingsPane and wait for the user to make a selection, then process the authentication result.
+        /// </summary>
         private async Task<WebTokenRequestResult> ShowAddAccountAndGetResultAsync()
         {
+            // The AccountSettingsPane uses events to support the flow of authentication events.
+            // Ultimately we need access to the user's selected account provider from the AccountSettingsPane, which is available
+            // in the WebAccountProviderCommandInvoked function for the chosen provider.
+            // To ensure no funny business, the entire AccountSettingsPane flow is contained here.
             var addAccountTaskCompletionSource = new TaskCompletionSource<WebTokenRequestResult>();
 
+            // Handle the selected account provider
             async void WebAccountProviderCommandInvoked(WebAccountProviderCommand command)
             {
-                var webTokenRequest = GetWebTokenRequest(command.WebAccountProvider);
+                try
+                {
+                    var webTokenRequest = GetWebTokenRequest(command.WebAccountProvider);
 
-                var authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest);
-                addAccountTaskCompletionSource.SetResult(authResult);
+                    var authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest);
+                    addAccountTaskCompletionSource.SetResult(authResult);
+                }
+                catch (Exception ex)
+                {
+                    addAccountTaskCompletionSource.SetException(ex);
+                }
             }
 
+            // Build the AccountSettingsPane and configure it with available providers.
             async void OnAccountCommandsRequested(AccountsSettingsPane sender, AccountsSettingsPaneCommandsRequestedEventArgs e)
             {
                 var deferral = e.GetDeferral();
 
                 try
                 {
-                    WebAccountProvider webAccountProvider = await GetWebAccountProviderAsync();
+                    // Configure available providers.
+                    List<WebAccountProvider> webAccountProviders = await GetWebAccountProvidersAsync();
 
-                    var providerCommand = new WebAccountProviderCommand(webAccountProvider, WebAccountProviderCommandInvoked);
-                    e.WebAccountProviderCommands.Add(providerCommand);
+                    foreach (WebAccountProvider webAccountProvider in webAccountProviders)
+                    {
+                        var providerCommand = new WebAccountProviderCommand(webAccountProvider, WebAccountProviderCommandInvoked);
+                        e.WebAccountProviderCommands.Add(providerCommand);
+                    }
 
                     // TODO: Expose configuration so developers can have some control over the popup.
                 }
-                catch
+                catch (Exception ex)
                 {
-                    await LogoutAsync();
+                    addAccountTaskCompletionSource.SetException(ex);
                 }
                 finally
                 {
@@ -318,6 +345,7 @@ namespace CommunityToolkit.Uwp.Authentication
 
             try
             {
+                // Show the AccountSettingsPane and wait for the result.
                 await AccountsSettingsPane.ShowAddAccountAsync();
 
                 var authResult = await addAccountTaskCompletionSource.Task;
@@ -331,14 +359,16 @@ namespace CommunityToolkit.Uwp.Authentication
 
         private WebTokenRequest GetWebTokenRequest(WebAccountProvider provider)
         {
-            var webTokenRequest = new WebTokenRequest(provider, string.Join(',', _scopes), _clientId);
+            WebTokenRequest webTokenRequest = new WebTokenRequest(provider, string.Join(',', _scopes), _clientId);
             webTokenRequest.Properties.Add("resource", GraphResourceProperty);
 
             return webTokenRequest;
         }
 
-        private async Task<WebAccountProvider> GetWebAccountProviderAsync()
+        private async Task<List<WebAccountProvider>> GetWebAccountProvidersAsync()
         {
+            List<WebAccountProvider> providers = new List<WebAccountProvider>();
+
             // TODO: Enable devs to turn on/off which account sources they wish to integrate with.
 
             // MSA - Works
@@ -348,7 +378,20 @@ namespace CommunityToolkit.Uwp.Authentication
             // return await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, AzureActiveDirectoryAuthority);
 
             // Both
-            return await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId);
+            providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId));
+
+            return providers;
+        }
+
+        // Instead of updating the State value directly, use SetState to ensure that provider events are fired on the proper thread.
+        private void SetState(ProviderState state)
+        {
+            if (State == state)
+            {
+                return;
+            }
+
+            State = state;
         }
     }
 }

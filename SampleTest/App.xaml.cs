@@ -3,9 +3,8 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Net.Authentication;
-using Microsoft.Toolkit.Graph.Providers.Uwp;
+using CommunityToolkit.Uwp.Authentication;
 using System;
-using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
@@ -44,34 +43,41 @@ namespace SampleTest
         /// <summary>
         /// Initialize the global authentication provider.
         /// </summary>
-        private void InitializeGlobalProvider()
+        private async void InitializeGlobalProvider()
         {
             if (ProviderManager.Instance.GlobalProvider != null)
             {
                 return;
             }
 
-            // Provider config
-            string clientId = "YOUR_CLIENT_ID_HERE";
-            string[] scopes = { "User.Read", "User.ReadBasic.All", "People.Read", "Calendars.Read", "Mail.Read", "Group.Read.All", "ChannelMessage.Read.All" };
-
-            switch(_providerType)
+            await Window.Current.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
             {
-                // Mock provider
-                case ProviderType.Mock:
-                    ProviderManager.Instance.GlobalProvider = new MockProvider(signedIn: true);
-                    break;
+                // Provider config
+                string clientId = "YOUR_CLIENT_ID_HERE";
+                string[] scopes = { "User.Read", "User.ReadBasic.All", "People.Read", "Calendars.Read", "Mail.Read", "Group.Read.All", "ChannelMessage.Read.All" };
 
-                // Msal provider
-                case ProviderType.Msal:
-                    ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, scopes);
-                    break;
+                switch (_providerType)
+                {
+                    // Mock provider
+                    case ProviderType.Mock:
+                        ProviderManager.Instance.GlobalProvider = new MockProvider(signedIn: true);
+                        break;
 
-                // Windows provider
-                case ProviderType.Windows:
-                    ProviderManager.Instance.GlobalProvider = new WindowsProvider(clientId, scopes);
-                    break;
-            }
+                    // Msal provider
+                    case ProviderType.Msal:
+                        var msalProvider = new MsalProvider(clientId, scopes);
+                        ProviderManager.Instance.GlobalProvider = msalProvider;
+                        await msalProvider.TrySilentSignInAsync();
+                        break;
+
+                    // Windows provider
+                    case ProviderType.Windows:
+                        WindowsProvider windowsProvider = new WindowsProvider(clientId, scopes);
+                        ProviderManager.Instance.GlobalProvider = windowsProvider;
+                        await windowsProvider.TrySilentLoginAsync();
+                        break;
+                }
+            });
         }
 
         /// <summary>
@@ -81,8 +87,6 @@ namespace SampleTest
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            Task.Run(InitializeGlobalProvider);
-
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -114,6 +118,8 @@ namespace SampleTest
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
+
+                InitializeGlobalProvider();
             }
         }
 
