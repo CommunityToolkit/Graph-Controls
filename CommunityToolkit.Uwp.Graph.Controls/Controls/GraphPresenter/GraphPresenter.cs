@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.Graph;
-using Microsoft.Toolkit.Uwp.Extensions;
+using Microsoft.Toolkit.Uwp;
 using Newtonsoft.Json.Linq;
 using Windows.System;
 using Windows.UI.Xaml;
@@ -77,7 +77,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                 var request = new BaseRequest(
                                         RequestBuilder.RequestUrl,
                                         RequestBuilder.Client); // TODO: Do we need separate Options here?
-                request.Method = "GET";
+                request.Method = HttpMethods.GET;
                 request.QueryOptions = QueryOptions?.Select(option => (Microsoft.Graph.QueryOption)option)?.ToList() ?? new List<Microsoft.Graph.QueryOption>();
 
                 // Handle Special QueryOptions
