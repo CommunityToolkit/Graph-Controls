@@ -116,13 +116,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         public object this[string key]
         {
             get => DataStore.Read<object>(key);
-            set
-            {
-                if (DataStore.KeyExists(key))
-                {
-                    DataStore.Save(key, value);
-                }
-            }
+            set => DataStore.Save(key, value);
         }
 
         /// <inheritdoc />
