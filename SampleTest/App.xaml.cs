@@ -4,7 +4,6 @@
 
 using CommunityToolkit.Net.Authentication;
 using System;
-using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
@@ -74,8 +73,6 @@ namespace SampleTest
         /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            Task.Run(InitializeGlobalProvider);
-
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -107,6 +104,8 @@ namespace SampleTest
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
+
+                InitializeGlobalProvider();
             }
         }
 
