@@ -21,6 +21,11 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// Store data using open extensions on the Graph User.
         /// </summary>
         UserExtensions,
+
+        /// <summary>
+        /// Store data in a Graph User's OneDrive.
+        /// </summary>
+        OneDrive,
     }
 
     /// <summary>
@@ -93,6 +98,10 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             {
                 case RoamingDataStore.UserExtensions:
                     DataStore = new UserExtensionDataStore(userId, dataStoreName, serializer, autoSync);
+                    break;
+
+                case RoamingDataStore.OneDrive:
+                    DataStore = new OneDriveDataStore(userId, dataStoreName, serializer, autoSync);
                     break;
 
                 default:
