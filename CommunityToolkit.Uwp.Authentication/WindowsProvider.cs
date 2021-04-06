@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -14,27 +18,6 @@ using Windows.UI.ApplicationSettings;
 namespace CommunityToolkit.Uwp.Authentication
 {
     /// <summary>
-    /// Enumeration of available authentication providers.
-    /// </summary>
-    public enum WebAccountProviderType
-    {
-        /// <summary>
-        /// Enable public MSAs to authenticate.
-        /// </summary>
-        Consumer,
-
-        /// <summary>
-        /// Enable organizational accounts to authenticate.
-        /// </summary>
-        Organizational,
-
-        /// <summary>
-        /// Enable both consumer and organizational accounts to authenticate.
-        /// </summary>
-        All,
-    }
-
-    /// <summary>
     /// An authentication provider based on the native AccountSettingsPane in Windows.
     /// </summary>
     public class WindowsProvider : BaseProvider
@@ -44,19 +27,16 @@ namespace CommunityToolkit.Uwp.Authentication
         /// </summary>
         public static string RedirectUri => string.Format("ms-appx-web://Microsoft.AAD.BrokerPlugIn/{0}", WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper());
 
-        private const string GraphResourceProperty = "https://graph.microsoft.com";
-        private const string MicrosoftProviderId = "https://login.microsoft.com";
-        private const string AzureActiveDirectoryAuthority = "organizations";
+        private const string AuthenticationHeaderScheme = "Bearer";
+        private const string GraphResourcePropertyKey = "resource";
+        private const string GraphResourcePropertyValue = "https://graph.microsoft.com";
         private const string MicrosoftAccountAuthority = "consumers";
-        //// private const string MicrosoftAccountClientId = "none";
-        //// private const string MicrosoftAccountScopeRequested = "wl.basic";
+        private const string MicrosoftProviderId = "https://login.microsoft.com";
         private const string SettingsKeyAccountId = "WindowsProvider_AccountId";
         private const string SettingsKeyProviderId = "WindowsProvider_ProviderId";
 
-        private static readonly string[] DefaultScopes =
-        {
-            "User.Read",
-        };
+        // Default/minimal scopes for authentication, if none are provided.
+        private static readonly string[] DefaultScopes = { "User.Read" };
 
         /// <summary>
         /// Gets a cache of important values for the signed in user.
@@ -66,7 +46,7 @@ namespace CommunityToolkit.Uwp.Authentication
         private string _clientId;
         private string[] _scopes;
         private WebAccount _webAccount;
-        private AccountsSettingsPaneConfig _accountsSettingsPaneConfig;
+        private AccountsSettingsPaneConfig? _accountsSettingsPaneConfig;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WindowsProvider"/> class.
@@ -78,7 +58,7 @@ namespace CommunityToolkit.Uwp.Authentication
         {
             _clientId = clientId;
             _scopes = scopes ?? DefaultScopes;
-            _accountsSettingsPaneConfig = accountsSettingsPaneConfig ?? default;
+            _accountsSettingsPaneConfig = accountsSettingsPaneConfig;
 
             _webAccount = null;
 
@@ -89,7 +69,7 @@ namespace CommunityToolkit.Uwp.Authentication
         public override async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
             string token = await GetTokenAsync();
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            request.Headers.Authorization = new AuthenticationHeaderValue(AuthenticationHeaderScheme, token);
         }
 
         /// <inheritdoc />
@@ -149,7 +129,7 @@ namespace CommunityToolkit.Uwp.Authentication
                 _webAccount = null;
             }
 
-            SetState(ProviderState.SignedOut);
+            State = ProviderState.SignedOut;
         }
 
         /// <summary>
@@ -171,7 +151,7 @@ namespace CommunityToolkit.Uwp.Authentication
             {
                 if (State == ProviderState.SignedOut)
                 {
-                    SetState(ProviderState.Loading);
+                    State = ProviderState.Loading;
                 }
 
                 // Attempt to authenticate silently.
@@ -246,7 +226,7 @@ namespace CommunityToolkit.Uwp.Authentication
             Settings[SettingsKeyAccountId] = account.Id;
             Settings[SettingsKeyProviderId] = account.WebAccountProvider.Id;
 
-            SetState(ProviderState.SignedIn);
+            State = ProviderState.SignedIn;
         }
 
         private async Task<WebTokenRequestResult> AuthenticateSilentAsync()
@@ -345,7 +325,7 @@ namespace CommunityToolkit.Uwp.Authentication
                 try
                 {
                     // Configure available providers.
-                    List<WebAccountProvider> webAccountProviders = await GetWebAccountProvidersAsync(_accountsSettingsPaneConfig.WebAccountProviderType);
+                    List<WebAccountProvider> webAccountProviders = await GetWebAccountProvidersAsync();
 
                     foreach (WebAccountProvider webAccountProvider in webAccountProviders)
                     {
@@ -353,14 +333,15 @@ namespace CommunityToolkit.Uwp.Authentication
                         e.WebAccountProviderCommands.Add(providerCommand);
                     }
 
-                    // Expose configuration so developers can have some control over the popup.
-                    var headerText = _accountsSettingsPaneConfig.HeaderText;
+                    // Apply the configured header.
+                    var headerText = _accountsSettingsPaneConfig?.HeaderText;
                     if (!string.IsNullOrWhiteSpace(headerText))
                     {
                         e.HeaderText = headerText;
                     }
 
-                    var commands = _accountsSettingsPaneConfig.Commands;
+                    // Apply any configured commands.
+                    var commands = _accountsSettingsPaneConfig?.Commands;
                     if (commands != null)
                     {
                         foreach (var command in commands)
@@ -391,6 +372,8 @@ namespace CommunityToolkit.Uwp.Authentication
                 // Show the AccountSettingsPane and wait for the result.
                 await AccountsSettingsPane.ShowAddAccountAsync();
 
+                // If an account was selected, the WebAccountProviderCommand will be invoked.
+                // If not, the AccountsSettingsPane must have been cancelled or closed.
                 var authResult = webAccountProviderCommandWasInvoked ? await addAccountTaskCompletionSource.Task : null;
                 return authResult;
             }
@@ -408,38 +391,19 @@ namespace CommunityToolkit.Uwp.Authentication
         private WebTokenRequest GetWebTokenRequest(WebAccountProvider provider)
         {
             WebTokenRequest webTokenRequest = new WebTokenRequest(provider, string.Join(',', _scopes), _clientId);
-            webTokenRequest.Properties.Add("resource", GraphResourceProperty);
+            webTokenRequest.Properties.Add(GraphResourcePropertyKey, GraphResourcePropertyValue);
 
             return webTokenRequest;
         }
 
-        private async Task<List<WebAccountProvider>> GetWebAccountProvidersAsync(WebAccountProviderType providerType)
+        private async Task<List<WebAccountProvider>> GetWebAccountProvidersAsync()
         {
-            List<WebAccountProvider> providers = new List<WebAccountProvider>();
+            var providers = new List<WebAccountProvider>();
 
-            if (providerType == WebAccountProviderType.Consumer || providerType == WebAccountProviderType.All)
-            {
-                // MSA
-                providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
-            }
-
-            if (providerType == WebAccountProviderType.Organizational || providerType == WebAccountProviderType.All)
-            {
-                // AAD - Works pre-store association. Once associated, fails complaining about 'client_assertion' or 'client_secret' for corp account.
-                providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, AzureActiveDirectoryAuthority));
-            }
+            // MSA
+            providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
 
             return providers;
-        }
-
-        private void SetState(ProviderState state)
-        {
-            if (State == state)
-            {
-                return;
-            }
-
-            State = state;
         }
     }
 
@@ -459,21 +423,14 @@ namespace CommunityToolkit.Uwp.Authentication
         public IList<SettingsCommand> Commands { get; set; }
 
         /// <summary>
-        /// Gets or sets the type of authentication providers that should be available through the accounts settings pane.
-        /// </summary>
-        public WebAccountProviderType WebAccountProviderType { get; set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="AccountsSettingsPaneConfig"/> struct.
         /// </summary>
         /// <param name="headerText">The header text for the accounts settings pane.</param>
         /// <param name="commands">The SettingsCommand collection for the account settings pane.</param>
-        /// <param name="webAccountProviderType">The type of authentication providers that should be available through the accounts settings pane.</param>
-        public AccountsSettingsPaneConfig(string headerText, IList<SettingsCommand> commands, WebAccountProviderType webAccountProviderType = WebAccountProviderType.Consumer)
+        public AccountsSettingsPaneConfig(string headerText, IList<SettingsCommand> commands)
         {
             HeaderText = headerText;
             Commands = commands;
-            WebAccountProviderType = webAccountProviderType;
         }
     }
 }
