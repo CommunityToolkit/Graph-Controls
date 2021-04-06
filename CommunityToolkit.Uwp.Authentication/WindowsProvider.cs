@@ -415,23 +415,16 @@ namespace CommunityToolkit.Uwp.Authentication
         {
             List<WebAccountProvider> providers = new List<WebAccountProvider>();
 
-            switch (providerType)
+            if (providerType == WebAccountProviderType.Consumer || providerType == WebAccountProviderType.All)
             {
-                case WebAccountProviderType.Consumer:
-                    // MSA
-                    providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
-                    break;
+                // MSA
+                providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
+            }
 
-                case WebAccountProviderType.Organizational:
-                    // AAD - Fails complaining about 'client_assertion' or 'client_secret'
-                    providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, AzureActiveDirectoryAuthority));
-                    break;
-
-                case WebAccountProviderType.All:
-                default:
-                    // Both
-                    providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId));
-                    break;
+            if (providerType == WebAccountProviderType.Organizational || providerType == WebAccountProviderType.All)
+            {
+                // AAD - Works pre-store association. Once associated, fails complaining about 'client_assertion' or 'client_secret' for corp account.
+                providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, AzureActiveDirectoryAuthority));
             }
 
             return providers;
