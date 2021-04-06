@@ -74,10 +74,11 @@ namespace SampleTest
 
                     // Windows provider
                     case ProviderType.Windows:
+                        var settingsCommandId = Guid.NewGuid();
                         WindowsProvider windowsProvider = new WindowsProvider(clientId, scopes, new AccountsSettingsPaneConfig()
                         {
                             HeaderText = "Custom header text goes here.",
-                            Commands = new List<SettingsCommand>() { new SettingsCommand("MySettingsCommandId", "Click me!", OnSettingsCommandInvoked) }
+                            Commands = new List<SettingsCommand>() { new SettingsCommand(settingsCommandId, "Click me!", OnSettingsCommandInvoked) }
                         });
                         ProviderManager.Instance.GlobalProvider = windowsProvider;
                         await windowsProvider.TrySilentLoginAsync();
@@ -88,7 +89,7 @@ namespace SampleTest
 
         private void OnSettingsCommandInvoked(IUICommand command)
         {
-            System.Diagnostics.Debug.WriteLine("AccountsSettingsPane command invoked: " + command.Id);
+            System.Diagnostics.Debug.WriteLine("AccountsSettingsPane command invoked: " + command.Label);
         }
 
         /// <summary>
