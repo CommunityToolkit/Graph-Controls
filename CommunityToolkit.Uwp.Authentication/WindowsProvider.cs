@@ -363,7 +363,11 @@ namespace CommunityToolkit.Uwp.Authentication
                     {
                         foreach (var command in commands)
                         {
-                            e.Commands.Add(command);
+                            e.Commands.Add(new SettingsCommand(command.Id, command.Label, (uic) =>
+                            {
+                                command.Invoked.Invoke(command);
+                                addAccountTaskCompletionSource.SetCanceled();
+                            }));
                         }
                     }
                 }
@@ -387,6 +391,11 @@ namespace CommunityToolkit.Uwp.Authentication
 
                 var authResult = await addAccountTaskCompletionSource.Task;
                 return authResult;
+            }
+            catch (TaskCanceledException)
+            {
+                // The task was cancelled. Do nothing.
+                return null;
             }
             finally
             {
