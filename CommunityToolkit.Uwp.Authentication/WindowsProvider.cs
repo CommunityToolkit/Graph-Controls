@@ -152,7 +152,12 @@ namespace CommunityToolkit.Uwp.Authentication
             SetState(ProviderState.SignedOut);
         }
 
-        private async Task<string> GetTokenAsync(bool silentOnly = false)
+        /// <summary>
+        /// Retrieve a token for the authenticated user.
+        /// </summary>
+        /// <param name="silentOnly">Determines if the acquisition should be done without prompts to the user.</param>
+        /// <returns>A token string for the authenticated user.</returns>
+        public async Task<string> GetTokenAsync(bool silentOnly = false)
         {
             var internetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
             if (internetConnectionProfile == null)
