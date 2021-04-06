@@ -14,6 +14,27 @@ using Windows.UI.ApplicationSettings;
 namespace CommunityToolkit.Uwp.Authentication
 {
     /// <summary>
+    /// Enumeration of available authentication providers.
+    /// </summary>
+    public enum WebAccountProviderType
+    {
+        /// <summary>
+        /// Enable public MSAs to authenticate.
+        /// </summary>
+        Consumer,
+
+        /// <summary>
+        /// Enable organizational accounts to authenticate.
+        /// </summary>
+        Organizational,
+
+        /// <summary>
+        /// Enable both consumer and organizational accounts to authenticate.
+        /// </summary>
+        All,
+    }
+
+    /// <summary>
     /// An authentication provider based on the native AccountSettingsPane in Windows.
     /// </summary>
     public class WindowsProvider : BaseProvider
@@ -25,44 +46,46 @@ namespace CommunityToolkit.Uwp.Authentication
 
         private const string GraphResourceProperty = "https://graph.microsoft.com";
         private const string MicrosoftProviderId = "https://login.microsoft.com";
-        //// private const string AzureActiveDirectoryAuthority = "organizations";
-        //// private const string MicrosoftAccountAuthority = "consumers";
+        private const string AzureActiveDirectoryAuthority = "organizations";
+        private const string MicrosoftAccountAuthority = "consumers";
         //// private const string MicrosoftAccountClientId = "none";
         //// private const string MicrosoftAccountScopeRequested = "wl.basic";
+        private const string SettingsKeyAccountId = "WindowsProvider_AccountId";
+        private const string SettingsKeyProviderId = "WindowsProvider_ProviderId";
 
         private static readonly string[] DefaultScopes =
         {
             "User.Read",
         };
 
+        private static readonly AccountsSettingsPaneConfig DefaultAccountsSettingsPaneConfig =
+            new AccountsSettingsPaneConfig()
+            {
+                WebAccountProviderType = WebAccountProviderType.All,
+            };
+
         /// <summary>
         /// Gets a cache of important values for the signed in user.
         /// </summary>
         protected IDictionary<string, object> Settings => ApplicationData.Current.LocalSettings.Values;
 
-        /// <summary>
-        /// The settings key for the active account id.
-        /// </summary>
-        protected const string SettingsKeyWamAccountId = "WamAccountId";
-
-        /// <summary>
-        /// The settings key for the active provider id.
-        /// </summary>
-        protected const string SettingsKeyWamProviderId = "WamProviderId";
-
         private string _clientId;
         private string[] _scopes;
         private WebAccount _webAccount;
+        private AccountsSettingsPaneConfig _accountsSettingsPaneConfig;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WindowsProvider"/> class.
         /// </summary>
         /// <param name="clientId">Registered ClientId.</param>
         /// <param name="scopes">List of Scopes to initially request.</param>
-        public WindowsProvider(string clientId, string[] scopes = null)
+        /// <param name="accountsSettingsPaneConfig">Configuration values for the AccountsSettingsPane.</param>
+        public WindowsProvider(string clientId, string[] scopes = null, AccountsSettingsPaneConfig? accountsSettingsPaneConfig = null)
         {
             _clientId = clientId;
             _scopes = scopes ?? DefaultScopes;
+            _accountsSettingsPaneConfig = accountsSettingsPaneConfig ?? DefaultAccountsSettingsPaneConfig;
+
             _webAccount = null;
 
             State = ProviderState.SignedOut;
@@ -115,8 +138,8 @@ namespace CommunityToolkit.Uwp.Authentication
         /// <inheritdoc />
         public override async Task LogoutAsync()
         {
-            Settings.Remove(SettingsKeyWamAccountId);
-            Settings.Remove(SettingsKeyWamProviderId);
+            Settings.Remove(SettingsKeyAccountId);
+            Settings.Remove(SettingsKeyProviderId);
 
             if (_webAccount != null)
             {
@@ -221,8 +244,8 @@ namespace CommunityToolkit.Uwp.Authentication
 
             // Save off the account ids.
             _webAccount = account;
-            Settings[SettingsKeyWamAccountId] = account.Id;
-            Settings[SettingsKeyWamProviderId] = account.WebAccountProvider.Id;
+            Settings[SettingsKeyAccountId] = account.Id;
+            Settings[SettingsKeyProviderId] = account.WebAccountProvider.Id;
 
             SetState(ProviderState.SignedIn);
         }
@@ -237,8 +260,8 @@ namespace CommunityToolkit.Uwp.Authentication
                 if (account == null)
                 {
                     // Check the cache for an existing user
-                    if (Settings[SettingsKeyWamAccountId] is string savedAccountId &&
-                        Settings[SettingsKeyWamProviderId] is string savedProviderId)
+                    if (Settings[SettingsKeyAccountId] is string savedAccountId &&
+                        Settings[SettingsKeyProviderId] is string savedProviderId)
                     {
                         var savedProvider = await WebAuthenticationCoreManager.FindAccountProviderAsync(savedProviderId);
                         account = await WebAuthenticationCoreManager.FindAccountAsync(savedProvider, savedAccountId);
@@ -320,7 +343,7 @@ namespace CommunityToolkit.Uwp.Authentication
                 try
                 {
                     // Configure available providers.
-                    List<WebAccountProvider> webAccountProviders = await GetWebAccountProvidersAsync();
+                    List<WebAccountProvider> webAccountProviders = await GetWebAccountProvidersAsync(_accountsSettingsPaneConfig.WebAccountProviderType);
 
                     foreach (WebAccountProvider webAccountProvider in webAccountProviders)
                     {
@@ -328,7 +351,21 @@ namespace CommunityToolkit.Uwp.Authentication
                         e.WebAccountProviderCommands.Add(providerCommand);
                     }
 
-                    // TODO: Expose configuration so developers can have some control over the popup.
+                    // Expose configuration so developers can have some control over the popup.
+                    var headerText = _accountsSettingsPaneConfig.HeaderText;
+                    if (!string.IsNullOrWhiteSpace(headerText))
+                    {
+                        e.HeaderText = headerText;
+                    }
+
+                    var commands = _accountsSettingsPaneConfig.Commands;
+                    if (commands != null)
+                    {
+                        foreach (var command in commands)
+                        {
+                            e.Commands.Add(command);
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -365,25 +402,32 @@ namespace CommunityToolkit.Uwp.Authentication
             return webTokenRequest;
         }
 
-        private async Task<List<WebAccountProvider>> GetWebAccountProvidersAsync()
+        private async Task<List<WebAccountProvider>> GetWebAccountProvidersAsync(WebAccountProviderType providerType)
         {
             List<WebAccountProvider> providers = new List<WebAccountProvider>();
 
-            // TODO: Enable devs to turn on/off which account sources they wish to integrate with.
+            switch (providerType)
+            {
+                case WebAccountProviderType.Consumer:
+                    // MSA
+                    providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
+                    break;
 
-            // MSA - Works
-            // return await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority);
+                case WebAccountProviderType.Organizational:
+                    // AAD - Fails complaining about 'client_assertion' or 'client_secret'
+                    providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, AzureActiveDirectoryAuthority));
+                    break;
 
-            // AAD - Fails complaining about 'client_assertion' or 'client_secret'
-            // return await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, AzureActiveDirectoryAuthority);
-
-            // Both
-            providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId));
+                case WebAccountProviderType.All:
+                default:
+                    // Both
+                    providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId));
+                    break;
+            }
 
             return providers;
         }
 
-        // Instead of updating the State value directly, use SetState to ensure that provider events are fired on the proper thread.
         private void SetState(ProviderState state)
         {
             if (State == state)
@@ -393,5 +437,26 @@ namespace CommunityToolkit.Uwp.Authentication
 
             State = state;
         }
+    }
+
+    /// <summary>
+    /// Configuration values for the AccountsSettingsPane.
+    /// </summary>
+    public struct AccountsSettingsPaneConfig
+    {
+        /// <summary>
+        /// Gets or sets the header text for the accounts settings pane.
+        /// </summary>
+        public string HeaderText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SettingsCommand collection for the account settings pane.
+        /// </summary>
+        public IList<SettingsCommand> Commands { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of authentication providers that should be available through the accounts settings pane.
+        /// </summary>
+        public WebAccountProviderType WebAccountProviderType { get; set; }
     }
 }
