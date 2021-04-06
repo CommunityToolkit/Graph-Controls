@@ -58,12 +58,6 @@ namespace CommunityToolkit.Uwp.Authentication
             "User.Read",
         };
 
-        private static readonly AccountsSettingsPaneConfig DefaultAccountsSettingsPaneConfig =
-            new AccountsSettingsPaneConfig()
-            {
-                WebAccountProviderType = WebAccountProviderType.All,
-            };
-
         /// <summary>
         /// Gets a cache of important values for the signed in user.
         /// </summary>
@@ -84,7 +78,7 @@ namespace CommunityToolkit.Uwp.Authentication
         {
             _clientId = clientId;
             _scopes = scopes ?? DefaultScopes;
-            _accountsSettingsPaneConfig = accountsSettingsPaneConfig ?? DefaultAccountsSettingsPaneConfig;
+            _accountsSettingsPaneConfig = accountsSettingsPaneConfig ?? default;
 
             _webAccount = null;
 
@@ -319,9 +313,12 @@ namespace CommunityToolkit.Uwp.Authentication
             // To ensure no funny business, the entire AccountSettingsPane flow is contained here.
             var addAccountTaskCompletionSource = new TaskCompletionSource<WebTokenRequestResult>();
 
+            bool webAccountProviderCommandWasInvoked = false;
+
             // Handle the selected account provider
             async void WebAccountProviderCommandInvoked(WebAccountProviderCommand command)
             {
+                webAccountProviderCommandWasInvoked = true;
                 try
                 {
                     var webTokenRequest = GetWebTokenRequest(command.WebAccountProvider);
@@ -389,7 +386,7 @@ namespace CommunityToolkit.Uwp.Authentication
                 // Show the AccountSettingsPane and wait for the result.
                 await AccountsSettingsPane.ShowAddAccountAsync();
 
-                var authResult = await addAccountTaskCompletionSource.Task;
+                var authResult = webAccountProviderCommandWasInvoked ? await addAccountTaskCompletionSource.Task : null;
                 return authResult;
             }
             catch (TaskCanceledException)
@@ -460,5 +457,18 @@ namespace CommunityToolkit.Uwp.Authentication
         /// Gets or sets the type of authentication providers that should be available through the accounts settings pane.
         /// </summary>
         public WebAccountProviderType WebAccountProviderType { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountsSettingsPaneConfig"/> struct.
+        /// </summary>
+        /// <param name="headerText">The header text for the accounts settings pane.</param>
+        /// <param name="commands">The SettingsCommand collection for the account settings pane.</param>
+        /// <param name="webAccountProviderType">The type of authentication providers that should be available through the accounts settings pane.</param>
+        public AccountsSettingsPaneConfig(string headerText, IList<SettingsCommand> commands, WebAccountProviderType webAccountProviderType = WebAccountProviderType.Consumer)
+        {
+            HeaderText = headerText;
+            Commands = commands;
+            WebAccountProviderType = webAccountProviderType;
+        }
     }
 }
