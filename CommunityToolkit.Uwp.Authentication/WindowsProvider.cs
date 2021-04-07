@@ -39,6 +39,21 @@ namespace CommunityToolkit.Uwp.Authentication
         private static readonly string[] DefaultScopes = { "User.Read" };
 
         /// <summary>
+        /// Gets the client id obtained from Azure registration.
+        /// </summary>
+        public string ClientId => _clientId;
+
+        /// <summary>
+        /// Gets the list of scopes to pre-authorize during authentication.
+        /// </summary>
+        public string[] Scopes => _scopes;
+
+        /// <summary>
+        /// Gets configuration values for the AccountsSettingsPane.
+        /// </summary>
+        public AccountsSettingsPaneConfig? AccountsSettingsPaneConfig => _accountsSettingsPaneConfig;
+
+        /// <summary>
         /// Gets a cache of important values for the signed in user.
         /// </summary>
         protected IDictionary<string, object> Settings => ApplicationData.Current.LocalSettings.Values;
