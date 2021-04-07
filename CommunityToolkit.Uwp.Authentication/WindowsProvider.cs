@@ -93,20 +93,11 @@ namespace CommunityToolkit.Uwp.Authentication
         /// Try logging in silently.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task TrySilentLoginAsync()
+        public async Task<bool> TrySilentLoginAsync()
         {
-            if (_webAccount != null || State != ProviderState.SignedOut)
-            {
-                return;
-            }
-
             // The state will get updated as part of the auth flow.
             var token = await GetTokenAsync(true);
-
-            if (token == null)
-            {
-                await LogoutAsync();
-            }
+            return token != null;
         }
 
         /// <inheritdoc />
@@ -271,12 +262,17 @@ namespace CommunityToolkit.Uwp.Authentication
                 var account = _webAccount;
                 if (account != null)
                 {
-                    var webTokenRequest = GetWebTokenRequest(account.WebAccountProvider);
+                    // We already have the account.
+                    var webAccountProvider = account.WebAccountProvider;
+                    var webTokenRequest = GetWebTokenRequest(webAccountProvider);
                     authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest, account);
                 }
                 else
                 {
-                    authResult = await ShowAddAccountAndGetResultAsync();
+                    // We don't have an account. Prompt the user to provide one.
+                    var webAccountProvider = await ShowAccountSettingsPaneAndGetProviderAsync();
+                    var webTokenRequest = GetWebTokenRequest(webAccountProvider);
+                    authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest);
                 }
 
                 return authResult;
@@ -290,30 +286,27 @@ namespace CommunityToolkit.Uwp.Authentication
         /// <summary>
         /// Show the AccountSettingsPane and wait for the user to make a selection, then process the authentication result.
         /// </summary>
-        private async Task<WebTokenRequestResult> ShowAddAccountAndGetResultAsync()
+        private async Task<WebAccountProvider> ShowAccountSettingsPaneAndGetProviderAsync()
         {
             // The AccountSettingsPane uses events to support the flow of authentication events.
             // Ultimately we need access to the user's selected account provider from the AccountSettingsPane, which is available
             // in the WebAccountProviderCommandInvoked function for the chosen provider.
-            // To ensure no funny business, the entire AccountSettingsPane flow is contained here.
-            var addAccountTaskCompletionSource = new TaskCompletionSource<WebTokenRequestResult>();
+            // The entire AccountSettingsPane flow is contained here.
+            var webAccountProviderTaskCompletionSource = new TaskCompletionSource<WebAccountProvider>();
 
             bool webAccountProviderCommandWasInvoked = false;
 
             // Handle the selected account provider
-            async void WebAccountProviderCommandInvoked(WebAccountProviderCommand command)
+            void WebAccountProviderCommandInvoked(WebAccountProviderCommand command)
             {
                 webAccountProviderCommandWasInvoked = true;
                 try
                 {
-                    var webTokenRequest = GetWebTokenRequest(command.WebAccountProvider);
-
-                    var authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest);
-                    addAccountTaskCompletionSource.SetResult(authResult);
+                    webAccountProviderTaskCompletionSource.SetResult(command.WebAccountProvider);
                 }
                 catch (Exception ex)
                 {
-                    addAccountTaskCompletionSource.SetException(ex);
+                    webAccountProviderTaskCompletionSource.SetException(ex);
                 }
             }
 
@@ -346,17 +339,19 @@ namespace CommunityToolkit.Uwp.Authentication
                     {
                         foreach (var command in commands)
                         {
+                            // We don't actually use the provided commands directly. Instead, we make new commands
+                            // with matching ids and labels, but we override the invoked action so we can cancel the TaskCompletionSource.
                             e.Commands.Add(new SettingsCommand(command.Id, command.Label, (uic) =>
                             {
                                 command.Invoked.Invoke(command);
-                                addAccountTaskCompletionSource.SetCanceled();
+                                webAccountProviderTaskCompletionSource.SetCanceled();
                             }));
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    addAccountTaskCompletionSource.SetException(ex);
+                    webAccountProviderTaskCompletionSource.SetException(ex);
                 }
                 finally
                 {
@@ -374,12 +369,12 @@ namespace CommunityToolkit.Uwp.Authentication
 
                 // If an account was selected, the WebAccountProviderCommand will be invoked.
                 // If not, the AccountsSettingsPane must have been cancelled or closed.
-                var authResult = webAccountProviderCommandWasInvoked ? await addAccountTaskCompletionSource.Task : null;
-                return authResult;
+                var webAccountProvider = webAccountProviderCommandWasInvoked ? await webAccountProviderTaskCompletionSource.Task : null;
+                return webAccountProvider;
             }
             catch (TaskCanceledException)
             {
-                // The task was cancelled. Do nothing.
+                // The task was cancelled. No provider was chosen.
                 return null;
             }
             finally
