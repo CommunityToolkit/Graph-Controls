@@ -14,6 +14,7 @@ namespace UnitTests.UWP.Authentication
     [TestClass]
     public class Test_WindowsProvider : VisualUITestBase
     {
+        // Note: Authenticaiton will work without a client id, however any Graph requests will fail.
         private const string ClientId = "";
 
         /// <summary>

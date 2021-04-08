@@ -66,10 +66,10 @@ namespace CommunityToolkit.Uwp.Authentication
         /// <summary>
         /// Initializes a new instance of the <see cref="WindowsProvider"/> class.
         /// </summary>
-        /// <param name="clientId">Registered ClientId.</param>
+        /// <param name="clientId">Registered ClientId. You can access an acount without one, but any Graph requests will fail.</param>
         /// <param name="scopes">List of Scopes to initially request.</param>
         /// <param name="accountsSettingsPaneConfig">Configuration values for the AccountsSettingsPane.</param>
-        public WindowsProvider(string clientId, string[] scopes = null, AccountsSettingsPaneConfig? accountsSettingsPaneConfig = null)
+        public WindowsProvider(string clientId = "", string[] scopes = null, AccountsSettingsPaneConfig? accountsSettingsPaneConfig = null)
         {
             _clientId = clientId;
             _scopes = scopes ?? DefaultScopes;
@@ -155,6 +155,7 @@ namespace CommunityToolkit.Uwp.Authentication
 
             try
             {
+                var initialState = State;
                 if (State == ProviderState.SignedOut)
                 {
                     State = ProviderState.Loading;
@@ -169,6 +170,7 @@ namespace CommunityToolkit.Uwp.Authentication
                     if (silentOnly)
                     {
                         // Silent login may fail if we don't have a cached account, and that's ok.
+                        State = initialState;
                         return null;
                     }
 
