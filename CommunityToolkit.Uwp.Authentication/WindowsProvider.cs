@@ -374,11 +374,13 @@ namespace CommunityToolkit.Uwp.Authentication
                 }
             }
 
-            var pane = AccountsSettingsPane.GetForCurrentView();
-            pane.AccountCommandsRequested += OnAccountCommandsRequested;
-
+            AccountsSettingsPane pane = null;
             try
             {
+                // GetForCurrentView may throw an exception if the current view isn't ready yet.
+                pane = AccountsSettingsPane.GetForCurrentView();
+                pane.AccountCommandsRequested += OnAccountCommandsRequested;
+
                 // Show the AccountSettingsPane and wait for the result.
                 await AccountsSettingsPane.ShowAddAccountAsync();
 
@@ -394,7 +396,10 @@ namespace CommunityToolkit.Uwp.Authentication
             }
             finally
             {
-                pane.AccountCommandsRequested -= OnAccountCommandsRequested;
+                if (pane != null)
+                {
+                    pane.AccountCommandsRequested -= OnAccountCommandsRequested;
+                }
             }
         }
 

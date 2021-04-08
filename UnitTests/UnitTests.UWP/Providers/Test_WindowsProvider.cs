@@ -4,6 +4,7 @@
 
 using CommunityToolkit.Net.Authentication;
 using CommunityToolkit.Uwp.Authentication;
+using Microsoft.Toolkit.Uwp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 namespace UnitTests.UWP.Authentication
 {
     [TestClass]
-    public class Test_WindowsProvider
+    public class Test_WindowsProvider : VisualUITestBase
     {
         private const string ClientId = "";
 
@@ -36,66 +37,69 @@ namespace UnitTests.UWP.Authentication
         [TestMethod]
         public async Task Test_WindowsProvider_LoginAsync()
         {
-            // Create the new provider.
-            WindowsProvider provider = new WindowsProvider(ClientId);
-
-            // Run logout to ensure that no cached users affect the test.
-            await provider.LogoutAsync();
-
-            // The newly created provider should be in a logged out state.
-            Assert.AreEqual(ProviderState.SignedOut, provider.State);
-
-            // Listen for changes in the provider state and count them.
-            int eventCount = 0;
-            provider.StateChanged += (s, e) =>
+            await App.DispatcherQueue.EnqueueAsync(async () =>
             {
-                eventCount += 1;
+                // Create the new provider.
+                WindowsProvider provider = new WindowsProvider(ClientId);
 
-                // Ensure that the states are properly reported through the StateChanged event.
-                switch (e.OldState)
+                // Run logout to ensure that no cached users affect the test.
+                await provider.LogoutAsync();
+
+                // The newly created provider should be in a logged out state.
+                Assert.AreEqual(ProviderState.SignedOut, provider.State);
+
+                // Listen for changes in the provider state and count them.
+                int eventCount = 0;
+                provider.StateChanged += (s, e) =>
                 {
-                    case ProviderState.SignedOut:
-                        // Login has been initiated, the provider should now be loading.
-                        Assert.AreEqual(ProviderState.Loading, e.NewState);
+                    eventCount += 1;
 
-                        // Loading should be the first event fired.
-                        Assert.AreEqual(eventCount, 1);
-                        break;
+                    // Ensure that the states are properly reported through the StateChanged event.
+                    switch (e.OldState)
+                    {
+                        case ProviderState.SignedOut:
+                            // Login has been initiated, the provider should now be loading.
+                            Assert.AreEqual(ProviderState.Loading, e.NewState);
 
-                    case ProviderState.Loading:
-                        // The provider has completed login, the provider should now be signed in.
-                        Assert.AreEqual(ProviderState.SignedIn, e.NewState);
+                            // Loading should be the first event fired.
+                            Assert.AreEqual(eventCount, 1);
+                            break;
 
-                        // SignedIn should be the second event fired.
-                        Assert.AreEqual(eventCount, 2);
-                        break;
+                        case ProviderState.Loading:
+                            // The provider has completed login, the provider should now be signed in.
+                            Assert.AreEqual(ProviderState.SignedIn, e.NewState);
 
-                    case ProviderState.SignedIn:
-                        // The provider has completed login, the provider should now be signed in.
-                        Assert.AreEqual(ProviderState.SignedOut, e.NewState);
+                            // SignedIn should be the second event fired.
+                            Assert.AreEqual(eventCount, 2);
+                            break;
 
-                        // SignedIn should be the second event fired.
-                        Assert.AreEqual(eventCount, 3);
-                        break;
+                        case ProviderState.SignedIn:
+                            // The provider has completed login, the provider should now be signed in.
+                            Assert.AreEqual(ProviderState.SignedOut, e.NewState);
 
-                    default:
-                        // This is unexpected, something went wrong during the test.
-                        Assert.Fail("The provider has transitioned from an unexpected state: " + Enum.GetName(typeof(ProviderState), e.OldState));
-                        break;
-                }
-            };
+                            // SignedIn should be the second event fired.
+                            Assert.AreEqual(eventCount, 3);
+                            break;
 
-            // Initiate logout.
-            await provider.LoginAsync();
+                        default:
+                            // This is unexpected, something went wrong during the test.
+                            Assert.Fail("The provider has transitioned from an unexpected state: " + Enum.GetName(typeof(ProviderState), e.OldState));
+                            break;
+                    }
+                };
 
-            // Logout has completed, the provider should be signed out.
-            Assert.AreEqual(ProviderState.SignedIn, provider.State);
+                // Initiate logout.
+                await provider.LoginAsync();
 
-            // Initiate logout, which should skip loading, and go straight to signed out.
-            await provider.LogoutAsync();
+                // Logout has completed, the provider should be signed out.
+                Assert.AreEqual(ProviderState.SignedIn, provider.State);
 
-            // Ensure the proper number of events were fired.
-            Assert.AreEqual(eventCount, 3);
+                // Initiate logout, which should skip loading, and go straight to signed out.
+                await provider.LogoutAsync();
+
+                // Ensure the proper number of events were fired.
+                Assert.AreEqual(eventCount, 3);
+            });
         }
     }
 }
