@@ -121,8 +121,8 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <returns>A void task.</returns>
         public override async Task Delete()
         {
-            // Clear the cache
-            ClearCache();
+            // Delete the cache
+            DeleteCache();
 
             if (AutoSync)
             {

@@ -72,7 +72,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         public override async Task Delete()
         {
             // Clear the cache
-            ClearCache();
+            DeleteCache();
 
             if (AutoSync)
             {

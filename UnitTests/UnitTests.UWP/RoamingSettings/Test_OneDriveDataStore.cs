@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 namespace UnitTests.UWP.Helpers
 {
     [TestClass]
-    public class Test_UserExtensionDataStore
+    public class Test_OneDriveDataStore
     {
         /// <summary>
-        /// Test the dafault state of a new instance of the UserExtensionDataStore.
+        /// Test the dafault state of a new instance of the OneDriveDataStore.
         /// </summary>
         [TestCategory("RoamingSettings")]
         [TestMethod]
@@ -31,7 +31,7 @@ namespace UnitTests.UWP.Helpers
                     string dataStoreId = "RoamingData.json";
                     IObjectSerializer serializer = new SystemSerializer();
 
-                    IRoamingSettingsDataStore dataStore = new UserExtensionDataStore(userId, dataStoreId, serializer, false);
+                    IRoamingSettingsDataStore dataStore = new OneDriveDataStore(userId, dataStoreId, serializer, false);
 
                     // Evaluate the default state is as expected
                     Assert.IsFalse(dataStore.AutoSync);
@@ -53,7 +53,7 @@ namespace UnitTests.UWP.Helpers
         }
 
         /// <summary>
-        /// Test the dafault state of a new instance of the UserExtensionDataStore.
+        /// Test the dafault state of a new instance of the OneDriveDataStore.
         /// </summary>
         [TestCategory("RoamingSettings")]
         [TestMethod]
@@ -69,7 +69,7 @@ namespace UnitTests.UWP.Helpers
                     string dataStoreId = "RoamingData.json";
                     IObjectSerializer serializer = new SystemSerializer();
 
-                    IRoamingSettingsDataStore dataStore = new UserExtensionDataStore(userId, dataStoreId, serializer, false);
+                    IRoamingSettingsDataStore dataStore = new OneDriveDataStore(userId, dataStoreId, serializer, false);
 
                     dataStore.SyncCompleted += (s, e) =>
                     {
@@ -110,7 +110,7 @@ namespace UnitTests.UWP.Helpers
         }
 
         /// <summary>
-        /// Test the dafault state of a new instance of the UserExtensionDataStore.
+        /// Test the dafault state of a new instance of the OneDriveDataStore.
         /// </summary>
         [TestCategory("RoamingSettings")]
         [TestMethod]
@@ -126,7 +126,7 @@ namespace UnitTests.UWP.Helpers
                     string dataStoreId = "RoamingData.json";
                     IObjectSerializer serializer = new SystemSerializer();
 
-                    IRoamingSettingsDataStore dataStore = new UserExtensionDataStore(userId, dataStoreId, serializer, false);
+                    IRoamingSettingsDataStore dataStore = new OneDriveDataStore(userId, dataStoreId, serializer, false);
 
                     Assert.IsNull(dataStore.Cache);
                     await dataStore.Create();

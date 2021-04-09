@@ -232,14 +232,11 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         }
 
         /// <summary>
-        /// Clear the internal cache.
+        /// Delete the internal cache.
         /// </summary>
-        protected void ClearCache()
+        protected void DeleteCache()
         {
-            if (Cache != null)
-            {
-                Cache.Clear();
-            }
+            Cache = null;
         }
     }
 }
