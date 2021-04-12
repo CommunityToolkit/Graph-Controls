@@ -5,11 +5,8 @@
 using CommunityToolkit.Net.Authentication;
 using CommunityToolkit.Uwp.Authentication;
 using System;
-using System.Collections.Generic;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.UI.ApplicationSettings;
-using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -32,7 +29,7 @@ namespace SampleTest
         }
 
         // Which provider should be used for authentication?
-        private readonly ProviderType _providerType = ProviderType.Mock;
+        private readonly ProviderType _providerType = ProviderType.Windows;
 
         // List of available authentication providers.
         private enum ProviderType
@@ -52,52 +49,44 @@ namespace SampleTest
                 return;
             }
 
-            await Window.Current.Dispatcher.TryRunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+            await Window.Current.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
                 // Provider config
                 string clientId = "YOUR_CLIENT_ID_HERE";
                 string[] scopes = { "User.Read", "User.ReadBasic.All", "People.Read", "Calendars.Read", "Mail.Read", "Group.Read.All", "ChannelMessage.Read.All" };
+                bool autoSignIn = true;
 
                 switch (_providerType)
                 {
                     // Mock provider
                     case ProviderType.Mock:
-                        ProviderManager.Instance.GlobalProvider = new MockProvider(signedIn: true);
+                        ProviderManager.Instance.GlobalProvider = new MockProvider(signedIn: autoSignIn);
                         break;
 
                     // Msal provider
                     case ProviderType.Msal:
-                        var msalProvider = new MsalProvider(clientId, scopes);
-                        ProviderManager.Instance.GlobalProvider = msalProvider;
-                        await msalProvider.TrySilentSignInAsync();
+                        ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId: clientId, scopes: scopes, autoSignIn: autoSignIn);
                         break;
 
                     // Windows provider
                     case ProviderType.Windows:
-                        var settingsCommandId = Guid.NewGuid();
-                        WindowsProvider windowsProvider = new WindowsProvider(clientId, scopes, new AccountsSettingsPaneConfig()
-                        {
-                            HeaderText = "Custom header text goes here.",
-                            Commands = new List<SettingsCommand>() { new SettingsCommand(settingsCommandId, "Click me!", OnSettingsCommandInvoked) }
-                        });
-                        ProviderManager.Instance.GlobalProvider = windowsProvider;
-                        await windowsProvider.TrySilentLoginAsync();
+                        ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes: scopes, autoSignIn: autoSignIn);
                         break;
                 }
             });
         }
 
-        private void OnSettingsCommandInvoked(IUICommand command)
-        {
-            System.Diagnostics.Debug.WriteLine("AccountsSettingsPane command invoked: " + command.Label);
-        }
+        //private void OnSettingsCommandInvoked(IUICommand command)
+        //{
+        //    System.Diagnostics.Debug.WriteLine("AccountsSettingsPane command invoked: " + command.Label);
+        //}
 
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
 

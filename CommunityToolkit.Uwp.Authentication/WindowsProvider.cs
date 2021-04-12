@@ -18,7 +18,19 @@ using Windows.UI.ApplicationSettings;
 namespace CommunityToolkit.Uwp.Authentication
 {
     /// <summary>
-    /// An authentication provider based on the native AccountSettingsPane in Windows.
+    /// An enumeration of the available authentication providers for use in the AccountsSettingsPane.
+    /// </summary>
+    [Flags]
+    public enum WebAccountProviderType
+    {
+        /// <summary>
+        /// Authenticate public/consumer MSA accounts.
+        /// </summary>
+        MSA,
+    }
+
+    /// <summary>
+    /// An authentication provider based on the native AccountsSettingsPane in Windows.
     /// </summary>
     public class WindowsProvider : BaseProvider
     {
@@ -38,10 +50,8 @@ namespace CommunityToolkit.Uwp.Authentication
         // Default/minimal scopes for authentication, if none are provided.
         private static readonly string[] DefaultScopes = { "User.Read" };
 
-        /// <summary>
-        /// Gets the client id obtained from Azure registration.
-        /// </summary>
-        public string ClientId => _clientId;
+        // The default account providers available in the AccountsSettingsPane.
+        private static readonly WebAccountProviderType DefaultWebAccountsProviderType = WebAccountProviderType.MSA;
 
         /// <summary>
         /// Gets the list of scopes to pre-authorize during authentication.
@@ -54,30 +64,44 @@ namespace CommunityToolkit.Uwp.Authentication
         public AccountsSettingsPaneConfig? AccountsSettingsPaneConfig => _accountsSettingsPaneConfig;
 
         /// <summary>
+        /// Gets the configuration values for determining the available web account providers.
+        /// </summary>
+        public WebAccountProviderConfig WebAccountProviderConfig => _webAccountProviderConfig;
+
+        /// <summary>
         /// Gets a cache of important values for the signed in user.
         /// </summary>
         protected IDictionary<string, object> Settings => ApplicationData.Current.LocalSettings.Values;
 
-        private string _clientId;
         private string[] _scopes;
         private WebAccount _webAccount;
         private AccountsSettingsPaneConfig? _accountsSettingsPaneConfig;
+        private WebAccountProviderConfig _webAccountProviderConfig;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WindowsProvider"/> class.
         /// </summary>
-        /// <param name="clientId">Registered ClientId. You can access an acount without one, but any Graph requests will fail.</param>
         /// <param name="scopes">List of Scopes to initially request.</param>
         /// <param name="accountsSettingsPaneConfig">Configuration values for the AccountsSettingsPane.</param>
-        public WindowsProvider(string clientId = "", string[] scopes = null, AccountsSettingsPaneConfig? accountsSettingsPaneConfig = null)
+        /// <param name="webAccountProviderConfig">Configuration value for determining the available web account providers.</param>
+        /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon instantionation.</param>
+        public WindowsProvider(string[] scopes = null, AccountsSettingsPaneConfig? accountsSettingsPaneConfig = null, WebAccountProviderConfig? webAccountProviderConfig = null, bool autoSignIn = true)
         {
-            _clientId = clientId;
             _scopes = scopes ?? DefaultScopes;
             _accountsSettingsPaneConfig = accountsSettingsPaneConfig;
+            _webAccountProviderConfig = webAccountProviderConfig ?? new WebAccountProviderConfig()
+            {
+                WebAccountProviderType = DefaultWebAccountsProviderType,
+            };
 
             _webAccount = null;
 
             State = ProviderState.SignedOut;
+
+            if (autoSignIn)
+            {
+                _ = TrySilentSignInAsync();
+            }
         }
 
         /// <inheritdoc />
@@ -92,7 +116,7 @@ namespace CommunityToolkit.Uwp.Authentication
         {
             if (_webAccount != null || State != ProviderState.SignedOut)
             {
-                await LogoutAsync();
+                return;
             }
 
             // The state will get updated as part of the auth flow.
@@ -105,11 +129,16 @@ namespace CommunityToolkit.Uwp.Authentication
         }
 
         /// <summary>
-        /// Try logging in silently.
+        /// Tries to check if the user is logged in without prompting to login.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task<bool> TrySilentLoginAsync()
+        public async Task<bool> TrySilentSignInAsync()
         {
+            if (_webAccount != null && State == ProviderState.SignedIn)
+            {
+                return true;
+            }
+
             // The state will get updated as part of the auth flow.
             var token = await GetTokenAsync(true);
             return token != null;
@@ -407,7 +436,7 @@ namespace CommunityToolkit.Uwp.Authentication
 
         private WebTokenRequest GetWebTokenRequest(WebAccountProvider provider)
         {
-            WebTokenRequest webTokenRequest = new WebTokenRequest(provider, string.Join(',', _scopes), _clientId);
+            WebTokenRequest webTokenRequest = new WebTokenRequest(provider, string.Join(',', _scopes));
             webTokenRequest.Properties.Add(GraphResourcePropertyKey, GraphResourcePropertyValue);
 
             return webTokenRequest;
@@ -418,7 +447,10 @@ namespace CommunityToolkit.Uwp.Authentication
             var providers = new List<WebAccountProvider>();
 
             // MSA
-            providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
+            if ((_webAccountProviderConfig.WebAccountProviderType & WebAccountProviderType.MSA) == WebAccountProviderType.MSA)
+            {
+                providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
+            }
 
             return providers;
         }
@@ -449,5 +481,21 @@ namespace CommunityToolkit.Uwp.Authentication
             HeaderText = headerText;
             Commands = commands;
         }
+    }
+
+    /// <summary>
+    /// Configuration values for what type of authentication providers to enable.
+    /// </summary>
+    public struct WebAccountProviderConfig
+    {
+        /// <summary>
+        /// Gets or sets the registered ClientId. Required for AAD login.
+        /// </summary>
+        public string ClientId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the types of accounts providers that should be available to the user.
+        /// </summary>
+        public WebAccountProviderType WebAccountProviderType { get; set; }
     }
 }
