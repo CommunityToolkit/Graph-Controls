@@ -138,7 +138,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                     // TODO: Batch when API easier https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
                     try
                     {
-                        user = await provider.Graph().Users[UserId].Request().GetAsync();
+                        user = await provider.Graph().GetUserAsync(UserId);
                     }
                     catch
                     {
@@ -147,7 +147,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                     try
                     {
                         // TODO: Move to LoadImage based on previous call?
-                        await DecodeStreamAsync(await provider.Graph().Users[UserId].Photo.Content.Request().GetAsync());
+                        await DecodeStreamAsync(await provider.Graph().GetUserPhoto(UserId));
                         _photoId = UserId;
                     }
                     catch
@@ -158,7 +158,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                 {
                     try
                     {
-                        user = await provider.Graph().Me.Request().GetAsync();
+                        user = await provider.Graph().GetMeAsync();
                     }
                     catch
                     {
@@ -166,7 +166,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
 
                     try
                     {
-                        await DecodeStreamAsync(await provider.Graph().Me.Photo.Content.Request().GetAsync());
+                        await DecodeStreamAsync(await provider.Graph().GetMyPhotoAsync());
                         _photoId = user.Id;
                     }
                     catch
@@ -203,7 +203,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                     await DecodeStreamAsync(await graph.GetUserPhoto(person.UserPrincipalName));
                     _photoId = person.Id; // TODO: Only set on success for photo?
                 }
-                else if (!string.IsNullOrWhiteSpace(person.EmailAddresses.First().Address))
+                else if (!string.IsNullOrWhiteSpace(person.ScoredEmailAddresses.First().Address))
                 {
                     // TODO https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-person/mgt-person.ts#L174
                 }

@@ -2,16 +2,14 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.IO;
-using System.Threading.Tasks;
 using Microsoft.Graph;
 
 namespace CommunityToolkit.Net.Graph.Extensions
 {
     /// <summary>
-    /// Extension methods to the Graph SDK used by the Microsoft.Toolkit.Graph.Controls.
+    /// Extension methods to the Graph SDK used by the controls and helpers.
     /// </summary>
-    public static class GraphExtensions
+    public static partial class GraphExtensions
     {
         /// <summary>
         /// Simple method to convert a <see cref="User"/> to a <see cref="Person"/> with basic common properties like <see cref="Entity.Id"/>, <see cref="User.DisplayName"/>, <see cref="Person.EmailAddresses"/>, <see cref="User.GivenName"/>, and <see cref="User.Surname"/> intact.
@@ -28,9 +26,9 @@ namespace CommunityToolkit.Net.Graph.Extensions
 
                 // Standard User Info
                 DisplayName = user.DisplayName,
-                EmailAddresses = new RankedEmailAddress[]
+                ScoredEmailAddresses = new ScoredEmailAddress[]
                         {
-                            new RankedEmailAddress()
+                            new ScoredEmailAddress()
                             {
                                 Address = user.Mail ?? user.UserPrincipalName,
                             },
@@ -41,83 +39,9 @@ namespace CommunityToolkit.Net.Graph.Extensions
                 // Company Information
                 CompanyName = user.CompanyName,
                 Department = user.Department,
-                Title = user.JobTitle,
+                JobTitle = user.JobTitle,
                 OfficeLocation = user.OfficeLocation,
             };
-        }
-
-        /// <summary>
-        /// Shortcut to perform a person query.
-        /// </summary>
-        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
-        /// <param name="query">User to search for.</param>
-        /// <returns><see cref="IUserPeopleCollectionPage"/> collection of <see cref="Person"/>.</returns>
-        public static async Task<IUserPeopleCollectionPage> FindPersonAsync(this GraphServiceClient graph, string query)
-        {
-            try
-            {
-                return await graph
-                    .Me
-                    .People
-                    .Request()
-                    .Search(query)
-                    .WithScopes(new string[] { "people.read" })
-                    .GetAsync();
-            }
-            catch
-            {
-            }
-
-            return new UserPeopleCollectionPage();
-        }
-
-        /// <summary>
-        /// Shortcut to perform a user query.
-        /// </summary>
-        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
-        /// <param name="query">User to search for.</param>
-        /// <returns><see cref="IGraphServiceUsersCollectionPage"/> collection of <see cref="User"/>.</returns>
-        public static async Task<IGraphServiceUsersCollectionPage> FindUserAsync(this GraphServiceClient graph, string query)
-        {
-            try
-            {
-                return await graph
-                    .Users
-                    .Request()
-                    .Filter($"startswith(displayName, '{query}') or startswith(givenName, '{query}') or startswith(surname, '{query}') or startswith(mail, '{query}') or startswith(userPrincipalName, '{query}')")
-                    .WithScopes(new string[] { "user.readbasic.all" })
-                    .GetAsync();
-            }
-            catch
-            {
-            }
-
-            return new GraphServiceUsersCollectionPage();
-        }
-
-        /// <summary>
-        /// Helper to get the photo of a particular user.
-        /// </summary>
-        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
-        /// <param name="userid">UserID.</param>
-        /// <returns>Stream with user photo or null.</returns>
-        public static async Task<Stream> GetUserPhoto(this GraphServiceClient graph, string userid)
-        {
-            try
-            {
-                return await graph
-                    .Users[userid]
-                    .Photo
-                    .Content
-                    .Request()
-                    .WithScopes(new string[] { "user.readbasic.all" })
-                    .GetAsync();
-            }
-            catch
-            {
-            }
-
-            return null;
         }
 
         /// <summary>
