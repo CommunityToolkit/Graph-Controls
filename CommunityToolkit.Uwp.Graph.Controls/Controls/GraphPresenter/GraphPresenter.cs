@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp;
+using Newtonsoft.Json.Linq;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -87,7 +88,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
 
                 try
                 {
-                    var response = await request.SendAsync<object>(null, CancellationToken.None).ConfigureAwait(false) as IDictionary<string, object>;
+                    var response = await request.SendAsync<object>(null, CancellationToken.None).ConfigureAwait(false) as JObject;
 
                     //// TODO: Deal with paging?
 
@@ -96,11 +97,11 @@ namespace CommunityToolkit.Uwp.Graph.Controls
 
                     if (IsCollection)
                     {
-                        data = Convert.ChangeType(values, Array.CreateInstance(ResponseType, 0).GetType());
+                        data = values.ToObject(Array.CreateInstance(ResponseType, 0).GetType());
                     }
                     else
                     {
-                        data = Convert.ChangeType(values, ResponseType);
+                        data = values.ToObject(ResponseType);
                     }
 
                     _ = dispatcherQueue.EnqueueAsync(() => Content = data);
