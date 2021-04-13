@@ -27,8 +27,6 @@ namespace CommunityToolkit.Uwp.Graph.Controls
         /// </summary>
         public const string PersonQueryMe = "me";
 
-        private static readonly string[] RequiredScopes = new string[] { "user.readbasic.all" };
-
         private string _photoId = null;
 
         private string _defaultImageSource = "ms-appx:///Microsoft.Toolkit.Graph.Controls/Assets/person.png";
@@ -147,7 +145,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                     try
                     {
                         // TODO: Move to LoadImage based on previous call?
-                        await DecodeStreamAsync(await provider.Graph().GetUserPhoto(UserId));
+                        await DecodeStreamAsync(await provider.BetaGraph().GetUserPhoto(UserId));
                         _photoId = UserId;
                     }
                     catch
@@ -166,7 +164,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
 
                     try
                     {
-                        await DecodeStreamAsync(await provider.Graph().GetMyPhotoAsync());
+                        await DecodeStreamAsync(await provider.BetaGraph().GetMyPhotoAsync());
                         _photoId = user.Id;
                     }
                     catch
@@ -196,7 +194,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
             try
             {
                 // TODO: Better guarding
-                var graph = ProviderManager.Instance.GlobalProvider.Graph();
+                var graph = ProviderManager.Instance.GlobalProvider.BetaGraph();
 
                 if (!string.IsNullOrWhiteSpace(person.UserPrincipalName))
                 {
