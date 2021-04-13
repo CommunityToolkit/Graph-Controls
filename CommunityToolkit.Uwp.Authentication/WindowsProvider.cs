@@ -34,11 +34,6 @@ namespace CommunityToolkit.Uwp.Authentication
     /// </summary>
     public class WindowsProvider : BaseProvider
     {
-        /// <summary>
-        /// Gets the redirect uri value based on the current app callback uri.
-        /// </summary>
-        public static string RedirectUri => string.Format("ms-appx-web://Microsoft.AAD.BrokerPlugIn/{0}", WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper());
-
         private const string AuthenticationHeaderScheme = "Bearer";
         private const string GraphResourcePropertyKey = "resource";
         private const string GraphResourcePropertyValue = "https://graph.microsoft.com";

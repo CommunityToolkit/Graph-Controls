@@ -3,40 +3,44 @@
 The WindowsProvider is an authentication provider for accessing locally configured accounts on Windows. 
 It extends IProvider and uses the native AccountsSettingsPane APIs for login.
 
-> [!IMPORTANT]
-> Be sure to Register Client Id in Azure first following the guidance here: <https://docs.microsoft.com/azure/active-directory/develop/quickstart-register-app>
->
-> After finishing the initial registration page, you will also need to add an additional redirect URI. Click on "Add a Redirect URI" and check the "https://login.microsoftonline.com/common/oauth2/nativeclient" checkbox on that page. 
-> 
-> You'll also want to set the toggle to true for "Allow public client flows".
-> 
-> Then click "Save".
-
 ## Syntax 
 
 ```CSharp
-// Simple
-string clientId = "YOUR_CLIENT_ID_HERE";
-string[] scopes = new string[] { "User.Read" };
+// Provider config
+string clientId = "YOUR_CLIENT_ID_HERE"; // Not used with MSA login, but shown here for completeness.
+string[] scopes = { "User.Read", "People.Read", "Calendars.Read", "Mail.Read" };
+bool autoSignIn = true;
 
-ProviderManager.Instance.GlobalProvider = new WindowsProvider(clientId, scopes);
+// Easily create a new WindowsProvider instance and set the GlobalProvider.
+// The provider will attempt to sign in automatically. 
+ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes);
 
-// Customized AccountsSettingsPane
-IList<SettingsCommand> commands = new List<SettingsCommand>() 
-{ 
-    new SettingsCommand(Guid.NewGuid(), "Click me!", OnSettingsCommandInvoked) 
-}
-AccountsSettingsPaneConfig accountsSettingsPaneConfig = new AccountsSettingsPaneConfig()
+// Additional parameters are also available,
+// such as custom settings commands for the AccountsSettingsPane.
+Guid settingsCommandId = Guid.NewGuid();
+void OnSettingsCommandInvoked(IUICommand command)
 {
-    HeaderText = "Custom header text goes here.",
-    Commands = commands
+    System.Diagnostics.Debug.WriteLine("AccountsSettingsPane command invoked: " + command.Id);
 }
 
-WindowsProvider windowsProvider = new WindowsProvider(clientId, scopes, accountsSettingsPaneConfig);
-ProviderManager.Instance.GlobalProvider = windowsProvider;
+// Configure which types accounts should be available to choose from. The default is MSA, but AAD will come in the future.
+// ClientId is not used with MSA login, but shown here for completeness.
+var webAccountProviderConfig = new WebAccountProviderConfig(WebAccountProviderType.MSA, clientId);
 
-// Silent login
-await windowsProvider.TrySilentLoginAsync();
+// Configure details to present in the AccountsSettingsPane, such as custom header text and links.
+var accountsSettingsPaneConfig = new AccountsSettingsPaneConfig(
+    headerText: "Custom header text", 
+    commands: new List<SettingsCommand>()
+    {
+        new SettingsCommand(settingsCommandId: settingsCommandId, label: "Click me!", handler: OnSettingsCommandInvoked)
+    });
+
+// Determine it the provider should automatically sign in or not. Default is true.
+// Set to false to delay silent sign in until TrySilentSignInAsync is called.
+bool autoSignIn = false;
+
+// Set the GlobalProvider with the extra configuration
+ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes, accountsSettingsPaneConfig, webAccountProviderConfig, autoSignIn);
 ```
 
 ## Prerequisite Windows Store Association in Visual Studio
