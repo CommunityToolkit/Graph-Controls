@@ -476,7 +476,7 @@ namespace CommunityToolkit.Uwp.Authentication
         /// </summary>
         /// <param name="headerText">The header text for the accounts settings pane.</param>
         /// <param name="commands">The SettingsCommand collection for the account settings pane.</param>
-        public AccountsSettingsPaneConfig(string headerText, IList<SettingsCommand> commands)
+        public AccountsSettingsPaneConfig(string headerText = null, IList<SettingsCommand> commands = null)
         {
             HeaderText = headerText;
             Commands = commands;
@@ -497,5 +497,16 @@ namespace CommunityToolkit.Uwp.Authentication
         /// Gets or sets the types of accounts providers that should be available to the user.
         /// </summary>
         public WebAccountProviderType WebAccountProviderType { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WebAccountProviderConfig"/> struct.
+        /// </summary>
+        /// <param name="webAccountProviderType">The types of accounts providers that should be available to the user.</param>
+        /// <param name="clientId">The registered ClientId. Required for AAD login.</param>
+        public WebAccountProviderConfig(WebAccountProviderType webAccountProviderType, string clientId = null)
+        {
+            WebAccountProviderType = webAccountProviderType;
+            ClientId = clientId;
+        }
     }
 }

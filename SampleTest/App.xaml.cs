@@ -29,7 +29,7 @@ namespace SampleTest
         }
 
         // Which provider should be used for authentication?
-        private readonly ProviderType _providerType = ProviderType.Windows;
+        private readonly ProviderType _providerType = ProviderType.Mock;
 
         // List of available authentication providers.
         private enum ProviderType
@@ -70,23 +70,18 @@ namespace SampleTest
 
                     // Windows provider
                     case ProviderType.Windows:
-                        ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes: scopes, autoSignIn: autoSignIn);
+                        ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes, autoSignIn: autoSignIn);
                         break;
                 }
             });
         }
-
-        //private void OnSettingsCommandInvoked(IUICommand command)
-        //{
-        //    System.Diagnostics.Debug.WriteLine("AccountsSettingsPane command invoked: " + command.Label);
-        //}
 
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override async void OnLaunched(LaunchActivatedEventArgs e)
+        protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
 
