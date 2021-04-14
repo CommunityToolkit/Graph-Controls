@@ -34,6 +34,12 @@ namespace CommunityToolkit.Uwp.Authentication
     /// </summary>
     public class WindowsProvider : BaseProvider
     {
+        /// <summary>
+        /// Gets the redirect uri value based on the current app callback uri.
+        /// Used for configuring in Azure app registration.
+        /// </summary>
+        public static string RedirectUri => string.Format("ms-appx-web://Microsoft.AAD.BrokerPlugIn/{0}", WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper());
+
         private const string AuthenticationHeaderScheme = "Bearer";
         private const string GraphResourcePropertyKey = "resource";
         private const string GraphResourcePropertyValue = "https://graph.microsoft.com";
@@ -80,14 +86,14 @@ namespace CommunityToolkit.Uwp.Authentication
         /// <param name="accountsSettingsPaneConfig">Configuration values for the AccountsSettingsPane.</param>
         /// <param name="webAccountProviderConfig">Configuration value for determining the available web account providers.</param>
         /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon instantionation.</param>
-        public WindowsProvider(string[] scopes = null, AccountsSettingsPaneConfig? accountsSettingsPaneConfig = null, WebAccountProviderConfig? webAccountProviderConfig = null, bool autoSignIn = true)
+        public WindowsProvider(string[] scopes = null, WebAccountProviderConfig? webAccountProviderConfig = null, AccountsSettingsPaneConfig? accountsSettingsPaneConfig = null, bool autoSignIn = true)
         {
             _scopes = scopes ?? DefaultScopes;
-            _accountsSettingsPaneConfig = accountsSettingsPaneConfig;
             _webAccountProviderConfig = webAccountProviderConfig ?? new WebAccountProviderConfig()
             {
                 WebAccountProviderType = DefaultWebAccountsProviderType,
             };
+            _accountsSettingsPaneConfig = accountsSettingsPaneConfig;
 
             _webAccount = null;
 
@@ -484,7 +490,7 @@ namespace CommunityToolkit.Uwp.Authentication
     public struct WebAccountProviderConfig
     {
         /// <summary>
-        /// Gets or sets the registered ClientId. Required for AAD login.
+        /// Gets or sets the registered ClientId. Required for AAD login and admin consent.
         /// </summary>
         public string ClientId { get; set; }
 
@@ -497,7 +503,7 @@ namespace CommunityToolkit.Uwp.Authentication
         /// Initializes a new instance of the <see cref="WebAccountProviderConfig"/> struct.
         /// </summary>
         /// <param name="webAccountProviderType">The types of accounts providers that should be available to the user.</param>
-        /// <param name="clientId">The registered ClientId. Required for AAD login.</param>
+        /// <param name="clientId">The registered ClientId. Required for AAD login and admin consent.</param>
         public WebAccountProviderConfig(WebAccountProviderType webAccountProviderType, string clientId = null)
         {
             WebAccountProviderType = webAccountProviderType;

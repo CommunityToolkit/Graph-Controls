@@ -7,7 +7,7 @@ It extends IProvider and uses the native AccountsSettingsPane APIs for login.
 
 ```CSharp
 // Provider config
-string clientId = "YOUR_CLIENT_ID_HERE"; // Not used with MSA login, but shown here for completeness.
+string clientId = "YOUR_CLIENT_ID_HERE"; // Only required for approving application or delegated permissions.
 string[] scopes = { "User.Read", "People.Read", "Calendars.Read", "Mail.Read" };
 bool autoSignIn = true;
 
@@ -24,7 +24,7 @@ void OnSettingsCommandInvoked(IUICommand command)
 }
 
 // Configure which types accounts should be available to choose from. The default is MSA, but AAD will come in the future.
-// ClientId is not used with MSA login, but shown here for completeness.
+// ClientId is only required for approving admin level consent.
 var webAccountProviderConfig = new WebAccountProviderConfig(WebAccountProviderType.MSA, clientId);
 
 // Configure details to present in the AccountsSettingsPane, such as custom header text and links.
@@ -44,7 +44,7 @@ ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes, accountsSe
 ```
 
 ## Prerequisite Windows Store Association in Visual Studio
-To get valid tokens and complete login, the app will need to be associated with the Microsoft Store.
+To get valid tokens and complete login, the app will need to be associated with the Microsoft Store. This will enable your app to authenticate consumer MSA accounts without any additional configuration.
 
 1. In Visual Studio Solution Explorer, right-click the UWP project, then select **Store -> Associate App with the Store...**
 
@@ -56,24 +56,58 @@ To get valid tokens and complete login, the app will need to be associated with 
 > You must have a Windows Developer account to use the WindowsProvider in your UWP app. You can [register a Microsoft developer account](https://developer.microsoft.com/store/register) if you don't already have one.
 
 
+## Prerequisite Configure Client Id in Partner Center
+
+If your product integrates with Azure AD and calls APIs that request either application permissions or delegated permissions that require administrator consent, you will also need to enter your Azure AD Client ID in Partner Center:
+
+https://partner.microsoft.com/en-us/dashboard/products/&lt;YOUR-APP-ID&gt;/administrator-consent
+
+This lets administrators who acquire the app for their organization grant consent for your product to act on behalf of all users in the tenant.
+
+> [!NOTE]
+> You only need to specify the client id if you need admin consent for delegated permissions from your AAD app registration. Simple authentication for public accounts does not require a client id or any additional configuration.
+
+> [!IMPORTANT]
+> Be sure to Register Client Id in Azure first following the guidance here: <https://docs.microsoft.com/azure/active-directory/develop/quickstart-register-app>
+>
+> After finishing the initial registration page, you will also need to add an additional redirect URI. Click on "Add a Redirect URI" and add the value retrieved from running `WindowsProvider.RedirectUri`. 
+> 
+> You'll also want to set the toggle to true for "Allow public client flows".
+> 
+> Then click "Save".
+
 ## Properties
 
 See IProvider for a full list of supported properties.
 
 | Property | Type | Description |
 | -- | -- | -- |
-| ClientId | string | Client Id obtained from Azure registration. |
-| Scopes | ScopeSet | Comma-delimited list of scopes to pre-authorize from user during authentication. |
+| Scopes | string[] | List of scopes to pre-authorize on the user during authentication. |
+| WebAccountsProviderConfig | WebAccountsProviderConfig | configuration values for determining the available web account providers. |
 | AccountsSettingsPaneConfig | AccountsSettingsPaneConfig | Configuration values for the AccountsSettingsPane, shown during authentication. |
 | RedirectUri | string | Static getter for retrieving a customized redirect uri to put in the Azure app registration. |
 
-### AccountsSettingsPane
+### WebAccountProviderConfig
+
+| Property | Type | Description |
+| -- | -- | -- |
+| ClientId | string | Client Id obtained from Azure registration. |
+| WebAccountsProviderType | WebAccountsProviderType | The types of accounts providers that should be available to the user. |
+
+### AccountsSettingsPaneConfig
 
 | Property | Type | Description |
 | -- | -- | -- |
 | HeaderText | string | Gets or sets the header text for the accounts settings pane. |
 | Commands | IList<SettingsCommand> | Gets or sets the SettingsCommand collection for the account settings pane. |
 
+## Enums
+
+### WebAccountProviderType
+
+| Value | Description |
+| -- | -- |
+| MSA | Enable authentication of public/consumer MSA accounts. |
 
 ## Methods
 
@@ -82,4 +116,4 @@ See IProvider for a full list of supported methods.
 | Method | Arguments | Returns | Description |
 | -- | -- | -- | -- |
 | GetTokenAsync | bool silentOnly = true | Task | Retrieve a token for the authenticated user. |
-| TrySilentLoginAsync | | Task<bool> | Try logging in silently, without prompts. |
+| TrySilentSignInAsync | | Task<bool> | Try logging in silently, without prompts. |
