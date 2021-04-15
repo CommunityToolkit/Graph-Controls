@@ -74,11 +74,8 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             // Clear the cache
             DeleteCache();
 
-            if (AutoSync)
-            {
-                // Delete the remote.
-                await Delete(UserId, Id);
-            }
+            // Delete the remote.
+            await Delete(UserId, Id);
         }
 
         /// <inheritdoc />
@@ -110,24 +107,39 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             {
                 // Get the remote
                 string fileName = Id;
-                IDictionary<string, object> remoteData = await Get<IDictionary<string, object>>(UserId, fileName);
-
-                if (remoteData.Keys.Count > 0)
+                IDictionary<string, object> remoteData = null;
+                try
                 {
-                    InitCache();
+                    remoteData = await Get<IDictionary<string, object>>(UserId, fileName);
+                }
+                catch
+                {
+                    // If get fails, we know the remote store does not exist.
                 }
 
                 bool needsUpdate = false;
-
-                // Update local cache with additions from remote
-                foreach (string key in remoteData.Keys.ToList())
+                if (remoteData != null)
                 {
-                    // Only insert new values. Existing keys should be overwritten on the remote.
-                    if (!Cache.ContainsKey(key))
+                    if (remoteData.Keys.Count > 0)
                     {
-                        Cache.Add(key, remoteData[key]);
-                        needsUpdate = true;
+                        InitCache();
                     }
+
+                    // Update local cache with additions from remote
+                    foreach (string key in remoteData.Keys.ToList())
+                    {
+                        // Only insert new values. Existing keys should be overwritten on the remote.
+                        if (!Cache.ContainsKey(key))
+                        {
+                            Cache.Add(key, remoteData[key]);
+                            needsUpdate = true;
+                        }
+                    }
+                }
+                else if (Cache != null && Cache.Count > 0)
+                {
+                    // The remote does not yet exist, and we have data to save.
+                    needsUpdate = true;
                 }
 
                 if (needsUpdate)
