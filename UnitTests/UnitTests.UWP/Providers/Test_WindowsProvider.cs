@@ -14,9 +14,6 @@ namespace UnitTests.UWP.Authentication
     [TestClass]
     public class Test_WindowsProvider : VisualUITestBase
     {
-        // Note: Authenticaiton will work without a client id, however any Graph requests will fail.
-        private const string ClientId = "";
-
         /// <summary>
         /// Create a new instance of the WindowsProvider and check that is has the proper default state.
         /// </summary>
@@ -24,7 +21,7 @@ namespace UnitTests.UWP.Authentication
         [TestMethod]
         public void Test_WindowsProvider_Default()
         {
-            WindowsProvider provider = new WindowsProvider(ClientId);
+            WindowsProvider provider = new WindowsProvider();
 
             Assert.AreEqual(ProviderState.SignedOut, provider.State);
         }
@@ -41,7 +38,7 @@ namespace UnitTests.UWP.Authentication
             await App.DispatcherQueue.EnqueueAsync(async () =>
             {
                 // Create the new provider.
-                WindowsProvider provider = new WindowsProvider(ClientId);
+                WindowsProvider provider = new WindowsProvider();
 
                 // Run logout to ensure that no cached users affect the test.
                 await provider.LogoutAsync();
