@@ -109,10 +109,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         {
             InitCache();
 
-            if (AutoSync)
-            {
-                await Create(UserId, Id);
-            }
+            await Create(UserId, Id);
         }
 
         /// <summary>
@@ -124,11 +121,8 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             // Delete the cache
             DeleteCache();
 
-            if (AutoSync)
-            {
-                // Delete the remote.
-                await Delete(UserId, Id);
-            }
+            // Delete the remote.
+            await Delete(UserId, Id);
         }
 
         /// <summary>
