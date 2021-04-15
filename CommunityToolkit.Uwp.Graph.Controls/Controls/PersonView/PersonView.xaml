@@ -65,7 +65,7 @@
                                        Visibility="{Binding ShowName, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}" />
                             <TextBlock Margin="4,0,2,0"
                                        FontSize="12"
-                                       Text="{Binding PersonDetails.EmailAddresses[0].Address, RelativeSource={RelativeSource TemplatedParent}}"
+                                       Text="{Binding PersonDetails.ScoredEmailAddresses[0].Address, RelativeSource={RelativeSource TemplatedParent}}"
                                        Visibility="{Binding ShowEmail, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}" />
                         </StackPanel>
                     </Grid>

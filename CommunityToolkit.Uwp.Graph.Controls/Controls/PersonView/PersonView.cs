@@ -27,8 +27,6 @@ namespace CommunityToolkit.Uwp.Graph.Controls
         /// </summary>
         public const string PersonQueryMe = "me";
 
-        private static readonly string[] RequiredScopes = new string[] { "user.readbasic.all" };
-
         private string _photoId = null;
 
         private string _defaultImageSource = "ms-appx:///Microsoft.Toolkit.Graph.Controls/Assets/person.png";
@@ -138,7 +136,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                     // TODO: Batch when API easier https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
                     try
                     {
-                        user = await provider.Graph().Users[UserId].Request().GetAsync();
+                        user = await provider.Graph().GetUserAsync(UserId);
                     }
                     catch
                     {
@@ -147,7 +145,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                     try
                     {
                         // TODO: Move to LoadImage based on previous call?
-                        await DecodeStreamAsync(await provider.Graph().Users[UserId].Photo.Content.Request().GetAsync());
+                        await DecodeStreamAsync(await provider.BetaGraph().GetUserPhoto(UserId));
                         _photoId = UserId;
                     }
                     catch
@@ -158,7 +156,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                 {
                     try
                     {
-                        user = await provider.Graph().Me.Request().GetAsync();
+                        user = await provider.Graph().GetMeAsync();
                     }
                     catch
                     {
@@ -166,7 +164,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
 
                     try
                     {
-                        await DecodeStreamAsync(await provider.Graph().Me.Photo.Content.Request().GetAsync());
+                        await DecodeStreamAsync(await provider.BetaGraph().GetMyPhotoAsync());
                         _photoId = user.Id;
                     }
                     catch
@@ -196,14 +194,14 @@ namespace CommunityToolkit.Uwp.Graph.Controls
             try
             {
                 // TODO: Better guarding
-                var graph = ProviderManager.Instance.GlobalProvider.Graph();
+                var graph = ProviderManager.Instance.GlobalProvider.BetaGraph();
 
                 if (!string.IsNullOrWhiteSpace(person.UserPrincipalName))
                 {
                     await DecodeStreamAsync(await graph.GetUserPhoto(person.UserPrincipalName));
                     _photoId = person.Id; // TODO: Only set on success for photo?
                 }
-                else if (!string.IsNullOrWhiteSpace(person.EmailAddresses.First().Address))
+                else if (!string.IsNullOrWhiteSpace(person.ScoredEmailAddresses.First().Address))
                 {
                     // TODO https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-person/mgt-person.ts#L174
                 }

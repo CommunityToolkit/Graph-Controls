@@ -13,6 +13,7 @@ namespace CommunityToolkit.Net.Graph.Extensions
     public static class ProviderExtensions
     {
         private static GraphServiceClient _client;
+        private static GraphServiceClient _betaClient;
 
         static ProviderExtensions()
         {
@@ -45,6 +46,25 @@ namespace CommunityToolkit.Net.Graph.Extensions
             }
 
             return _client;
+        }
+
+        /// <summary>
+        /// Lazily gets a GraphServiceClient instance based on the current GlobalProvider, but configured for the beta endpoint.
+        /// The beta client instance is cleared whenever the GlobalProvider changes.
+        /// </summary>
+        /// <param name="provider">The provider for authenticating Graph calls.</param>
+        /// <returns>A GraphServiceClient instance configured for the beta endpoint.</returns>
+        public static GraphServiceClient BetaGraph(this IProvider provider)
+        {
+            if (_betaClient == null && provider?.State == ProviderState.SignedIn)
+            {
+                _betaClient = new GraphServiceClient("https://graph.microsoft.com/beta", new DelegateAuthenticationProvider(async (requestMessage) =>
+                {
+                    await provider.AuthenticateRequestAsync(requestMessage);
+                }));
+            }
+
+            return _betaClient;
         }
     }
 }
