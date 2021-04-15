@@ -26,6 +26,7 @@
   </ItemGroup> 
 
 	<ItemGroup>
+    <PackageReference Include="Microsoft.Graph" Version="4.0.0-preview.1" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="7.0.0" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="7.0.0" />
   </ItemGroup>

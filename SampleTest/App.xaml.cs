@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Net.Authentication;
+using CommunityToolkit.Uwp.Authentication;
 using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -27,7 +28,6 @@ namespace SampleTest
             this.Suspending += OnSuspending;
         }
 
-
         // Which provider should be used for authentication?
         private readonly ProviderType _providerType = ProviderType.Mock;
 
@@ -35,35 +35,46 @@ namespace SampleTest
         private enum ProviderType
         {
             Mock,
-            Msal
+            Msal,
+            Windows
         }
 
         /// <summary>
         /// Initialize the global authentication provider.
         /// </summary>
-        private void InitializeGlobalProvider()
+        private async void InitializeGlobalProvider()
         {
             if (ProviderManager.Instance.GlobalProvider != null)
             {
                 return;
             }
 
-            // Provider config
-            string clientId = "YOUR_CLIENT_ID_HERE";
-            string[] scopes = { "User.Read", "User.ReadBasic.All", "People.Read", "Calendars.Read", "Mail.Read", "Group.Read.All", "ChannelMessage.Read.All" };
-
-            switch(_providerType)
+            await Window.Current.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                // Mock provider
-                case ProviderType.Mock:
-                    ProviderManager.Instance.GlobalProvider = new MockProvider(signedIn: true);
-                    break;
+                // Provider config
+                string clientId = "YOUR_CLIENT_ID_HERE";
+                string[] scopes = { "User.Read", "User.ReadBasic.All", "People.Read", "Calendars.Read", "Mail.Read", "Group.Read.All", "ChannelMessage.Read.All" };
+                bool autoSignIn = true;
 
-                //Msal provider
-                case ProviderType.Msal:
-                    ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, scopes);
-                    break;
-            }
+                switch (_providerType)
+                {
+                    // Mock provider
+                    case ProviderType.Mock:
+                        ProviderManager.Instance.GlobalProvider = new MockProvider(signedIn: autoSignIn);
+                        break;
+
+                    // Msal provider
+                    case ProviderType.Msal:
+                        ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId: clientId, scopes: scopes, autoSignIn: autoSignIn);
+                        break;
+
+                    // Windows provider
+                    case ProviderType.Windows:
+                        var webAccountProviderConfig = new WebAccountProviderConfig(WebAccountProviderType.MSA, clientId);
+                        ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes, webAccountProviderConfig: webAccountProviderConfig, autoSignIn: autoSignIn);
+                        break;
+                }
+            });
         }
 
         /// <summary>

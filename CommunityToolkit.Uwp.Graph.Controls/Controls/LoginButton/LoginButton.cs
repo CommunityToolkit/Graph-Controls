@@ -115,7 +115,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                 {
                     // https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-login/mgt-login.ts#L139
                     // TODO: Batch with photo request later? https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
-                    UserDetails = await provider.Graph().Me.Request().GetAsync();
+                    UserDetails = await provider.Graph().GetMeAsync();
                 }
                 catch (Exception e)
                 {

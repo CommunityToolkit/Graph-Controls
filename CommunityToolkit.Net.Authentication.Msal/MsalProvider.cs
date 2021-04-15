@@ -34,7 +34,8 @@ namespace CommunityToolkit.Net.Authentication
         /// <param name="clientId">Registered ClientId.</param>
         /// <param name="redirectUri">RedirectUri for auth response.</param>
         /// <param name="scopes">List of Scopes to initially request.</param>
-        public MsalProvider(string clientId, string[] scopes = null, string redirectUri = "https://login.microsoftonline.com/common/oauth2/nativeclient")
+        /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon instantionation.</param>
+        public MsalProvider(string clientId, string[] scopes = null, string redirectUri = "https://login.microsoftonline.com/common/oauth2/nativeclient", bool autoSignIn = true)
         {
             var client = PublicClientApplicationBuilder.Create(clientId)
                 .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
@@ -47,7 +48,10 @@ namespace CommunityToolkit.Net.Authentication
 
             Client = client;
 
-            _ = TrySilentSignInAsync();
+            if (autoSignIn)
+            {
+                Task.Run(TrySilentSignInAsync);
+            }
         }
 
         /// <inheritdoc/>

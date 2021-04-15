@@ -176,6 +176,10 @@
       <Project>{b2246169-0cd8-473c-aff6-172310e2c3f6}</Project>
       <Name>CommunityToolkit.Net.Graph</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CommunityToolkit.Uwp.Authentication\CommunityToolkit.Uwp.Authentication.csproj">
+      <Project>{2E4A708A-DF53-4863-B797-E14CDC6B90FA}</Project>
+      <Name>CommunityToolkit.Uwp.Authentication</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CommunityToolkit.Uwp.Graph.Controls\CommunityToolkit.Uwp.Graph.Controls.csproj">
       <Project>{42252ee8-7e68-428f-972b-6d2dd3aa12cc}</Project>
       <Name>CommunityToolkit.Uwp.Graph.Controls</Name>
