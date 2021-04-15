@@ -3,7 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Net.Authentication;
+using CommunityToolkit.Uwp.Authentication;
 using CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings;
+using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -19,7 +21,7 @@ namespace UnitTests.UWP.Helpers
         /// </summary>
         [TestCategory("RoamingSettings")]
         [TestMethod]
-        public async Task Test_MockProvider_Default()
+        public async Task Test_Default()
         {
             var tcs = new TaskCompletionSource<bool>();
 
@@ -28,7 +30,7 @@ namespace UnitTests.UWP.Helpers
                 try
                 {
                     string userId = "TestUserId";
-                    string dataStoreId = "RoamingData.json";
+                    string dataStoreId = "RoamingData";
                     IObjectSerializer serializer = new SystemSerializer();
 
                     IRoamingSettingsDataStore dataStore = new UserExtensionDataStore(userId, dataStoreId, serializer, false);
@@ -47,7 +49,7 @@ namespace UnitTests.UWP.Helpers
                 }
             };
 
-            PrepareMockProvider(test);
+            PrepareProvider(test);
 
             await tcs.Task;
         }
@@ -57,7 +59,7 @@ namespace UnitTests.UWP.Helpers
         /// </summary>
         [TestCategory("RoamingSettings")]
         [TestMethod]
-        public async Task Test_MockProvider_Sync()
+        public async Task Test_Sync()
         {
             var tcs = new TaskCompletionSource<bool>();
 
@@ -66,16 +68,32 @@ namespace UnitTests.UWP.Helpers
                 try
                 {
                     string userId = "TestUserId";
-                    string dataStoreId = "RoamingData.json";
+                    string dataStoreId = "RoamingData";
                     IObjectSerializer serializer = new SystemSerializer();
 
                     IRoamingSettingsDataStore dataStore = new UserExtensionDataStore(userId, dataStoreId, serializer, false);
 
-                    dataStore.SyncCompleted += (s, e) =>
+                    try
+                    {
+                        // Attempt to delete the remote first.
+                        await dataStore.Delete();
+                    }
+                    catch
+                    {
+                    }
+
+                    dataStore.SyncCompleted += async (s, e) =>
                     {
                         try
                         {
-                            Assert.Fail("Sync should have failed because we are using the MockProvider.");
+                            // Create a second instance to ensure that the Cache doesn't yield a false positive.
+                            IRoamingSettingsDataStore dataStore2 = new OneDriveDataStore(userId, dataStoreId, serializer, false);
+                            await dataStore2.Sync();
+
+                            var foo = dataStore.Read<string>("foo");
+                            Assert.AreEqual("bar", foo);
+
+                            tcs.SetResult(true);
                         }
                         catch (Exception ex)
                         {
@@ -87,8 +105,7 @@ namespace UnitTests.UWP.Helpers
                     {
                         try
                         {
-                            Assert.IsNull((s as IRoamingSettingsDataStore).Cache);
-                            tcs.SetResult(true);
+                            Assert.Fail("Sync Failed");
                         }
                         catch (Exception ex)
                         {
@@ -96,6 +113,7 @@ namespace UnitTests.UWP.Helpers
                         }
                     };
 
+                    dataStore.Save("foo", "bar");
                     await dataStore.Sync();
                 }
                 catch (Exception ex)
@@ -104,78 +122,34 @@ namespace UnitTests.UWP.Helpers
                 }
             }
 
-            PrepareMockProvider(test);
+            PrepareProvider(test);
 
-            await tcs.Task;
+            var result = await tcs.Task;
+            Assert.IsTrue(result);
         }
 
         /// <summary>
-        /// Test the dafault state of a new instance of the UserExtensionDataStore.
+        /// Create a new instance of IProvider and check that it has the proper default state, then execute the provided action.
         /// </summary>
-        [TestCategory("RoamingSettings")]
-        [TestMethod]
-        public async Task Test_MockProvider_CRUD()
+        private async void PrepareProvider(Action test)
         {
-            var tcs = new TaskCompletionSource<bool>();
-
-            async void test()
+            await App.DispatcherQueue.EnqueueAsync(async () =>
             {
-                try
+                var provider = new WindowsProvider(new string[] { "User.ReadWrite" }, autoSignIn: false);
+
+                ProviderManager.Instance.ProviderUpdated += (s, e) =>
                 {
-                    string userId = "TestUserId";
-                    string dataStoreId = "RoamingData.json";
-                    IObjectSerializer serializer = new SystemSerializer();
+                    var providerManager = s as ProviderManager;
+                    if (providerManager.GlobalProvider.State == ProviderState.SignedIn)
+                    {
+                        test.Invoke();
+                    }
+                };
 
-                    IRoamingSettingsDataStore dataStore = new UserExtensionDataStore(userId, dataStoreId, serializer, false);
+                ProviderManager.Instance.GlobalProvider = provider;
 
-                    Assert.IsNull(dataStore.Cache);
-                    await dataStore.Create();
-                    Assert.IsNotNull(dataStore.Cache);
-
-                    string key = "myKey";
-                    string value1 = "myFirstValue";
-                    string value2 = "mySecondValue";
-                    Assert.IsFalse(dataStore.KeyExists(key));
-
-                    dataStore.Save(key, value1);
-                    Assert.IsTrue(dataStore.KeyExists(key));
-                    Assert.AreEqual(value1, dataStore.Read<string>(key));
-
-                    dataStore.Save(key, value2);
-                    Assert.AreEqual(value2, dataStore.Read<string>(key));
-
-                    await dataStore.Delete();
-                    Assert.IsNull(dataStore.Cache);
-
-                    Assert.AreEqual(default, dataStore.Read<string>(key));
-
-                    tcs.SetResult(true);
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
-                }
-            };
-
-            PrepareMockProvider(test);
-
-            await tcs.Task;
-        }
-
-        /// <summary>
-        /// Create a new instance of the MockProvider and check that it has the proper default state, then execute the provided action.
-        /// </summary>
-        private void PrepareMockProvider(Action test)
-        {
-            ProviderManager.Instance.ProviderUpdated += (s, e) =>
-            {
-                var providerManager = s as ProviderManager;
-                if (providerManager.GlobalProvider.State == ProviderState.SignedIn)
-                {
-                    test.Invoke();
-                }
-            };
-            ProviderManager.Instance.GlobalProvider = new MockProvider();
+                await provider.LoginAsync();
+            });
         }
     }
 }

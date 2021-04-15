@@ -139,9 +139,17 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         {
             try
             {
-                // Get the remote
-                Extension extension = await GetExtensionForUser(UserId, Id);
-                IDictionary<string, object> remoteData = extension.AdditionalData;
+                IDictionary<string, object> remoteData = null;
+
+                try
+                {
+                    // Get the remote
+                    Extension extension = await GetExtensionForUser(UserId, Id);
+                    remoteData = extension.AdditionalData;
+                }
+                catch
+                {
+                }
 
                 if (Cache != null)
                 {
@@ -153,24 +161,24 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                             continue;
                         }
 
-                        if (!remoteData.ContainsKey(key) || !EqualityComparer<object>.Default.Equals(remoteData[key], Cache[key]))
+                        if (remoteData == null || !remoteData.ContainsKey(key) || !EqualityComparer<object>.Default.Equals(remoteData[key], Cache[key]))
                         {
                             Save(key, Cache[key]);
                         }
                     }
                 }
 
-                if (remoteData.Keys.Count > 0)
+                if (remoteData != null)
                 {
                     InitCache();
-                }
 
-                // Update local cache with additions from remote
-                foreach (string key in remoteData.Keys.ToList())
-                {
-                    if (!Cache.ContainsKey(key))
+                    // Update local cache with additions from remote
+                    foreach (string key in remoteData.Keys.ToList())
                     {
-                        Cache.Add(key, remoteData[key]);
+                        if (!Cache.ContainsKey(key))
+                        {
+                            Cache.Add(key, remoteData[key]);
+                        }
                     }
                 }
 
