@@ -68,13 +68,22 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <returns>A task.</returns>
         public abstract Task Delete();
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines whether a setting already exists.
+        /// </summary>
+        /// <param name="key">Key of the setting (that contains object).</param>
+        /// <returns>True if a value exists.</returns>
         public bool KeyExists(string key)
         {
             return Cache != null && Cache.ContainsKey(key);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines whether a setting already exists in composite.
+        /// </summary>
+        /// <param name="compositeKey">Key of the composite (that contains settings).</param>
+        /// <param name="key"> Key of the setting (that contains object).</param>
+        /// <returns>True if a value exists.</returns>
         public bool KeyExists(string compositeKey, string key)
         {
             if (KeyExists(compositeKey))
@@ -89,7 +98,13 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             return false;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Retrieves a single item by its key.
+        /// </summary>
+        /// <param name="key">Key of the object.</param>
+        /// <param name="default">Default value of the object.</param>
+        /// <typeparam name="T">Type of object retrieved.</typeparam>
+        /// <returns>The T object.</returns>
         public T Read<T>(string key, T @default = default)
         {
             if (Cache != null && Cache.TryGetValue(key, out object value))
@@ -108,7 +123,14 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             return @default;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Retrieves a single item by its key in composite.
+        /// </summary>
+        /// <param name="compositeKey"> Key of the composite (that contains settings).</param>
+        /// <param name="key">Key of the object.</param>
+        /// <param name="default">Default value of the object.</param>
+        /// <typeparam name="T">Type of object retrieved.</typeparam>
+        /// <returns>The T object.</returns>
         public T Read<T>(string compositeKey, string key, T @default = default)
         {
             if (Cache != null)
@@ -135,7 +157,12 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             return @default;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Saves a single item by its key.
+        /// </summary>
+        /// <param name="key">Key of the value saved.</param>
+        /// <param name="value">Object to save.</param>
+        /// <typeparam name="T">Type of object saved.</typeparam>
         public void Save<T>(string key, T value)
         {
             InitCache();
@@ -159,7 +186,16 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Saves a group of items by its key in a composite. This method should be considered
+        /// for objects that do not exceed 8k bytes during the lifetime of the application
+        /// (refers to Microsoft.Toolkit.Uwp.Helpers.IObjectStorageHelper.SaveFileAsync``1(System.String,``0)
+        /// for complex/large objects) and for groups of settings which need to be treated
+        /// in an atomic way.
+        /// </summary>
+        /// <param name="compositeKey">Key of the composite (that contains settings)</param>
+        /// <param name="values">Objects to save.</param>
+        /// <typeparam name="T">Type of object saved.</typeparam>
         public void Save<T>(string compositeKey, IDictionary<string, T> values)
         {
             InitCache();
@@ -208,13 +244,28 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines whether a file already exists.
+        /// </summary>
+        /// <param name="filePath">Key of the file (that contains object).</param>
+        /// <returns>True if a value exists.</returns>
         public abstract Task<bool> FileExistsAsync(string filePath);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Retrieves an object from a file.
+        /// </summary>
+        /// <param name="filePath">Path to the file that contains the object.</param>
+        /// <param name="default">Default value of the object.</param>
+        /// <typeparam name="T">Type of object retrieved.</typeparam>
+        /// <returns>Waiting task until completion with the object in the file.</returns>
         public abstract Task<T> ReadFileAsync<T>(string filePath, T @default = default);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Saves an object inside a file.
+        /// </summary>
+        /// <param name="filePath">Path to the file that will contain the object.</param>
+        /// <param name="value">Object to save.</param>
+        /// <returns>Waiting task until completion.</returns>
         public abstract Task<StorageFile> SaveFileAsync<T>(string filePath, T value);
 
         /// <inheritdoc />
