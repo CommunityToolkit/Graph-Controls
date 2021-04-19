@@ -193,7 +193,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// for complex/large objects) and for groups of settings which need to be treated
         /// in an atomic way.
         /// </summary>
-        /// <param name="compositeKey">Key of the composite (that contains settings).</param>
+        /// <param name="compositeKey">Key of the composite (that contains settings)</param>
         /// <param name="values">Objects to save.</param>
         /// <typeparam name="T">Type of object saved.</typeparam>
         public void Save<T>(string compositeKey, IDictionary<string, T> values)
@@ -265,7 +265,6 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// </summary>
         /// <param name="filePath">Path to the file that will contain the object.</param>
         /// <param name="value">Object to save.</param>
-        /// <typeparam name="T">Type of object saved.</typeparam>
         /// <returns>Waiting task until completion.</returns>
         public abstract Task<StorageFile> SaveFileAsync<T>(string filePath, T value);
 
