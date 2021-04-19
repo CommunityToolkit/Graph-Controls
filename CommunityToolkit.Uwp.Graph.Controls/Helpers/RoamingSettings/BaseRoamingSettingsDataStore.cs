@@ -16,22 +16,34 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
     /// </summary>
     public abstract class BaseRoamingSettingsDataStore : IRoamingSettingsDataStore
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets an event handler for when a remote data sync completes successfully.
+        /// </summary>
         public EventHandler SyncCompleted { get; set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets an event handler for when a remote data sync fails.
+        /// </summary>
         public EventHandler SyncFailed { get; set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets a value indicating whether the values should immediately sync or not.
+        /// </summary>
         public bool AutoSync { get; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the id of the data store.
+        /// </summary>
         public string Id { get; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the id of the target user.
+        /// </summary>
         public string UserId { get; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets access to the key/value pairs cache directly.
+        /// </summary>
         public IDictionary<string, object> Cache { get; private set; }
 
         /// <summary>
@@ -269,7 +281,10 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <returns>Waiting task until completion.</returns>
         public abstract Task<StorageFile> SaveFileAsync<T>(string filePath, T value);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Syncronize the internal cache with the remote storage endpoint.
+        /// </summary>
+        /// <returns>A Task.</returns>
         public abstract Task Sync();
 
         /// <summary>
