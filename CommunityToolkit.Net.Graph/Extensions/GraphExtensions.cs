@@ -12,7 +12,7 @@ namespace CommunityToolkit.Net.Graph.Extensions
     public static partial class GraphExtensions
     {
         /// <summary>
-        /// Simple method to convert a <see cref="User"/> to a <see cref="Person"/> with basic common properties like <see cref="Entity.Id"/>, <see cref="User.DisplayName"/>, <see cref="Person.EmailAddresses"/>, <see cref="User.GivenName"/>, and <see cref="User.Surname"/> intact.
+        /// Simple method to convert a <see cref="User"/> to a <see cref="Person"/> with basic common properties like <see cref="Entity.Id"/>, <see cref="User.DisplayName"/>, <see cref="Person.ScoredEmailAddresses"/>, <see cref="User.GivenName"/>, and <see cref="User.Surname"/> intact.
         /// </summary>
         /// <param name="user"><see cref="User"/> instance to convert.</param>
         /// <returns>A new basic <see cref="Person"/> representation of that user.</returns>
