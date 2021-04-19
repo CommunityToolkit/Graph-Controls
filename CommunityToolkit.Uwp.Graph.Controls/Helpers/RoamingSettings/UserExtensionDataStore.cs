@@ -15,7 +15,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
     /// <summary>
     /// An IObjectStorageHelper implementation using open extensions on the Graph User for storing key/value pairs.
     /// </summary>
-    public class UserExtensionDataStore : BaseRoamingSettingsDataStore
+    public class UserExtensionDataStore : IRoamingSettingsDataStore
     {
         /// <summary>
         /// Retrieve the value from Graph User extensions and cast the response to the provided type.
@@ -93,57 +93,80 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
 
         private static readonly IList<string> ReservedKeys = new List<string> { "responseHeaders", "statusCode", "@odata.context" };
 
+        /// <inheritdoc />
+        public EventHandler SyncCompleted { get; set; }
+
+        /// <inheritdoc />
+        public EventHandler SyncFailed { get; set; }
+
+        /// <inheritdoc />
+        public bool AutoSync { get; }
+
+        /// <inheritdoc />
+        public string Id { get; }
+
+        /// <inheritdoc />
+        public string UserId { get; }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> Cache { get; private set; }
+
+        private readonly IObjectSerializer _serializer;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UserExtensionDataStore"/> class.
         /// </summary>
         public UserExtensionDataStore(string userId, string extensionId, IObjectSerializer objectSerializer, bool autoSync = true)
-            : base(userId, extensionId, objectSerializer, autoSync)
         {
+            AutoSync = autoSync;
+            Id = extensionId;
+            UserId = userId;
+            _serializer = objectSerializer;
+
+            Cache = null;
         }
 
         /// <summary>
         /// Creates a new roaming settings extension on the Graph User.
         /// </summary>
         /// <returns>The newly created Extension object.</returns>
-        public override async Task Create()
+        public async Task Create()
         {
             InitCache();
 
-            await Create(UserId, Id);
+            if (AutoSync)
+            {
+                await Create(UserId, Id);
+            }
         }
 
         /// <summary>
         /// Deletes the roamingSettings extension from the Graph User.
         /// </summary>
         /// <returns>A void task.</returns>
-        public override async Task Delete()
+        public async Task Delete()
         {
-            // Delete the cache
-            DeleteCache();
+            // Clear the cache
+            Cache = null;
 
-            // Delete the remote.
-            await Delete(UserId, Id);
+            if (AutoSync)
+            {
+                // Delete the remote.
+                await Delete(UserId, Id);
+            }
         }
 
         /// <summary>
         /// Update the remote extension to match the local cache and retrieve any new keys. Any existing remote values are replaced.
         /// </summary>
         /// <returns>The freshly synced user extension.</returns>
-        public override async Task Sync()
+        public async Task Sync()
         {
             try
             {
-                IDictionary<string, object> remoteData = null;
-
-                try
-                {
-                    // Get the remote
-                    Extension extension = await GetExtensionForUser(UserId, Id);
-                    remoteData = extension.AdditionalData;
-                }
-                catch
-                {
-                }
+                // Get the remote
+                Extension extension = await GetExtensionForUser(UserId, Id);
+                IDictionary<string, object> remoteData = extension.AdditionalData;
 
                 if (Cache != null)
                 {
@@ -155,24 +178,24 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                             continue;
                         }
 
-                        if (remoteData == null || !remoteData.ContainsKey(key) || !EqualityComparer<object>.Default.Equals(remoteData[key], Cache[key]))
+                        if (!remoteData.ContainsKey(key) || !EqualityComparer<object>.Default.Equals(remoteData[key], Cache[key]))
                         {
                             Save(key, Cache[key]);
                         }
                     }
                 }
 
-                if (remoteData != null)
+                if (remoteData.Keys.Count > 0)
                 {
                     InitCache();
+                }
 
-                    // Update local cache with additions from remote
-                    foreach (string key in remoteData.Keys.ToList())
+                // Update local cache with additions from remote
+                foreach (string key in remoteData.Keys.ToList())
+                {
+                    if (!Cache.ContainsKey(key))
                     {
-                        if (!Cache.ContainsKey(key))
-                        {
-                            Cache.Add(key, remoteData[key]);
-                        }
+                        Cache.Add(key, remoteData[key]);
                     }
                 }
 
@@ -185,21 +208,169 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         }
 
         /// <inheritdoc />
-        public override Task<bool> FileExistsAsync(string filePath)
+        public virtual bool KeyExists(string key)
+        {
+            return Cache != null && Cache.ContainsKey(key);
+        }
+
+        /// <inheritdoc />
+        public bool KeyExists(string compositeKey, string key)
+        {
+            if (KeyExists(compositeKey))
+            {
+                ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
+                if (composite != null)
+                {
+                    return composite.ContainsKey(key);
+                }
+            }
+
+            return false;
+        }
+
+        /// <inheritdoc />
+        public T Read<T>(string key, T @default = default)
+        {
+            if (Cache != null && Cache.TryGetValue(key, out object value))
+            {
+                try
+                {
+                    return _serializer.Deserialize<T>((string)value);
+                }
+                catch
+                {
+                    // Primitive types can't be deserialized.
+                    return (T)Convert.ChangeType(value, typeof(T));
+                }
+            }
+
+            return @default;
+        }
+
+        /// <inheritdoc />
+        public T Read<T>(string compositeKey, string key, T @default = default)
+        {
+            if (Cache != null)
+            {
+                ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
+                if (composite != null)
+                {
+                    object value = composite[key];
+                    if (value != null)
+                    {
+                        try
+                        {
+                            return _serializer.Deserialize<T>((string)value);
+                        }
+                        catch
+                        {
+                            // Primitive types can't be deserialized.
+                            return (T)Convert.ChangeType(value, typeof(T));
+                        }
+                    }
+                }
+            }
+
+            return @default;
+        }
+
+        /// <inheritdoc />
+        public void Save<T>(string key, T value)
+        {
+            InitCache();
+
+            // Skip serialization for primitives.
+            if (typeof(T) == typeof(object) || Type.GetTypeCode(typeof(T)) != TypeCode.Object)
+            {
+                // Update the cache
+                Cache[key] = value;
+            }
+            else
+            {
+                // Update the cache
+                Cache[key] = _serializer.Serialize(value);
+            }
+
+            if (AutoSync)
+            {
+                // Update the remote
+                Task.Run(() => Set(UserId, Id, key, value));
+            }
+        }
+
+        /// <inheritdoc />
+        public void Save<T>(string compositeKey, IDictionary<string, T> values)
+        {
+            InitCache();
+
+            if (KeyExists(compositeKey))
+            {
+                ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
+
+                foreach (KeyValuePair<string, T> setting in values.ToList())
+                {
+                    if (composite.ContainsKey(setting.Key))
+                    {
+                        composite[setting.Key] = _serializer.Serialize(setting.Value);
+                    }
+                    else
+                    {
+                        composite.Add(setting.Key, _serializer.Serialize(setting.Value));
+                    }
+                }
+
+                // Update the cache
+                Cache[compositeKey] = composite;
+
+                if (AutoSync)
+                {
+                    // Update the remote
+                    Task.Run(() => Set(UserId, Id, compositeKey, composite));
+                }
+            }
+            else
+            {
+                ApplicationDataCompositeValue composite = new ApplicationDataCompositeValue();
+                foreach (KeyValuePair<string, T> setting in values.ToList())
+                {
+                    composite.Add(setting.Key, _serializer.Serialize(setting.Value));
+                }
+
+                // Update the cache
+                Cache[compositeKey] = composite;
+
+                if (AutoSync)
+                {
+                    // Update the remote
+                    Task.Run(() => Set(UserId, Id, compositeKey, composite));
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public Task<bool> FileExistsAsync(string filePath)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public override Task<T> ReadFileAsync<T>(string filePath, T @default = default)
+        public Task<T> ReadFileAsync<T>(string filePath, T @default = default)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public override Task<StorageFile> SaveFileAsync<T>(string filePath, T value)
+        public Task<StorageFile> SaveFileAsync<T>(string filePath, T value)
         {
             throw new NotImplementedException();
+        }
+
+        private void InitCache()
+        {
+            if (Cache == null)
+            {
+                Cache = new Dictionary<string, object>();
+            }
         }
     }
 }
