@@ -38,22 +38,34 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// </summary>
         public IRoamingSettingsDataStore DataStore { get; private set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets an event handler for when a remote data sync completes successfully.
+        /// </summary>
         public EventHandler SyncCompleted { get; set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets an event handler for when a remote data sync fails.
+        /// </summary>
         public EventHandler SyncFailed { get; set; }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets a value indicating whether the values should immediately sync or not.
+        /// </summary>
         public bool AutoSync => DataStore.AutoSync;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets access to the key/value pairs cache directly.
+        /// </summary>
         public IDictionary<string, object> Cache => DataStore.Cache;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the id of the data store.
+        /// </summary>
         public string Id => DataStore.Id;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the id of the target user.
+        /// </summary>
         public string UserId => DataStore.UserId;
 
         /// <summary>
@@ -128,31 +140,83 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             set => DataStore.Save(key, value);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines whether a file already exists.
+        /// </summary>
+        /// <param name="filePath">Key of the file (that contains object).</param>
+        /// <returns>True if a value exists.</returns>
         public Task<bool> FileExistsAsync(string filePath) => DataStore.FileExistsAsync(filePath);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines whether a setting already exists.
+        /// </summary>
+        /// <param name="key">Key of the setting (that contains object).</param>
+        /// <returns>True if a value exists.</returns>
         public bool KeyExists(string key) => DataStore.KeyExists(key);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines whether a setting already exists in composite.
+        /// </summary>
+        /// <param name="compositeKey">Key of the composite (that contains settings).</param>
+        /// <param name="key"> Key of the setting (that contains object).</param>
+        /// <returns>True if a value exists.</returns>
         public bool KeyExists(string compositeKey, string key) => DataStore.KeyExists(compositeKey, key);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Retrieves a single item by its key.
+        /// </summary>
+        /// <param name="key">Key of the object.</param>
+        /// <param name="default">Default value of the object.</param>
+        /// <typeparam name="T">Type of object retrieved.</typeparam>
+        /// <returns>The T object.</returns>
         public T Read<T>(string key, T @default = default) => DataStore.Read<T>(key, @default);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Retrieves a single item by its key in composite.
+        /// </summary>
+        /// <param name="compositeKey"> Key of the composite (that contains settings).</param>
+        /// <param name="key">Key of the object.</param>
+        /// <param name="default">Default value of the object.</param>
+        /// <typeparam name="T">Type of object retrieved.</typeparam>
+        /// <returns>The T object.</returns>
         public T Read<T>(string compositeKey, string key, T @default = default) => DataStore.Read(compositeKey, key, @default);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Retrieves an object from a file.
+        /// </summary>
+        /// <param name="filePath">Path to the file that contains the object.</param>
+        /// <param name="default">Default value of the object.</param>
+        /// <typeparam name="T">Type of object retrieved.</typeparam>
+        /// <returns>Waiting task until completion with the object in the file.</returns>
         public Task<T> ReadFileAsync<T>(string filePath, T @default = default) => DataStore.ReadFileAsync(filePath, @default);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Saves a single item by its key.
+        /// </summary>
+        /// <param name="key">Key of the value saved.</param>
+        /// <param name="value">Object to save.</param>
+        /// <typeparam name="T">Type of object saved.</typeparam>
         public void Save<T>(string key, T value) => DataStore.Save<T>(key, value);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Saves a group of items by its key in a composite. This method should be considered
+        /// for objects that do not exceed 8k bytes during the lifetime of the application
+        /// (refers to Microsoft.Toolkit.Uwp.Helpers.IObjectStorageHelper.SaveFileAsync``1(System.String,``0)
+        /// for complex/large objects) and for groups of settings which need to be treated
+        /// in an atomic way.
+        /// </summary>
+        /// <param name="compositeKey">Key of the composite (that contains settings).</param>
+        /// <param name="values">Objects to save.</param>
+        /// <typeparam name="T">Type of object saved.</typeparam>
         public void Save<T>(string compositeKey, IDictionary<string, T> values) => DataStore.Save<T>(compositeKey, values);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Saves an object inside a file.
+        /// </summary>
+        /// <param name="filePath">Path to the file that will contain the object.</param>
+        /// <param name="value">Object to save.</param>
+        /// <typeparam name="T">Type of object saved.</typeparam>
+        /// <returns>Waiting task until completion.</returns>
         public Task<StorageFile> SaveFileAsync<T>(string filePath, T value) => DataStore.SaveFileAsync<T>(filePath, value);
 
         /// <summary>
