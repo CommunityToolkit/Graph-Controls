@@ -184,19 +184,35 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// File object storage is not supported by open extensions.
+        /// </summary>
+        /// <param name="filePath">Key of the file (that contains object).</param>
+        /// <returns>True if a value exists.</returns>
         public override Task<bool> FileExistsAsync(string filePath)
         {
             throw new NotImplementedException();
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// File object storage is not supported by open extensions.
+        /// </summary>
+        /// <param name="filePath">Path to the file that contains the object.</param>
+        /// <param name="default">Default value of the object.</param>
+        /// <typeparam name="T">Type of object retrieved.</typeparam>
+        /// <returns>Waiting task until completion with the object in the file.</returns>
         public override Task<T> ReadFileAsync<T>(string filePath, T @default = default)
         {
             throw new NotImplementedException();
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// File object storage is not supported by open extensions.
+        /// </summary>
+        /// <param name="filePath">Path to the file that will contain the object.</param>
+        /// <param name="value">Object to save.</param>
+        /// <typeparam name="T">Type of object saved.</typeparam>
+        /// <returns>Waiting task until completion.</returns>
         public override Task<StorageFile> SaveFileAsync<T>(string filePath, T value)
         {
             throw new NotImplementedException();
