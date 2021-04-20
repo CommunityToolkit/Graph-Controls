@@ -7,7 +7,7 @@ It extends IProvider and uses the native AccountsSettingsPane APIs for login.
 
 ```CSharp
 // Provider config
-string clientId = "YOUR_CLIENT_ID_HERE"; // Only required for approving application or delegated permissions.
+string clientId = "YOUR_CLIENT_ID_HERE"; // AAD configuration is only required for admin-level consent.
 string[] scopes = { "User.Read", "People.Read", "Calendars.Read", "Mail.Read" };
 bool autoSignIn = true;
 
