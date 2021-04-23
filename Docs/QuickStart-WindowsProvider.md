@@ -14,12 +14,8 @@ Here are some quick setup steps for using the WindowsProvider in a UWP app:
 // Find this line in the OnLaunched method and add the following code immediately after.
 Window.Current.Activate();
  
-// Configure the GlobalProvider on the UI thread
-await Window.Current.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-{
-    string[] scopes = new string[] { "User.Read"};
-    ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes);
-});
+string[] scopes = new string[] { "User.Read", "Tasks.ReadWrite" };
+ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes);
 ```
  
 4. Add a LoginButton to the MainPage.xaml
