@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
@@ -109,15 +110,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         {
             if (Cache != null && Cache.TryGetValue(key, out object value))
             {
-                try
-                {
-                    return Serializer.Deserialize<T>((string)value);
-                }
-                catch
-                {
-                    // Primitive types can't be deserialized.
-                    return (T)Convert.ChangeType(value, typeof(T));
-                }
+                return DeserializeValue<T>(value);
             }
 
             return @default;
@@ -141,15 +134,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                     object value = composite[key];
                     if (value != null)
                     {
-                        try
-                        {
-                            return Serializer.Deserialize<T>((string)value);
-                        }
-                        catch
-                        {
-                            // Primitive types can't be deserialized.
-                            return (T)Convert.ChangeType(value, typeof(T));
-                        }
+                        return DeserializeValue<T>(value);
                     }
                 }
             }
@@ -167,17 +152,8 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         {
             InitCache();
 
-            // Skip serialization for primitives.
-            if (typeof(T) == typeof(object) || Type.GetTypeCode(typeof(T)) != TypeCode.Object)
-            {
-                // Update the cache
-                Cache[key] = value;
-            }
-            else
-            {
-                // Update the cache
-                Cache[key] = Serializer.Serialize(value);
-            }
+            // Update the cache
+            Cache[key] = SerializeValue(value);
 
             if (AutoSync)
             {
@@ -200,19 +176,24 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         {
             InitCache();
 
+            var type = typeof(T);
+            var typeInfo = type.GetTypeInfo();
+
             if (KeyExists(compositeKey))
             {
                 ApplicationDataCompositeValue composite = (ApplicationDataCompositeValue)Cache[compositeKey];
 
                 foreach (KeyValuePair<string, T> setting in values.ToList())
                 {
+                    string key = setting.Key;
+                    object value = SerializeValue(setting.Value);
                     if (composite.ContainsKey(setting.Key))
                     {
-                        composite[setting.Key] = Serializer.Serialize(setting.Value);
+                        composite[key] = value;
                     }
                     else
                     {
-                        composite.Add(setting.Key, Serializer.Serialize(setting.Value));
+                        composite.Add(key, value);
                     }
                 }
 
@@ -230,7 +211,9 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 ApplicationDataCompositeValue composite = new ApplicationDataCompositeValue();
                 foreach (KeyValuePair<string, T> setting in values.ToList())
                 {
-                    composite.Add(setting.Key, Serializer.Serialize(setting.Value));
+                    string key = setting.Key;
+                    object value = SerializeValue(setting.Value);
+                    composite.Add(key, value);
                 }
 
                 // Update the cache
@@ -289,6 +272,43 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         protected void DeleteCache()
         {
             Cache = null;
+        }
+
+        /// <summary>
+        /// Use the serializer to serialize a value appropriately for the type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        protected T DeserializeValue<T>(object value)
+        {
+            try
+            {
+                return Serializer.Deserialize<T>((string)value);
+            }
+            catch
+            {
+                // Primitive types can't be deserialized.
+                return (T)Convert.ChangeType(value, typeof(T));
+            }
+        }
+
+        private object SerializeValue<T>(T value)
+        {
+            var type = typeof(T);
+            var typeInfo = type.GetTypeInfo();
+
+            // Skip serialization for primitives.
+            if (typeInfo.IsPrimitive || type == typeof(string))
+            {
+                // Update the cache
+                return value;
+            }
+            else
+            {
+                // Update the cache
+                return Serializer.Serialize(value);
+            }
         }
     }
 }
