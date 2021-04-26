@@ -51,7 +51,9 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         {
             Stream stream = await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(fileWithExt).Content.Request().GetAsync();
 
-            return Graph.HttpProvider.Serializer.DeserializeObject<T>(stream);
+            string streamContents = new StreamReader(stream).ReadToEnd();
+
+            return Graph.HttpProvider.Serializer.DeserializeObject<T>(streamContents);
         }
 
         /// <summary>
