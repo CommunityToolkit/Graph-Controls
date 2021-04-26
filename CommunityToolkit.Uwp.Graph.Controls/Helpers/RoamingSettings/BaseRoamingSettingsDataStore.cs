@@ -275,11 +275,11 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         }
 
         /// <summary>
-        /// Use the serializer to serialize a value appropriately for the type.
+        /// Use the serializer to deserialize a value appropriately for the type.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The type of object expected.</typeparam>
+        /// <param name="value">The value to deserialize.</param>
+        /// <returns>An object of type T.</returns>
         protected T DeserializeValue<T>(object value)
         {
             try
@@ -293,7 +293,13 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             }
         }
 
-        private object SerializeValue<T>(T value)
+        /// <summary>
+        /// Use the serializer to serialize a value appropriately for the type.
+        /// </summary>
+        /// <typeparam name="T">The type of object being serialized.</typeparam>
+        /// <param name="value">The object to serialize.</param>
+        /// <returns>The serialized object.</returns>
+        protected object SerializeValue<T>(T value)
         {
             var type = typeof(T);
             var typeInfo = type.GetTypeInfo();
