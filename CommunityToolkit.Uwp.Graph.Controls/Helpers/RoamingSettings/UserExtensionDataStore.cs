@@ -107,8 +107,6 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <returns>The newly created Extension object.</returns>
         public override async Task Create()
         {
-            InitCache();
-
             await Create(UserId, Id);
         }
 
@@ -119,7 +117,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         public override async Task Delete()
         {
             // Delete the cache
-            DeleteCache();
+            Cache.Clear();
 
             // Delete the remote.
             await Delete(UserId, Id);
@@ -164,8 +162,6 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
 
                 if (remoteData != null)
                 {
-                    InitCache();
-
                     // Update local cache with additions from remote
                     foreach (string key in remoteData.Keys.ToList())
                     {

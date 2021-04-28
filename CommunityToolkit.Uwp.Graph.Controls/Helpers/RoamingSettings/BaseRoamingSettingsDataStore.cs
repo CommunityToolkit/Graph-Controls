@@ -33,7 +33,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         public string UserId { get; }
 
         /// <inheritdoc />
-        public IDictionary<string, object> Cache { get; private set; }
+        public IDictionary<string, object> Cache { get; private set; } = new Dictionary<string, object>();
 
         /// <summary>
         /// Gets an object serializer for converting objects in the data store.
@@ -53,8 +53,6 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             Id = dataStoreId;
             UserId = userId;
             Serializer = objectSerializer;
-
-            Cache = null;
         }
 
         /// <summary>
@@ -76,7 +74,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <returns>True if a value exists.</returns>
         public bool KeyExists(string key)
         {
-            return Cache != null && Cache.ContainsKey(key);
+            return Cache?.ContainsKey(key) ?? false;
         }
 
         /// <summary>
@@ -150,8 +148,6 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <typeparam name="T">Type of object saved.</typeparam>
         public void Save<T>(string key, T value)
         {
-            InitCache();
-
             // Update the cache
             Cache[key] = SerializeValue(value);
 
@@ -174,8 +170,6 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <typeparam name="T">Type of object saved.</typeparam>
         public void Save<T>(string compositeKey, IDictionary<string, T> values)
         {
-            InitCache();
-
             var type = typeof(T);
             var typeInfo = type.GetTypeInfo();
 
@@ -256,22 +250,11 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         public abstract Task Sync();
 
         /// <summary>
-        /// Initialize the internal cache.
-        /// </summary>
-        protected void InitCache()
-        {
-            if (Cache == null)
-            {
-                Cache = new Dictionary<string, object>();
-            }
-        }
-
-        /// <summary>
         /// Delete the internal cache.
         /// </summary>
         protected void DeleteCache()
         {
-            Cache = null;
+            Cache.Clear();
         }
 
         /// <summary>

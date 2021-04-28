@@ -65,8 +65,6 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public override Task Create()
         {
-            InitCache();
-
             return Task.CompletedTask;
         }
 
@@ -74,7 +72,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         public override async Task Delete()
         {
             // Clear the cache
-            DeleteCache();
+            Cache.Clear();
 
             // Delete the remote.
             await Delete(UserId, Id);
@@ -122,11 +120,6 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 bool needsUpdate = false;
                 if (remoteData != null)
                 {
-                    if (remoteData.Keys.Count > 0)
-                    {
-                        InitCache();
-                    }
-
                     // Update local cache with additions from remote
                     foreach (string key in remoteData.Keys.ToList())
                     {
@@ -138,7 +131,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                         }
                     }
                 }
-                else if (Cache != null && Cache.Count > 0)
+                else if (Cache.Count > 0)
                 {
                     // The remote does not yet exist, and we have data to save.
                     needsUpdate = true;

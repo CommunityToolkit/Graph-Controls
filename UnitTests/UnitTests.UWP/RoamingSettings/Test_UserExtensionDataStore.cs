@@ -37,7 +37,7 @@ namespace UnitTests.UWP.Helpers
 
                     // Evaluate the default state is as expected
                     Assert.IsFalse(dataStore.AutoSync);
-                    Assert.IsNull(dataStore.Cache);
+                    Assert.IsNotNull(dataStore.Cache);
                     Assert.AreEqual(dataStoreId, dataStore.Id);
                     Assert.AreEqual(userId, dataStore.UserId);
 
