@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Net.Authentication;
 using CommunityToolkit.Net.Graph.Extensions;
 using Microsoft.Graph;
+using Microsoft.Toolkit.Uwp.Helpers;
 
 namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
 {
@@ -34,9 +35,9 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// </summary>
         /// <typeparam name="T">The type of object to save.</typeparam>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public static async Task<DriveItem> Update<T>(string userId, string fileWithExt, T fileContents)
+        public static async Task<DriveItem> Update<T>(string userId, string fileWithExt, T fileContents, IObjectSerializer serializer)
         {
-            var json = Graph.HttpProvider.Serializer.SerializeObject(fileContents);
+            var json = serializer.Serialize(fileContents) as string;
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
             return await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(fileWithExt).Content.Request().PutAsync<DriveItem>(stream);
@@ -47,13 +48,13 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// </summary>
         /// <typeparam name="T">The type of object to return.</typeparam>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public static async Task<T> Retrieve<T>(string userId, string fileWithExt)
+        public static async Task<T> Retrieve<T>(string userId, string fileWithExt, IObjectSerializer serializer)
         {
             Stream stream = await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(fileWithExt).Content.Request().GetAsync();
 
             string streamContents = new StreamReader(stream).ReadToEnd();
 
-            return Graph.HttpProvider.Serializer.DeserializeObject<T>(streamContents);
+            return serializer.Deserialize<T>(streamContents);
         }
 
         /// <summary>
