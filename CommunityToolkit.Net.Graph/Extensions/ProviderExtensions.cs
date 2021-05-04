@@ -26,6 +26,7 @@ namespace CommunityToolkit.Net.Graph.Extensions
             if (e.Reason == ProviderManagerChangedState.ProviderChanged || !(providerManager.GlobalProvider?.State == ProviderState.SignedIn))
             {
                 _client = null;
+                _betaClient = null;
             }
         }
 

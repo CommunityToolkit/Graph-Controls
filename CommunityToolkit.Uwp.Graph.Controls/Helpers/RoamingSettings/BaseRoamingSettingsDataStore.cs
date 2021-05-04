@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
@@ -32,7 +33,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         public string UserId { get; }
 
         /// <inheritdoc />
-        public IDictionary<string, object> Cache { get; private set; }
+        public IDictionary<string, object> Cache { get; private set; } = new Dictionary<string, object>();
 
         /// <summary>
         /// Gets an object serializer for converting objects in the data store.
@@ -52,8 +53,6 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
             Id = dataStoreId;
             UserId = userId;
             Serializer = objectSerializer;
-
-            Cache = null;
         }
 
         /// <summary>
@@ -75,7 +74,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <returns>True if a value exists.</returns>
         public bool KeyExists(string key)
         {
-            return Cache != null && Cache.ContainsKey(key);
+            return Cache?.ContainsKey(key) ?? false;
         }
 
         /// <summary>
@@ -109,15 +108,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         {
             if (Cache != null && Cache.TryGetValue(key, out object value))
             {
-                try
-                {
-                    return Serializer.Deserialize<T>((string)value);
-                }
-                catch
-                {
-                    // Primitive types can't be deserialized.
-                    return (T)Convert.ChangeType(value, typeof(T));
-                }
+                return DeserializeValue<T>(value);
             }
 
             return @default;
@@ -141,15 +132,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                     object value = composite[key];
                     if (value != null)
                     {
-                        try
-                        {
-                            return Serializer.Deserialize<T>((string)value);
-                        }
-                        catch
-                        {
-                            // Primitive types can't be deserialized.
-                            return (T)Convert.ChangeType(value, typeof(T));
-                        }
+                        return DeserializeValue<T>(value);
                     }
                 }
             }
@@ -165,19 +148,8 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <typeparam name="T">Type of object saved.</typeparam>
         public void Save<T>(string key, T value)
         {
-            InitCache();
-
-            // Skip serialization for primitives.
-            if (typeof(T) == typeof(object) || Type.GetTypeCode(typeof(T)) != TypeCode.Object)
-            {
-                // Update the cache
-                Cache[key] = value;
-            }
-            else
-            {
-                // Update the cache
-                Cache[key] = Serializer.Serialize(value);
-            }
+            // Update the cache
+            Cache[key] = SerializeValue(value);
 
             if (AutoSync)
             {
@@ -198,7 +170,8 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <typeparam name="T">Type of object saved.</typeparam>
         public void Save<T>(string compositeKey, IDictionary<string, T> values)
         {
-            InitCache();
+            var type = typeof(T);
+            var typeInfo = type.GetTypeInfo();
 
             if (KeyExists(compositeKey))
             {
@@ -206,13 +179,15 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
 
                 foreach (KeyValuePair<string, T> setting in values.ToList())
                 {
+                    string key = setting.Key;
+                    object value = SerializeValue(setting.Value);
                     if (composite.ContainsKey(setting.Key))
                     {
-                        composite[setting.Key] = Serializer.Serialize(setting.Value);
+                        composite[key] = value;
                     }
                     else
                     {
-                        composite.Add(setting.Key, Serializer.Serialize(setting.Value));
+                        composite.Add(key, value);
                     }
                 }
 
@@ -230,7 +205,9 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 ApplicationDataCompositeValue composite = new ApplicationDataCompositeValue();
                 foreach (KeyValuePair<string, T> setting in values.ToList())
                 {
-                    composite.Add(setting.Key, Serializer.Serialize(setting.Value));
+                    string key = setting.Key;
+                    object value = SerializeValue(setting.Value);
+                    composite.Add(key, value);
                 }
 
                 // Update the cache
@@ -273,22 +250,54 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         public abstract Task Sync();
 
         /// <summary>
-        /// Initialize the internal cache.
-        /// </summary>
-        protected void InitCache()
-        {
-            if (Cache == null)
-            {
-                Cache = new Dictionary<string, object>();
-            }
-        }
-
-        /// <summary>
         /// Delete the internal cache.
         /// </summary>
         protected void DeleteCache()
         {
-            Cache = null;
+            Cache.Clear();
+        }
+
+        /// <summary>
+        /// Use the serializer to deserialize a value appropriately for the type.
+        /// </summary>
+        /// <typeparam name="T">The type of object expected.</typeparam>
+        /// <param name="value">The value to deserialize.</param>
+        /// <returns>An object of type T.</returns>
+        protected T DeserializeValue<T>(object value)
+        {
+            try
+            {
+                return Serializer.Deserialize<T>((string)value);
+            }
+            catch
+            {
+                // Primitive types can't be deserialized.
+                return (T)Convert.ChangeType(value, typeof(T));
+            }
+        }
+
+        /// <summary>
+        /// Use the serializer to serialize a value appropriately for the type.
+        /// </summary>
+        /// <typeparam name="T">The type of object being serialized.</typeparam>
+        /// <param name="value">The object to serialize.</param>
+        /// <returns>The serialized object.</returns>
+        protected object SerializeValue<T>(T value)
+        {
+            var type = typeof(T);
+            var typeInfo = type.GetTypeInfo();
+
+            // Skip serialization for primitives.
+            if (typeInfo.IsPrimitive || type == typeof(string))
+            {
+                // Update the cache
+                return value;
+            }
+            else
+            {
+                // Update the cache
+                return Serializer.Serialize(value);
+            }
         }
     }
 }

@@ -22,10 +22,11 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <typeparam name="T">The type of object to retrieve.</typeparam>
         /// <param name="userId">The id of the target Graph user.</param>
         /// <param name="fileName">The name of the file.</param>
+        /// <param name="serializer">An object serializer for handling deserialization.</param>
         /// <returns>The deserialized file contents.</returns>
-        public static async Task<T> Get<T>(string userId, string fileName)
+        public static async Task<T> Get<T>(string userId, string fileName, IObjectSerializer serializer)
         {
-            return await OneDriveDataSource.Retrieve<T>(userId, fileName);
+            return await OneDriveDataSource.Retrieve<T>(userId, fileName, serializer);
         }
 
         /// <summary>
@@ -35,10 +36,11 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <param name="userId">The id of the target Graph user.</param>
         /// <param name="fileName">The name of the file.</param>
         /// <param name="fileContents">The object to store.</param>
+        /// <param name="serializer">An object serializer for handling serialization.</param>
         /// <returns>A task.</returns>
-        public static async Task Set<T>(string userId, string fileName, T fileContents)
+        public static async Task Set<T>(string userId, string fileName, T fileContents, IObjectSerializer serializer)
         {
-            await OneDriveDataSource.Update<T>(userId, fileName, fileContents);
+            await OneDriveDataSource.Update(userId, fileName, fileContents, serializer);
         }
 
         /// <summary>
@@ -63,8 +65,6 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public override Task Create()
         {
-            InitCache();
-
             return Task.CompletedTask;
         }
 
@@ -72,7 +72,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         public override async Task Delete()
         {
             // Clear the cache
-            DeleteCache();
+            Cache.Clear();
 
             // Delete the remote.
             await Delete(UserId, Id);
@@ -81,20 +81,20 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public override async Task<bool> FileExistsAsync(string filePath)
         {
-            var roamingSettings = await Get<object>(UserId, Id);
+            var roamingSettings = await Get<object>(UserId, Id, Serializer);
             return roamingSettings != null;
         }
 
         /// <inheritdoc />
         public override async Task<T> ReadFileAsync<T>(string filePath, T @default = default)
         {
-            return await Get<T>(UserId, filePath) ?? @default;
+            return await Get<T>(UserId, filePath, Serializer) ?? @default;
         }
 
         /// <inheritdoc />
         public override async Task<StorageFile> SaveFileAsync<T>(string filePath, T value)
         {
-            await Set(UserId, filePath, value);
+            await Set(UserId, filePath, value, Serializer);
 
             // Can't convert DriveItem to StorageFile, so we return null instead.
             return null;
@@ -110,7 +110,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 IDictionary<string, object> remoteData = null;
                 try
                 {
-                    remoteData = await Get<IDictionary<string, object>>(UserId, fileName);
+                    remoteData = await Get<IDictionary<string, object>>(UserId, fileName, Serializer);
                 }
                 catch
                 {
@@ -120,11 +120,6 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 bool needsUpdate = false;
                 if (remoteData != null)
                 {
-                    if (remoteData.Keys.Count > 0)
-                    {
-                        InitCache();
-                    }
-
                     // Update local cache with additions from remote
                     foreach (string key in remoteData.Keys.ToList())
                     {
@@ -136,7 +131,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                         }
                     }
                 }
-                else if (Cache != null && Cache.Count > 0)
+                else if (Cache.Count > 0)
                 {
                     // The remote does not yet exist, and we have data to save.
                     needsUpdate = true;
@@ -145,7 +140,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 if (needsUpdate)
                 {
                     // Send updates for local values, overwriting the remote.
-                    await Set(UserId, fileName, Cache);
+                    await Set(UserId, fileName, Cache, Serializer);
                 }
 
                 SyncCompleted?.Invoke(this, new EventArgs());
