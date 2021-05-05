@@ -17,7 +17,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
     /// </summary>
     internal static class OneDriveDataSource
     {
-        private static GraphServiceClient Graph => ProviderManager.Instance.GlobalProvider?.Graph();
+        private static GraphServiceClient Graph => ProviderManager.Instance.GlobalProvider?.GetClient();
 
         // Create a new file.
         // This fails, because OneDrive doesn't like empty files. Use Update instead.

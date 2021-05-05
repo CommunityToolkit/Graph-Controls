@@ -72,7 +72,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
                 throw new InvalidOperationException("The GlobalProvider must be set and signed in to create a new RoamingSettingsHelper for the current user.");
             }
 
-            var me = await provider.Graph().Me.Request().GetAsync();
+            var me = await provider.GetClient().Me.Request().GetAsync();
             return new RoamingSettingsHelper(me.Id, dataStore, syncOnInit, autoSync, serializer);
         }
 

@@ -41,16 +41,19 @@ namespace SampleTest
                 && sender is ProviderManager pm 
                 && pm.GlobalProvider.State == ProviderState.SignedIn)
             {
-                CalendarViewBuilder = ProviderManager.Instance.GlobalProvider.Graph().Me.CalendarView;
-                MessagesBuilder = ProviderManager.Instance.GlobalProvider.Graph().Me.Messages;
-                PlannerTasksBuilder = ProviderManager.Instance.GlobalProvider.Graph().Me.Planner.Tasks;
-                TeamsChannelMessagesBuilder = ProviderManager.Instance.GlobalProvider.Graph().Teams["02bd9fd6-8f93-4758-87c3-1fb73740a315"].Channels["19:d0bba23c2fc8413991125a43a54cc30e@thread.skype"].Messages;
+                var graphClient = ProviderManager.Instance.GlobalProvider.GetClient();
+
+                CalendarViewBuilder = graphClient.Me.CalendarView;
+                MessagesBuilder = graphClient.Me.Messages;
+                PlannerTasksBuilder = graphClient.Me.Planner.Tasks;
+                TeamsChannelMessagesBuilder = graphClient.Teams["02bd9fd6-8f93-4758-87c3-1fb73740a315"].Channels["19:d0bba23c2fc8413991125a43a54cc30e@thread.skype"].Messages;
             }
             else
             {
                 CalendarViewBuilder = null;
                 MessagesBuilder = null;
                 PlannerTasksBuilder = null;
+                TeamsChannelMessagesBuilder = null;
             }
         }
 

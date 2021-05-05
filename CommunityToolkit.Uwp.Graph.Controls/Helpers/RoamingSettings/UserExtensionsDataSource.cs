@@ -17,7 +17,7 @@ namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
     /// </summary>
     internal static class UserExtensionsDataSource
     {
-        private static GraphServiceClient Graph => ProviderManager.Instance.GlobalProvider?.Graph();
+        private static GraphServiceClient Graph => ProviderManager.Instance.GlobalProvider?.GetClient();
 
         /// <summary>
         /// Retrieve an extension object for a user.

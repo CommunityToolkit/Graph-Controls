@@ -136,7 +136,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                     // TODO: Batch when API easier https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
                     try
                     {
-                        user = await provider.Graph().GetUserAsync(UserId);
+                        user = await provider.GetClient().GetUserAsync(UserId);
                     }
                     catch
                     {
@@ -145,7 +145,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                     try
                     {
                         // TODO: Move to LoadImage based on previous call?
-                        await DecodeStreamAsync(await provider.BetaGraph().GetUserPhoto(UserId));
+                        await DecodeStreamAsync(await provider.GetBetaClient().GetUserPhoto(UserId));
                         _photoId = UserId;
                     }
                     catch
@@ -156,7 +156,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                 {
                     try
                     {
-                        user = await provider.Graph().GetMeAsync();
+                        user = await provider.GetClient().GetMeAsync();
                     }
                     catch
                     {
@@ -164,7 +164,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
 
                     try
                     {
-                        await DecodeStreamAsync(await provider.BetaGraph().GetMyPhotoAsync());
+                        await DecodeStreamAsync(await provider.GetBetaClient().GetMyPhotoAsync());
                         _photoId = user.Id;
                     }
                     catch
@@ -179,7 +179,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
             }
             else if (PersonDetails == null && !string.IsNullOrWhiteSpace(PersonQuery))
             {
-                var people = await provider.Graph().FindPersonAsync(PersonQuery);
+                var people = await provider.GetClient().FindPersonAsync(PersonQuery);
                 if (people != null && people.Count > 0)
                 {
                     var person = people.FirstOrDefault();
@@ -194,7 +194,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
             try
             {
                 // TODO: Better guarding
-                var graph = ProviderManager.Instance.GlobalProvider.BetaGraph();
+                var graph = ProviderManager.Instance.GlobalProvider.GetBetaClient();
 
                 if (!string.IsNullOrWhiteSpace(person.UserPrincipalName))
                 {

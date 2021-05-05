@@ -43,7 +43,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
             using (args.GetDeferral())
             {
                 // Try and convert typed text to people
-                var graph = ProviderManager.Instance.GlobalProvider.Graph();
+                var graph = ProviderManager.Instance.GlobalProvider.GetClient();
                 if (graph != null)
                 {
                     args.Item = (await graph.FindPersonAsync(args.TokenText)).CurrentPage.FirstOrDefault();
@@ -76,7 +76,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                     _typeTimer.Debounce(
                     async () =>
                     {
-                        var graph = ProviderManager.Instance.GlobalProvider.Graph();
+                        var graph = ProviderManager.Instance.GlobalProvider.GetClient();
                         if (graph != null)
                         {
                             // If empty, will clear out

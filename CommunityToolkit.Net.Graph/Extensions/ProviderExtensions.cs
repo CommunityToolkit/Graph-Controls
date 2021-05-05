@@ -36,7 +36,7 @@ namespace CommunityToolkit.Net.Graph.Extensions
         /// </summary>
         /// <param name="provider">The provider for authenticating Graph calls.</param>
         /// <returns>A GraphServiceClient instance.</returns>
-        public static GraphServiceClient Graph(this IProvider provider)
+        public static GraphServiceClient GetClient(this IProvider provider)
         {
             if (_client == null && provider?.State == ProviderState.SignedIn)
             {
@@ -55,7 +55,7 @@ namespace CommunityToolkit.Net.Graph.Extensions
         /// </summary>
         /// <param name="provider">The provider for authenticating Graph calls.</param>
         /// <returns>A GraphServiceClient instance configured for the beta endpoint.</returns>
-        public static GraphServiceClient BetaGraph(this IProvider provider)
+        public static GraphServiceClient GetBetaClient(this IProvider provider)
         {
             if (_betaClient == null && provider?.State == ProviderState.SignedIn)
             {
