@@ -64,7 +64,7 @@ namespace CommunityToolkit.Net.Graph.Extensions
                     .Users
                     .Request()
                     .Filter($"startswith(displayName, '{query}') or startswith(givenName, '{query}') or startswith(surname, '{query}') or startswith(mail, '{query}') or startswith(userPrincipalName, '{query}')")
-                    .WithScopes(new string[] { "user.readbasic.all" })
+                    ////.WithScopes(new string[] { "user.readbasic.all" })
                     .GetAsync();
             }
             catch
@@ -89,7 +89,7 @@ namespace CommunityToolkit.Net.Graph.Extensions
                     .Photo
                     .Content
                     .Request()
-                    .WithScopes(new string[] { "user.readbasic.all" })
+                    ////.WithScopes(new string[] { "user.readbasic.all" })
                     .GetAsync();
             }
             catch
@@ -113,7 +113,7 @@ namespace CommunityToolkit.Net.Graph.Extensions
                     .Photo
                     .Content
                     .Request()
-                    .WithScopes(new string[] { "user.read" })
+                    ////.WithScopes(new string[] { "user.read" })
                     .GetAsync();
             }
             catch

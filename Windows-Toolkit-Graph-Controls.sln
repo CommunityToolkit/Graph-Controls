@@ -37,6 +37,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.UWP", "UnitTests\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{EACBCDF3-8CCC-4A30-87E9-75FCA815831E}"
 	ProjectSection(SolutionItems) = preProject
+		Docs\QuickStart-WindowsProvider.md = Docs\QuickStart-WindowsProvider.md
 		Docs\WindowsProvider.md = Docs\WindowsProvider.md
 	EndProjectSection
 EndProject

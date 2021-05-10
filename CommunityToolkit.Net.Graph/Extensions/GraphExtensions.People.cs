@@ -27,7 +27,7 @@ namespace CommunityToolkit.Net.Graph.Extensions
                     .People
                     .Request()
                     .Search(query)
-                    .WithScopes(new string[] { "people.read" })
+                    ////.WithScopes(new string[] { "people.read" })
                     .GetAsync();
             }
             catch
