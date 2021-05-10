@@ -2,11 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Graph;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media.Imaging;
@@ -73,42 +68,6 @@ namespace CommunityToolkit.Uwp.Graph.Controls
             DependencyProperty.Register(nameof(UserId), typeof(string), typeof(PersonView), new PropertyMetadata(null, QueryPropertyChanged));
 
         /// <summary>
-        /// Gets or sets a value indicating whether the user's name should be displayed.
-        /// </summary>
-        public bool ShowName
-        {
-            get { return (bool)GetValue(ShowNameProperty); }
-            set { SetValue(ShowNameProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="ShowName"/> dependency property.
-        /// </summary>
-        /// <returns>
-        /// The identifier for the <see cref="ShowName"/> dependency property.
-        /// </returns>
-        public static readonly DependencyProperty ShowNameProperty =
-            DependencyProperty.Register(nameof(ShowName), typeof(bool), typeof(PersonView), new PropertyMetadata(false, ShowDisplayPropertiesChanged));
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the user's email address should be displayed.
-        /// </summary>
-        public bool ShowEmail
-        {
-            get { return (bool)GetValue(ShowEmailProperty); }
-            set { SetValue(ShowEmailProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="ShowEmail"/> dependency property.
-        /// </summary>
-        /// <returns>
-        /// The identifier for the <see cref="ShowEmail"/> dependency property.
-        /// </returns>
-        public static readonly DependencyProperty ShowEmailProperty =
-            DependencyProperty.Register(nameof(ShowEmail), typeof(bool), typeof(PersonView), new PropertyMetadata(false, ShowDisplayPropertiesChanged));
-
-        /// <summary>
         /// Gets or sets the photo of the user to be displayed.
         /// </summary>
         public BitmapImage UserPhoto
@@ -145,7 +104,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
             DependencyProperty.Register(nameof(Initials), typeof(string), typeof(PersonView), new PropertyMetadata(string.Empty));
 
         /// <summary>
-        /// Gets a value indicating whether the image has expanded because both <see cref="ShowName"/> and <see cref="ShowEmail"/> are enabled.
+        /// Gets a value indicating whether the image has expanded based on the PersonViewType.
         /// </summary>
         public bool IsLargeImage
         {
@@ -161,5 +120,20 @@ namespace CommunityToolkit.Uwp.Graph.Controls
         /// </returns>
         public static readonly DependencyProperty IsLargeImageProperty =
             DependencyProperty.Register(nameof(IsLargeImage), typeof(bool), typeof(PersonView), new PropertyMetadata(false));
+
+        /// <summary>
+        /// Gets or sets the type of details to display in the PersonView part of the template.
+        /// </summary>
+        public PersonViewType PersonViewType
+        {
+            get => (PersonViewType)GetValue(PersonViewTypeProperty);
+            set => SetValue(PersonViewTypeProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="PersonViewType"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PersonViewTypeProperty =
+            DependencyProperty.Register(nameof(PersonViewType), typeof(PersonViewType), typeof(PersonView), new PropertyMetadata(PersonViewType.TwoLines, PersonViewTypePropertiesChanged));
     }
 }

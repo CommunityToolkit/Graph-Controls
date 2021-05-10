@@ -17,7 +17,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:LoginButton">
-                    <!--  TODO: In Future Use DropDownButton  -->
+                    <!-- TODO: In Future Use DropDownButton  -->
                     <Button x:Name="PART_LoginButton"
                             Margin="{TemplateBinding Padding}"
                             Background="{TemplateBinding Background}"
@@ -26,18 +26,17 @@
                             IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}, RelativeSource={RelativeSource TemplatedParent}}">
                         <StackPanel Orientation="Horizontal">
                             <local:PersonView PersonDetails="{Binding UserDetails, Converter={StaticResource UserToPersonConverter}, RelativeSource={RelativeSource TemplatedParent}}"
-                                              ShowName="True" />
-                            <TextBlock VerticalAlignment="Center"
+                                              PersonViewType="OneLine" />
+                            <TextBlock Text="Sign In"
+                                       VerticalAlignment="Center"
                                        Visibility="{Binding UserDetails, Converter={StaticResource InverseNullToVisibilityConverter}, RelativeSource={RelativeSource TemplatedParent}}">
-                                Sign In
                             </TextBlock>
                         </StackPanel>
                         <FlyoutBase.AttachedFlyout>
                             <Flyout>
                                 <StackPanel>
                                     <local:PersonView PersonDetails="{Binding UserDetails, Converter={StaticResource UserToPersonConverter}, RelativeSource={RelativeSource TemplatedParent}}"
-                                                      ShowEmail="True"
-                                                      ShowName="True" />
+                                                      PersonViewType="TwoLines" />
                                     <HyperlinkButton x:Name="PART_SignOutButton">Sign Out</HyperlinkButton>
                                 </StackPanel>
                             </Flyout>

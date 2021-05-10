@@ -74,11 +74,11 @@ namespace CommunityToolkit.Uwp.Graph.Controls
             }
         }
 
-        private static void ShowDisplayPropertiesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void PersonViewTypePropertiesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is PersonView pv)
             {
-                pv.IsLargeImage = pv.ShowName && pv.ShowEmail;
+                pv.IsLargeImage = pv.PersonViewType == PersonViewType.Avatar;
             }
         }
 

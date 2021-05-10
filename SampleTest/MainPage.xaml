@@ -155,7 +155,7 @@
                                                         <StackPanel>
                                                             <wgt:PersonView Margin="-4"
                                                                             PersonQuery="{x:Bind Sender.EmailAddress.Address}"
-                                                                            ShowName="True" />
+                                                                            PersonViewType="OneLine" />
                                                             <TextBlock Padding="0"
                                                                        Style="{StaticResource BaseTextBlockStyle}"
                                                                        Text="{x:Bind Subject}" />

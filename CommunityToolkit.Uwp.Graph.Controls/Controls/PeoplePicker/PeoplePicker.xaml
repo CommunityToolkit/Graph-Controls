@@ -23,8 +23,7 @@
             <Setter.Value>
                 <DataTemplate>
                     <local:PersonView PersonDetails="{Binding}"
-                                      ShowEmail="True"
-                                      ShowName="True" />
+                                      PersonViewType="TwoLines" />
                 </DataTemplate>
             </Setter.Value>
         </Setter>
@@ -32,7 +31,7 @@
             <Setter.Value>
                 <DataTemplate>
                     <local:PersonView PersonDetails="{Binding}"
-                                      ShowName="True" />
+                                      PersonViewType="OneLine" />
                 </DataTemplate>
             </Setter.Value>
         </Setter>
