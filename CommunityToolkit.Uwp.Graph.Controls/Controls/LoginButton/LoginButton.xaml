@@ -2,12 +2,12 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
                     xmlns:graphconverters="using:CommunityToolkit.Uwp.Graph.Controls.Converters"
-                    xmlns:local="using:CommunityToolkit.Uwp.Graph.Controls">
+                    xmlns:local="using:CommunityToolkit.Uwp.Graph.Controls" xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls">
 
     <converters:BoolNegationConverter x:Key="InverseBoolConverter" />
-    <converters:EmptyObjectToObjectConverter x:Key="InverseNullToVisibilityConverter"
-                                             EmptyValue="Visible"
-                                             NotEmptyValue="Collapsed" />
+    <converters:EmptyObjectToObjectConverter x:Key="NullToProviderStateConverter"
+                                             EmptyValue="SignedOut"
+                                             NotEmptyValue="SignedIn" />
     <graphconverters:UserToPersonConverter x:Key="UserToPersonConverter" />
 
     <Style TargetType="local:LoginButton">
@@ -24,20 +24,30 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}, RelativeSource={RelativeSource TemplatedParent}}">
-                        <StackPanel Orientation="Horizontal">
-                            <local:PersonView PersonDetails="{Binding UserDetails, Converter={StaticResource UserToPersonConverter}, RelativeSource={RelativeSource TemplatedParent}}"
-                                              PersonViewType="OneLine" />
-                            <TextBlock Text="Sign In"
-                                       VerticalAlignment="Center"
-                                       Visibility="{Binding UserDetails, Converter={StaticResource InverseNullToVisibilityConverter}, RelativeSource={RelativeSource TemplatedParent}}">
-                            </TextBlock>
-                        </StackPanel>
+
+                        <!-- Grid matches the height of the PersonView in OneLine view.
+                             TODO: Define the height values in PersonView so we can reference them here instead or hard-coding. -->
+                        <Grid MinHeight="32">
+                            <controls:SwitchPresenter VerticalContentAlignment="Center" Value="{Binding UserDetails, Converter={StaticResource NullToProviderStateConverter}, RelativeSource={RelativeSource TemplatedParent}}">
+                                <controls:Case Value="SignedOut" 
+                                               IsDefault="True">
+                                    <TextBlock Text="Sign In" />
+                                </controls:Case>
+                                <controls:Case Value="SignedIn">
+                                    <local:PersonView PersonDetails="{Binding UserDetails, Converter={StaticResource UserToPersonConverter}, RelativeSource={RelativeSource TemplatedParent}}"
+                                                      PersonViewType="OneLine" />
+                                </controls:Case>
+                            </controls:SwitchPresenter>
+                        </Grid>
+
                         <FlyoutBase.AttachedFlyout>
                             <Flyout>
                                 <StackPanel>
                                     <local:PersonView PersonDetails="{Binding UserDetails, Converter={StaticResource UserToPersonConverter}, RelativeSource={RelativeSource TemplatedParent}}"
                                                       PersonViewType="TwoLines" />
-                                    <HyperlinkButton x:Name="PART_SignOutButton">Sign Out</HyperlinkButton>
+                                    <HyperlinkButton x:Name="PART_SignOutButton">
+                                        <TextBlock Text="Sign Out" />
+                                    </HyperlinkButton>
                                 </StackPanel>
                             </Flyout>
                         </FlyoutBase.AttachedFlyout>

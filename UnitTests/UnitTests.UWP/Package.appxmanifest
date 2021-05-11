@@ -6,14 +6,14 @@
   IgnorableNamespaces="uap mp">
 
   <Identity Name="c089351a-4c91-4cb0-afa7-b976ac715456"
-            Publisher="CN=shweaver"
+            Publisher="CN=Microsoft"
             Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="c089351a-4c91-4cb0-afa7-b976ac715456" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>UnitTests.UWP</DisplayName>
-    <PublisherDisplayName>WCT</PublisherDisplayName>
+    <PublisherDisplayName>Microsoft</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -40,7 +40,7 @@
     </Application>
   </Applications>
   <Capabilities>
-    <Capability Name="internetClientServer" />
-    <Capability Name="privateNetworkClientServer" />
+      <Capability Name="internetClientServer" />
+      <Capability Name="privateNetworkClientServer" />
   </Capabilities>
 </Package>

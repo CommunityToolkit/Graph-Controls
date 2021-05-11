@@ -7,14 +7,14 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="54b2f5a5-a4ed-4158-b816-d7a6a07d85e5"
+    Name="97f8520a-f3a2-4dce-baae-c6e5b6165d6d"
     Publisher="CN=Microsoft"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="54b2f5a5-a4ed-4158-b816-d7a6a07d85e5" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="97f8520a-f3a2-4dce-baae-c6e5b6165d6d" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>SampleTest</DisplayName>
+    <DisplayName>UwpWindowsProviderSample</DisplayName>
     <PublisherDisplayName>Microsoft</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -30,12 +30,12 @@
   <Applications>
     <Application Id="App"
       Executable="$targetnametoken$.exe"
-      EntryPoint="SampleTest.App">
+      EntryPoint="UwpWindowsProviderSample.App">
       <uap:VisualElements
-        DisplayName="WCT Graph Controls Sample"
+        DisplayName="UwpWindowsProviderSample"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="SampleTest"
+        Description="UwpWindowsProviderSample"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
