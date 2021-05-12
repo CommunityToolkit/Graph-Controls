@@ -14,7 +14,7 @@ namespace WpfMsalProviderSample
         {
             if (ProviderManager.Instance.GlobalProvider == null)
             {
-                string clientId = "728f3423-bd1e-4424-aa2b-0ac50751c03a";
+                string clientId = "YOUR-CLIENT-ID-HERE";
                 string[] scopes = new string[] { "User.Read" };
                 string redirectUri = "http://localhost";
                 ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, scopes, redirectUri);
