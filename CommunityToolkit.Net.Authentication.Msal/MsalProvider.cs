@@ -50,7 +50,7 @@ namespace CommunityToolkit.Net.Authentication
 
             if (autoSignIn)
             {
-                Task.Run(TrySilentSignInAsync);
+                _ = TrySilentSignInAsync();
             }
         }
 

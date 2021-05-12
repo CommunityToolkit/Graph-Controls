@@ -3,13 +3,12 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Net.Authentication;
-using CommunityToolkit.Uwp.Authentication;
 using Windows.ApplicationModel.Activation;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace UwpWindowsProviderSample
+namespace UwpMsalProviderSample
 {
     sealed partial class App : Application
     {
@@ -19,12 +18,7 @@ namespace UwpWindowsProviderSample
         }
 
         /// <summary>
-        /// Sets the global IProvider instance for authentication using native Windows Account Manager APIs.
-        /// 
-        /// Don't forget to associate your app with the store as well. The WindowsProvider leverages the 
-        /// default app registration that comes with store assocation, no clientId required!
-        /// 
-        /// For now only consumer MSA accounts supported, however organizational AAD account support is planned and coming soon.
+        /// Sets the global IProvider instance for authentication using the official MSAL library.
         /// </summary>
         void ConfigureGlobalProvider()
         {
@@ -32,8 +26,9 @@ namespace UwpWindowsProviderSample
             {
                 if (ProviderManager.Instance.GlobalProvider == null)
                 {
+                    string clientId = "YOUR-CLIENT-ID-HERE";
                     string[] scopes = new string[] { "User.Read" };
-                    ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes);
+                    ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, scopes);
                 }
             });
         }
@@ -53,7 +48,6 @@ namespace UwpWindowsProviderSample
                 {
                     rootFrame.Navigate(typeof(MainPage), e.Arguments);
                 }
-
                 Window.Current.Activate();
 
                 ConfigureGlobalProvider();

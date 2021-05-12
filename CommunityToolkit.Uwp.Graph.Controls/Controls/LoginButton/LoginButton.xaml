@@ -19,15 +19,15 @@
                 <ControlTemplate TargetType="local:LoginButton">
                     <!-- TODO: In Future Use DropDownButton  -->
                     <Button x:Name="PART_LoginButton"
-                            Margin="{TemplateBinding Padding}"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}, RelativeSource={RelativeSource TemplatedParent}}">
 
                         <!-- Grid matches the height of the PersonView in OneLine view.
-                             TODO: Define the height values in PersonView so we can reference them here instead or hard-coding. -->
-                        <Grid MinHeight="32">
+                             This prevents the vertical height from changing when transitioning between states. -->
+                        <Grid MinHeight="40" 
+                              Padding="{TemplateBinding Padding}">
                             <controls:SwitchPresenter VerticalContentAlignment="Center" Value="{Binding UserDetails, Converter={StaticResource NullToProviderStateConverter}, RelativeSource={RelativeSource TemplatedParent}}">
                                 <controls:Case Value="SignedOut" 
                                                IsDefault="True">
