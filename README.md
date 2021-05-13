@@ -1,70 +1,124 @@
-# Windows Graph Controls
+# Windows Community Toolkit - Graph Helpers and Controls
 
-This is a sub-repo for the [Windows Community Toolkit](https://aka.ms/wct) focused on [Microsoft Graph](https://developer.microsoft.com/en-us/graph/) providing a set of Helpers and Controls for development on Windows 10 with .NET.
+Welcome! This is a sub-repo for the [Windows Community Toolkit](https://aka.ms/wct) focused on [Microsoft Graph](https://developer.microsoft.com/en-us/graph/) providing a set of Helpers and Controls for netstandard and UWP apps.
 
-This new library replaces the `Microsoft.Toolkit.Uwp.UI.Controls.Graph` package; however, it is not backwards compatible nor does it provide all the same features at this time.
+Note: This new library replaces the `Microsoft.Toolkit.Uwp.UI.Controls.Graph` package; however, it is not backwards compatible nor does it provide all the same features at this time.
 
 If you need similar controls for the Web, please use the [Microsoft Graph Toolkit](https://aka.ms/mgt).
+
+## What's new?
+
+We've overhauled our approach and introduced some big improvements:
+
+- Authentication packages are split per provider and all are netstandard 🎉
+- Access to the GraphServiceClient now lives in a sparate package. This means no dependency on the Graph SDK for simple auth scenarios and apps that perform Graph requests manually (sans SDK) 🥳
+- Removed Beta Graph SDK, but enabled access with V1 SDK types. This is so our controls and helpers can be based on the stable Graph endpoint, while also allowing for requests to the beta endpoint in some circumstances (Such as retrieving a user's photo) 🎈
+
+For more info on our roadmap, check out the current [Release Plan](https://github.com/windows-toolkit/Graph-Controls/issues/81)
 
 ## <a name="supported"></a> Supported SDKs
 
 * UWP Windows 10 18362 (🚧 TODO: Check Lower SDKs for UWP)
-* XAML Islands on .NET Core 3 w/ Windows 10 18362 (See Sample)
-* `LoginButton` & `PersonView` on Android via [Uno.Graph-Controls](https://aka.ms/wgt-uno) use `Uno.Microsoft.Graph.Controls` package. (🚧 `PeoplePicker` soon!)
-* 🚧 Coming Soon 🚧
-  * iOS (Waiting on [MSAL#1378](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/pull/1378) merge should be 4.4.0?)
 
 ## <a name="documentation"></a> Getting Started
 
-Before using controls that access [Microsoft Graph](https://graph.microsoft.com), you will need to [register your application](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app) to get a **ClientID**.
+To get started using Graph data in your application, you'll first need to enable authentication.
 
-> After finishing the initial registration page, you will also need to add an additional redirect URI. Click on "Add a Redirect URI", then "Add a platform", and then on "Mobile and desktop applications". Check the `https://login.microsoftonline.com/common/oauth2/nativeclient` checkbox on that page. Then click "Configure".
+The nuget packages metioned below are not yet released, and can be accessed from using our dedicated Nuget feed: [WindowsCommunityToolkit-MainLatest](https://pkgs.dev.azure.com/dotnet/WindowsCommunityToolkit/_packaging/WindowsCommunityToolkit-MainLatest/nuget/v3/index.json):
 
-### UWP Quick Start
+### 1A. Setup authentication with MSAL
 
-Use the following command on the _Package Manager Console_ to install the NuGet to your project:
+Leverage the official Microsoft Authentication Library (MSAL) to enable authentication in any NetStandard application.
 
-```powershell
-Install-Package Microsoft.Toolkit.Graph.Controls -IncludePrerelease
+1. Register your app in Azure AAD
+    
+    Before requesting data from [Microsoft Graph](https://graph.microsoft.com), you will need to [register your application](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app) to get a **ClientID**.
+
+    > After finishing the initial registration page, you will also need to add an additional redirect URI. Click on "Add a Redirect URI", then "Add a platform", and then on "Mobile and desktop applications". Check the `https://login.microsoftonline.com/common/oauth2/nativeclient` checkbox on that page. Then click "Configure".
+
+3. Install the `CommunityToolkit.Net.Authentication.Msal` package.
+4. Set the GlobalProvder to a new instance of MsalProvider with clientId and pre-configured scopes:
+    
+    ```csharp
+    using CommunityToolkit.Net.Authentication;
+    using CommunityToolkit.Net.Authentication.Msal;
+
+    string clientId = "YOUR-CLIENT-ID-HERE";
+    string[] scopes = new string[] { "User.Read" };
+
+    ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, scopes);
+    ```
+
+> Note: You can use the `Scopes` property to preemptively request permissions from the user of your app for data your app needs to access from Microsoft Graph.
+
+### 1B. Setup authentication with WindowsProvider
+
+Try out the WindowsProvider to enable authentication based on the native Windows Account Manager (WAM) APIs in your UWP apps, without requiring a dependency on MSAL.
+
+1. Associate your app with the Microsoft Store. The app association will act as our minimal app registration for authenticating consumer MSAs. See the [WindowsProvider docs](https://github.com/windows-toolkit/Graph-Controls/edit/main/Docs/WindowsProvider.md) for more details.
+1. Install the `CommunityToolkit.Uwp.Authentication` package
+1. Set the GlobalProvider to a new instance of WindowsProvider with pre-configured scopes:
+
+    ```csharp
+    using CommunityToolkit.Net.Authentication;
+    using CommunityToolkit.Uwp.Authentication;
+
+    string[] scopes = new string[] { "User.Read" };
+
+    ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes);
+    ```
+
+### 2. Make a Graph call
+
+Once you are authenticated, you can then make requests to the Graph using the GraphServiceClient instance.
+
+> Install the `CommunityToolkit.Net.Graph` package.
+
 ```
+using CommunityToolkit.Net.Authentication;
+using CommunityToolkit.Net.Graph.Extensions;
 
-Then open your `MainPage.xaml` file and add the following behavior:
-
-```xml
-<Page
-    ...
-    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
-    xmlns:providers="using:Microsoft.Toolkit.Graph.Providers">
-    <Interactivity:Interaction.Behaviors>
-        <providers:InteractiveProviderBehavior ClientId="YOUR_CLIENT_ID_HERE" Scopes="User.Read,User.ReadBasic.All,People.Read"/>
-    </Interactivity:Interaction.Behaviors>
-</Page>
-```
-
-*You can also use the `<providers:MockProviderBehavior/>` instead to provide some test data.*
-
-You can use the `Scopes` property to preemptively request permissions from the user of your app for data your app needs to access from Microsoft Graph.
-
-You only need the main/first page of your app to load use the provider behavior. This will initialize the graph provider for your entire application.
-
-**That's all you need to get started!**
-
-You can add any of the controls now to your XAML pages like we've done in our [sample](SampleTest/MainPage.xaml).
-
-You can use the `ProviderManager.Instance` to listen to changes in authentication status with the `ProviderUpdated` event or get direct access to the [.NET Graph Beta API](https://github.com/microsoftgraph/msgraph-beta-sdk-dotnet) through `ProviderManager.Instance.GlobalProvider.Graph`, just be sure to check if the `GlobalProvider` has been set first and its `State` is `SignedIn`:
-
-```csharp
 var provider = ProviderManager.Instance.GlobalProvider;
 
 if (provider != null && provider.State == ProviderState.SignedIn)
 {
-    // Do graph call here with provider.Graph...
+    var graphClient = provider.GetClient();
+    var me = await graphClient.Me.Request().GetAsync();
 }
 ```
 
-### Android Quick Start
+**That's all you need to get started!**
 
-Visit the [Uno.Graph-Controls](https://aka.ms/wgt-uno) repo for instructions on using the library with Uno on Android.
+You can use the `ProviderManager.Instance` to listen to changes in authentication status with the `ProviderUpdated` event or get direct access to the [.NET Graph Beta API](https://github.com/microsoftgraph/msgraph-beta-sdk-dotnet) through `ProviderManager.Instance.GlobalProvider.GetBetaClient()`, just be sure to check if the `GlobalProvider` has been set first and its `State` is `SignedIn`:
+
+```csharp
+// Get a my photo from the Graph beta endpoint as a BitmapSource.
+public BitmapSource GetMyPhotoAsync()
+{
+    var provider = ProviderManager.Instance.GlobalProvider;
+
+    if (provider != null && provider.State == ProviderState.SignedIn)
+    {
+        var betaGraphClient = provider.GetBetaClient();
+    
+        try
+        {
+            var photoStream = await betaGraphClient.Me.Photo.Content.Request().GetAsync();
+            using var ras = photoStream.AsRandomAccessStream();
+            
+            var bitmap = new BitmapImage();
+            await bitmap.SetSourceAsync(ras);
+    
+            return bitmap;
+        }
+        catch
+        {
+        }
+    }
+    
+    return null;
+}
+```
 
 ## Build Status
 | Target | Branch | Status | Recommended package version |
