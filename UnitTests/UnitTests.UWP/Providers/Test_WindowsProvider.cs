@@ -33,7 +33,7 @@ namespace UnitTests.UWP.Authentication
         /// </summary>
         [TestCategory("Providers")]
         [TestMethod]
-        public async Task Test_WindowsProvider_LoginAsync()
+        public async Task Test_WindowsProvider_SignInAsync()
         {
             await App.DispatcherQueue.EnqueueAsync(async () =>
             {
@@ -41,7 +41,7 @@ namespace UnitTests.UWP.Authentication
                 WindowsProvider provider = new WindowsProvider();
 
                 // Run logout to ensure that no cached users affect the test.
-                await provider.LogoutAsync();
+                await provider.SignOutAsync();
 
                 // The newly created provider should be in a logged out state.
                 Assert.AreEqual(ProviderState.SignedOut, provider.State);
@@ -87,13 +87,13 @@ namespace UnitTests.UWP.Authentication
                 };
 
                 // Initiate logout.
-                await provider.LoginAsync();
+                await provider.SignInAsync();
 
                 // Logout has completed, the provider should be signed out.
                 Assert.AreEqual(ProviderState.SignedIn, provider.State);
 
                 // Initiate logout, which should skip loading, and go straight to signed out.
-                await provider.LogoutAsync();
+                await provider.SignOutAsync();
 
                 // Ensure the proper number of events were fired.
                 Assert.AreEqual(eventCount, 3);

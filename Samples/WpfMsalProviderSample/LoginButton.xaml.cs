@@ -56,11 +56,11 @@ namespace WpfMsalProviderSample
                     switch (provider.State)
                     {
                         case ProviderState.SignedOut:
-                            provider.LoginAsync();
+                            provider.SignInAsync();
                             break;
 
                         case ProviderState.SignedIn:
-                            provider.LogoutAsync();
+                            provider.SignOutAsync();
                             break;
                     }
                 }

@@ -121,7 +121,7 @@ namespace CommunityToolkit.Net.Authentication
                 }
                 catch (MsalUiRequiredException)
                 {
-                    await LoginAsync();
+                    await SignInAsync();
                 }
                 catch (Exception)
                 {
@@ -131,14 +131,14 @@ namespace CommunityToolkit.Net.Authentication
         }
 
         /// <inheritdoc/>
-        public override async Task LoginAsync()
+        public override async Task SignInAsync()
         {
             // Force fake request to start auth process
             await AuthenticateRequestAsync(new System.Net.Http.HttpRequestMessage());
         }
 
         /// <inheritdoc/>
-        public override async Task LogoutAsync()
+        public override async Task SignOutAsync()
         {
             // Forcibly remove each user.
             foreach (var user in await Client.GetAccountsAsync())

@@ -34,12 +34,12 @@ namespace CommunityToolkit.Net.Authentication
         /// Login the user.
         /// </summary>
         /// <returns><see cref="Task"/>.</returns>
-        Task LoginAsync();
+        Task SignInAsync();
 
         /// <summary>
         /// Logout the user.
         /// </summary>
         /// <returns><see cref="Task"/>.</returns>
-        Task LogoutAsync();
+        Task SignOutAsync();
     }
 }

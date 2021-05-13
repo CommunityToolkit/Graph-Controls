@@ -46,10 +46,10 @@ namespace CommunityToolkit.Net.Authentication
         }
 
         /// <inheritdoc />
-        public abstract Task LoginAsync();
+        public abstract Task SignInAsync();
 
         /// <inheritdoc />
-        public abstract Task LogoutAsync();
+        public abstract Task SignOutAsync();
 
         /// <inheritdoc />
         public abstract Task AuthenticateRequestAsync(HttpRequestMessage request);

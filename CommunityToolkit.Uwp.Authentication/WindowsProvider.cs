@@ -113,7 +113,7 @@ namespace CommunityToolkit.Uwp.Authentication
         }
 
         /// <inheritdoc />
-        public override async Task LoginAsync()
+        public override async Task SignInAsync()
         {
             if (_webAccount != null || State != ProviderState.SignedOut)
             {
@@ -125,7 +125,7 @@ namespace CommunityToolkit.Uwp.Authentication
 
             if (token == null)
             {
-                await LogoutAsync();
+                await SignOutAsync();
             }
         }
 
@@ -146,7 +146,7 @@ namespace CommunityToolkit.Uwp.Authentication
         }
 
         /// <inheritdoc />
-        public override async Task LogoutAsync()
+        public override async Task SignOutAsync()
         {
             Settings.Remove(SettingsKeyAccountId);
             Settings.Remove(SettingsKeyProviderId);
@@ -239,7 +239,7 @@ namespace CommunityToolkit.Uwp.Authentication
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e.Message);
-                await LogoutAsync();
+                await SignOutAsync();
             }
 
             return null;
@@ -250,7 +250,7 @@ namespace CommunityToolkit.Uwp.Authentication
             if (account == null)
             {
                 // Clear account
-                 await LogoutAsync();
+                 await SignOutAsync();
                  return;
             }
             else if (account.Id == _webAccount?.Id)

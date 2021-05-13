@@ -148,7 +148,7 @@ namespace UnitTests.UWP.Helpers
 
                 ProviderManager.Instance.GlobalProvider = provider;
 
-                await provider.LoginAsync();
+                await provider.SignInAsync();
             });
         }
     }

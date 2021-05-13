@@ -42,7 +42,7 @@ namespace CommunityToolkit.Net.Authentication
         }
 
         /// <inheritdoc/>
-        public override async Task LoginAsync()
+        public override async Task SignInAsync()
         {
             State = ProviderState.Loading;
             await Task.Delay(3000);
@@ -50,7 +50,7 @@ namespace CommunityToolkit.Net.Authentication
         }
 
         /// <inheritdoc/>
-        public override async Task LogoutAsync()
+        public override async Task SignOutAsync()
         {
             State = ProviderState.Loading;
             await Task.Delay(3000);

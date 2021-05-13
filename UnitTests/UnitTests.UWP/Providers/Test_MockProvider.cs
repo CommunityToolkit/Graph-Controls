@@ -32,7 +32,7 @@ namespace UnitTests.UWP.Authentication
         /// </summary>
         [TestCategory("Providers")]
         [TestMethod]
-        public async Task Test_MockProvider_LoginAsync()
+        public async Task Test_MockProvider_SignInAsync()
         {
             // Create the new provider, pre-signed out.
             IProvider provider = new MockProvider(false);
@@ -73,7 +73,7 @@ namespace UnitTests.UWP.Authentication
             };
 
             // Initiate logout.
-            await provider.LoginAsync();
+            await provider.SignInAsync();
 
             // Logout has completed, the provider should be signed out.
             Assert.AreEqual(ProviderState.SignedIn, provider.State);
@@ -89,7 +89,7 @@ namespace UnitTests.UWP.Authentication
         /// </summary>
         [TestCategory("Providers")]
         [TestMethod]
-        public async Task Test_MockProvider_LogoutAsync()
+        public async Task Test_MockProvider_SignOutAsync()
         {
             // Create the new provider, pre-signed in.
             IProvider provider = new MockProvider(true);
@@ -130,7 +130,7 @@ namespace UnitTests.UWP.Authentication
             };
 
             // Initiate logout.
-            await provider.LogoutAsync();
+            await provider.SignOutAsync();
 
             // Logout has completed, the provider should be signed out.
             Assert.AreEqual(ProviderState.SignedOut, provider.State);

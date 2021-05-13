@@ -86,14 +86,14 @@ namespace CommunityToolkit.Uwp.Graph.Controls
 
                 if (!cargs.Cancel)
                 {
-                    await LoginAsync();
+                    await SignInAsync();
                 }
             }
         }
 
         private async void SignOutButton_Click(object sender, RoutedEventArgs e)
         {
-            await LogoutAsync();
+            await SignOutAsync();
         }
 
         private async void LoadData()
@@ -141,7 +141,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
         /// Initiates logging in with the current <see cref="IProvider"/> registered in the <see cref="ProviderManager"/>.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task LoginAsync()
+        public async Task SignInAsync()
         {
             if (UserDetails != null || IsLoading)
             {
@@ -155,7 +155,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
                 try
                 {
                     IsLoading = true;
-                    await provider.LoginAsync();
+                    await provider.SignInAsync();
 
                     if (provider.State == ProviderState.SignedIn)
                     {
@@ -184,7 +184,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
         /// Log a signed-in user out.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task LogoutAsync()
+        public async Task SignOutAsync()
         {
             // Close Menu
             if (FlyoutBase.GetAttachedFlyout(_loginButton) is FlyoutBase flyout)
@@ -219,7 +219,7 @@ namespace CommunityToolkit.Uwp.Graph.Controls
             if (provider != null)
             {
                 IsLoading = true;
-                await provider.LogoutAsync();
+                await provider.SignOutAsync();
                 IsLoading = false;
 
                 LogoutCompleted?.Invoke(this, new EventArgs());
