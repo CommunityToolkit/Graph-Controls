@@ -437,7 +437,13 @@ namespace CommunityToolkit.Uwp.Authentication
 
         private WebTokenRequest GetWebTokenRequest(WebAccountProvider provider)
         {
-            WebTokenRequest webTokenRequest = new WebTokenRequest(provider, string.Join(',', _scopes));
+            string clientId = _webAccountProviderConfig.ClientId;
+            string scopes = string.Join(',', _scopes);
+
+            WebTokenRequest webTokenRequest = clientId != null
+                ? new WebTokenRequest(provider, scopes, clientId)
+                : new WebTokenRequest(provider, scopes);
+
             webTokenRequest.Properties.Add(GraphResourcePropertyKey, GraphResourcePropertyValue);
 
             return webTokenRequest;
