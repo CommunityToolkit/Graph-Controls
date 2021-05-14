@@ -2,8 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -57,37 +55,8 @@ namespace CommunityToolkit.Net.Authentication
         /// <inheritdoc/>
         public override async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
-            IEnumerable<IAccount> accounts = await Client.GetAccountsAsync();
-            AuthenticationResult authResult;
-
-            try
-            {
-                authResult = await Client.AcquireTokenSilent(Scopes, accounts.FirstOrDefault()).ExecuteAsync();
-            }
-            catch (MsalUiRequiredException)
-            {
-                authResult = await Client.AcquireTokenInteractive(Scopes).ExecuteAsync();
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
-            }
-
-            if (authResult != null)
-            {
-                AddSdkVersion(request);
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authResult.AccessToken);
-            }
-
-            // Check state after request to see if we're now signed-in.
-            if (State != ProviderState.SignedIn)
-            {
-                if ((await Client.GetAccountsAsync()).Any())
-                {
-                    State = ProviderState.SignedIn;
-                }
-                else
-                {
-                    State = ProviderState.SignedOut;
-                }
-            }
+            string token = await GetTokenAsync();
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
         /// <inheritdoc/>
@@ -99,47 +68,40 @@ namespace CommunityToolkit.Net.Authentication
             {
                 return true;
             }
-            else if (account == null)
-            {
-                // No accounts
-                State = ProviderState.SignedOut;
-            }
-            else
-            {
-                try
-                {
-                    // Try and sign-in // TODO: can we use empty scopes?
-                    var result = await Client.AcquireTokenSilent(new string[] { string.Empty }, account).ExecuteAsync();
 
-                    if (!string.IsNullOrWhiteSpace(result.AccessToken))
-                    {
-                        State = ProviderState.SignedIn;
-                        return true;
-                    }
-                    else
-                    {
-                        State = ProviderState.SignedOut;
-                    }
-                }
-                catch (MsalUiRequiredException)
-                {
-                    await SignInAsync();
-                    return true;
-                }
-                catch (Exception)
-                {
-                    State = ProviderState.SignedOut;
-                }
+            State = ProviderState.Loading;
+
+            var token = await GetTokenAsync(true);
+            if (token == null)
+            {
+                await SignOutAsync();
+                return false;
             }
 
-            return false;
+            State = ProviderState.SignedIn;
+            return true;
         }
 
         /// <inheritdoc/>
         public override async Task SignInAsync()
         {
-            // Force fake request to start auth process
-            await AuthenticateRequestAsync(new HttpRequestMessage());
+            var account = (await Client.GetAccountsAsync()).FirstOrDefault();
+            if (account != null || State != ProviderState.SignedOut)
+            {
+                return;
+            }
+
+            State = ProviderState.Loading;
+
+            var token = await GetTokenAsync();
+            if (token == null)
+            {
+                await SignOutAsync();
+            }
+            else
+            {
+                State = ProviderState.SignedIn;
+            }
         }
 
         /// <inheritdoc/>
@@ -152,6 +114,47 @@ namespace CommunityToolkit.Net.Authentication
             }
 
             State = ProviderState.SignedOut;
+        }
+
+        /// <summary>
+        /// Retrieve a token for the authenticated user.
+        /// </summary>
+        /// <param name="silentOnly">Determines if the acquisition should be done without prompts to the user.</param>
+        /// <returns>A token string for the authenticated user.</returns>
+        public async Task<string> GetTokenAsync(bool silentOnly = false)
+        {
+            AuthenticationResult authResult = null;
+            try
+            {
+                var account = (await Client.GetAccountsAsync()).FirstOrDefault();
+                if (account != null)
+                {
+                    authResult = await Client.AcquireTokenSilent(Scopes, account).ExecuteAsync();
+                }
+            }
+            catch (MsalUiRequiredException)
+            {
+            }
+            catch
+            {
+                // Unexpected exception
+                // TODO: Send exception to a logger.
+            }
+
+            if (authResult == null && !silentOnly)
+            {
+                try
+                {
+                    authResult = await Client.AcquireTokenInteractive(Scopes).ExecuteAsync();
+                }
+                catch
+                {
+                    // Unexpected exception
+                    // TODO: Send exception to a logger.
+                }
+            }
+
+            return authResult?.AccessToken;
         }
     }
 }

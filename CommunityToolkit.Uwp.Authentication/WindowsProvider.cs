@@ -120,6 +120,8 @@ namespace CommunityToolkit.Uwp.Authentication
                 return;
             }
 
+            State = ProviderState.Loading;
+
             // The state will get updated as part of the auth flow.
             var token = await GetTokenAsync();
 
@@ -140,6 +142,8 @@ namespace CommunityToolkit.Uwp.Authentication
                 return true;
             }
 
+            State = ProviderState.Loading;
+
             // The state will get updated as part of the auth flow.
             var token = await GetTokenAsync(true);
             return token != null;
@@ -148,6 +152,8 @@ namespace CommunityToolkit.Uwp.Authentication
         /// <inheritdoc />
         public override async Task SignOutAsync()
         {
+            State = ProviderState.Loading;
+
             Settings.Remove(SettingsKeyAccountId);
             Settings.Remove(SettingsKeyProviderId);
 
@@ -185,12 +191,6 @@ namespace CommunityToolkit.Uwp.Authentication
 
             try
             {
-                var initialState = State;
-                if (State == ProviderState.SignedOut)
-                {
-                    State = ProviderState.Loading;
-                }
-
                 // Attempt to authenticate silently.
                 var authResult = await AuthenticateSilentAsync();
 
@@ -200,7 +200,6 @@ namespace CommunityToolkit.Uwp.Authentication
                     if (silentOnly)
                     {
                         // Silent login may fail if we don't have a cached account, and that's ok.
-                        State = initialState;
                         return null;
                     }
 
@@ -210,14 +209,8 @@ namespace CommunityToolkit.Uwp.Authentication
 
                 if (authResult?.ResponseStatus == WebTokenRequestStatus.Success)
                 {
-                    var account = _webAccount;
                     var newAccount = authResult.ResponseData[0].WebAccount;
-
-                    if (account == null || account.Id != newAccount.Id)
-                    {
-                        // Account was switched, update the active account.
-                        await SetAccountAsync(newAccount);
-                    }
+                    await SetAccountAsync(newAccount);
 
                     var authToken = authResult.ResponseData[0].Token;
                     return authToken;
@@ -236,9 +229,8 @@ namespace CommunityToolkit.Uwp.Authentication
                     throw new Exception("Authentication response was not successful, but is also missing a ResponseError.");
                 }
             }
-            catch (Exception e)
+            catch
             {
-                System.Diagnostics.Debug.WriteLine(e.Message);
                 await SignOutAsync();
             }
 
