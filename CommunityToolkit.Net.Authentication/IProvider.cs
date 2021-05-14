@@ -41,5 +41,11 @@ namespace CommunityToolkit.Net.Authentication
         /// </summary>
         /// <returns><see cref="Task"/>.</returns>
         Task SignOutAsync();
+
+        /// <summary>
+        /// Tries to check if the user is logged in without prompting to login.
+        /// </summary>
+        /// <returns>A boolean indicating success or failure to sign in silently.</returns>
+        Task<bool> TrySilentSignInAsync();
     }
 }

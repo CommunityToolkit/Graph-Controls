@@ -133,7 +133,7 @@ namespace CommunityToolkit.Uwp.Authentication
         /// Tries to check if the user is logged in without prompting to login.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task<bool> TrySilentSignInAsync()
+        public override async Task<bool> TrySilentSignInAsync()
         {
             if (_webAccount != null && State == ProviderState.SignedIn)
             {

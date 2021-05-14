@@ -46,13 +46,16 @@ namespace CommunityToolkit.Net.Authentication
         }
 
         /// <inheritdoc />
+        public abstract Task AuthenticateRequestAsync(HttpRequestMessage request);
+
+        /// <inheritdoc />
         public abstract Task SignInAsync();
 
         /// <inheritdoc />
         public abstract Task SignOutAsync();
 
         /// <inheritdoc />
-        public abstract Task AuthenticateRequestAsync(HttpRequestMessage request);
+        public abstract Task<bool> TrySilentSignInAsync();
 
         /// <summary>
         /// Append the Sdk version to the request headers.

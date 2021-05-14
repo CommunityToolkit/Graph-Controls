@@ -44,6 +44,11 @@ namespace CommunityToolkit.Net.Authentication
         /// <inheritdoc/>
         public override async Task SignInAsync()
         {
+            if (State == ProviderState.SignedIn)
+            {
+                return;
+            }
+
             State = ProviderState.Loading;
             await Task.Delay(3000);
             State = ProviderState.SignedIn;
@@ -52,9 +57,26 @@ namespace CommunityToolkit.Net.Authentication
         /// <inheritdoc/>
         public override async Task SignOutAsync()
         {
+            if (State == ProviderState.SignedOut)
+            {
+                return;
+            }
+
             State = ProviderState.Loading;
             await Task.Delay(3000);
             State = ProviderState.SignedOut;
+        }
+
+        /// <inheritdoc/>
+        public override async Task<bool> TrySilentSignInAsync()
+        {
+            if (State == ProviderState.SignedIn)
+            {
+                return true;
+            }
+
+            await SignInAsync();
+            return true;
         }
     }
 }

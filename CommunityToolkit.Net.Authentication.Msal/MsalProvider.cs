@@ -90,15 +90,16 @@ namespace CommunityToolkit.Net.Authentication
             }
         }
 
-        /// <summary>
-        /// Tries to check if the user is logged in without prompting to login.
-        /// </summary>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task TrySilentSignInAsync()
+        /// <inheritdoc/>
+        public override async Task<bool> TrySilentSignInAsync()
         {
             var account = (await Client.GetAccountsAsync()).FirstOrDefault();
 
-            if (account == null)
+            if (account != null && State == ProviderState.SignedIn)
+            {
+                return true;
+            }
+            else if (account == null)
             {
                 // No accounts
                 State = ProviderState.SignedOut;
@@ -113,6 +114,7 @@ namespace CommunityToolkit.Net.Authentication
                     if (!string.IsNullOrWhiteSpace(result.AccessToken))
                     {
                         State = ProviderState.SignedIn;
+                        return true;
                     }
                     else
                     {
@@ -122,19 +124,22 @@ namespace CommunityToolkit.Net.Authentication
                 catch (MsalUiRequiredException)
                 {
                     await SignInAsync();
+                    return true;
                 }
                 catch (Exception)
                 {
                     State = ProviderState.SignedOut;
                 }
             }
+
+            return false;
         }
 
         /// <inheritdoc/>
         public override async Task SignInAsync()
         {
             // Force fake request to start auth process
-            await AuthenticateRequestAsync(new System.Net.Http.HttpRequestMessage());
+            await AuthenticateRequestAsync(new HttpRequestMessage());
         }
 
         /// <inheritdoc/>
