@@ -15,7 +15,7 @@ using Windows.Security.Credentials;
 using Windows.Storage;
 using Windows.UI.ApplicationSettings;
 
-namespace CommunityToolkit.Uwp.Authentication
+namespace CommunityToolkit.Authentication.Uwp
 {
     /// <summary>
     /// An authentication provider based on the native AccountsSettingsPane in Windows.

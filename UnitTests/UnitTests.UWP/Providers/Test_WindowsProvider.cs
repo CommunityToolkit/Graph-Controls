@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Net.Authentication;
-using CommunityToolkit.Uwp.Authentication;
+using CommunityToolkit.Authentication.Uwp;
 using Microsoft.Toolkit.Uwp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;

@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using Windows.UI.ApplicationSettings;
 
-namespace CommunityToolkit.Uwp.Authentication
+namespace CommunityToolkit.Authentication.Uwp
 {
     /// <summary>
     /// Configuration values for the AccountsSettingsPane.
