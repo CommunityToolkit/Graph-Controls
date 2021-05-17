@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleTest", "SampleTest\Sa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Net.Authentication", "CommunityToolkit.Net.Authentication\CommunityToolkit.Net.Authentication.csproj", "{B323A2E1-66EF-4037-95B7-2DEFA051B4B1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Net.Authentication.Msal", "CommunityToolkit.Net.Authentication.Msal\CommunityToolkit.Net.Authentication.Msal.csproj", "{CA4042D2-33A2-450B-8B9D-C286B9F3F3F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Authentication.Msal", "CommunityToolkit.Net.Authentication.Msal\CommunityToolkit.Authentication.Msal.csproj", "{CA4042D2-33A2-450B-8B9D-C286B9F3F3F4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Authentication.Uwp", "CommunityToolkit.Uwp.Authentication\CommunityToolkit.Authentication.Uwp.csproj", "{2E4A708A-DF53-4863-B797-E14CDC6B90FA}"
 EndProject
