@@ -48,6 +48,9 @@ namespace CommunityToolkit.Net.Authentication
         /// <inheritdoc />
         public abstract Task AuthenticateRequestAsync(HttpRequestMessage request);
 
+        /// <inheritdoc/>
+        public abstract Task<string> GetTokenAsync(bool silentOnly = false);
+
         /// <inheritdoc />
         public abstract Task SignInAsync();
 

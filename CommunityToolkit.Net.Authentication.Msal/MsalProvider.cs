@@ -104,7 +104,7 @@ namespace CommunityToolkit.Net.Authentication
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override async Task SignOutAsync()
         {
             // Forcibly remove each user.
@@ -116,12 +116,8 @@ namespace CommunityToolkit.Net.Authentication
             State = ProviderState.SignedOut;
         }
 
-        /// <summary>
-        /// Retrieve a token for the authenticated user.
-        /// </summary>
-        /// <param name="silentOnly">Determines if the acquisition should be done without prompts to the user.</param>
-        /// <returns>A token string for the authenticated user.</returns>
-        public async Task<string> GetTokenAsync(bool silentOnly = false)
+        /// <inheritdoc/>
+        public override async Task<string> GetTokenAsync(bool silentOnly = false)
         {
             AuthenticationResult authResult = null;
             try

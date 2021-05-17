@@ -18,18 +18,6 @@ using Windows.UI.ApplicationSettings;
 namespace CommunityToolkit.Uwp.Authentication
 {
     /// <summary>
-    /// An enumeration of the available authentication providers for use in the AccountsSettingsPane.
-    /// </summary>
-    [Flags]
-    public enum WebAccountProviderType
-    {
-        /// <summary>
-        /// Authenticate public/consumer MSA accounts.
-        /// </summary>
-        MSA,
-    }
-
-    /// <summary>
     /// An authentication provider based on the native AccountsSettingsPane in Windows.
     /// </summary>
     public class WindowsProvider : BaseProvider
@@ -52,7 +40,7 @@ namespace CommunityToolkit.Uwp.Authentication
         private static readonly string[] DefaultScopes = { "User.Read" };
 
         // The default account providers available in the AccountsSettingsPane.
-        private static readonly WebAccountProviderType DefaultWebAccountsProviderType = WebAccountProviderType.MSA;
+        private static readonly WebAccountProviderType DefaultWebAccountsProviderType = WebAccountProviderType.All;
 
         /// <summary>
         /// Gets the list of scopes to pre-authorize during authentication.
@@ -174,12 +162,8 @@ namespace CommunityToolkit.Uwp.Authentication
             State = ProviderState.SignedOut;
         }
 
-        /// <summary>
-        /// Retrieve a token for the authenticated user.
-        /// </summary>
-        /// <param name="silentOnly">Determines if the acquisition should be done without prompts to the user.</param>
-        /// <returns>A token string for the authenticated user.</returns>
-        public async Task<string> GetTokenAsync(bool silentOnly = false)
+        /// <inheritdoc />
+        public override async Task<string> GetTokenAsync(bool silentOnly = false)
         {
             var internetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
             if (internetConnectionProfile == null)
@@ -446,66 +430,13 @@ namespace CommunityToolkit.Uwp.Authentication
             var providers = new List<WebAccountProvider>();
 
             // MSA
-            if ((_webAccountProviderConfig.WebAccountProviderType & WebAccountProviderType.MSA) == WebAccountProviderType.MSA)
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.All ||
+                _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Msa)
             {
                 providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
             }
 
             return providers;
-        }
-    }
-
-    /// <summary>
-    /// Configuration values for the AccountsSettingsPane.
-    /// </summary>
-    public struct AccountsSettingsPaneConfig
-    {
-        /// <summary>
-        /// Gets or sets the header text for the accounts settings pane.
-        /// </summary>
-        public string HeaderText { get; set; }
-
-        /// <summary>
-        /// Gets or sets the SettingsCommand collection for the account settings pane.
-        /// </summary>
-        public IList<SettingsCommand> Commands { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AccountsSettingsPaneConfig"/> struct.
-        /// </summary>
-        /// <param name="headerText">The header text for the accounts settings pane.</param>
-        /// <param name="commands">The SettingsCommand collection for the account settings pane.</param>
-        public AccountsSettingsPaneConfig(string headerText = null, IList<SettingsCommand> commands = null)
-        {
-            HeaderText = headerText;
-            Commands = commands;
-        }
-    }
-
-    /// <summary>
-    /// Configuration values for what type of authentication providers to enable.
-    /// </summary>
-    public struct WebAccountProviderConfig
-    {
-        /// <summary>
-        /// Gets or sets the registered ClientId. Required for AAD login and admin consent.
-        /// </summary>
-        public string ClientId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the types of accounts providers that should be available to the user.
-        /// </summary>
-        public WebAccountProviderType WebAccountProviderType { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="WebAccountProviderConfig"/> struct.
-        /// </summary>
-        /// <param name="webAccountProviderType">The types of accounts providers that should be available to the user.</param>
-        /// <param name="clientId">The registered ClientId. Required for AAD login and admin consent.</param>
-        public WebAccountProviderConfig(WebAccountProviderType webAccountProviderType, string clientId = null)
-        {
-            WebAccountProviderType = webAccountProviderType;
-            ClientId = clientId;
         }
     }
 }

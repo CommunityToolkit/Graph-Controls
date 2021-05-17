@@ -31,13 +31,20 @@ namespace CommunityToolkit.Net.Authentication
         Task AuthenticateRequestAsync(HttpRequestMessage request);
 
         /// <summary>
-        /// Login the user.
+        /// Retrieve a token for the authenticated user.
+        /// </summary>
+        /// <param name="silentOnly">Determines if the acquisition should be done without prompts to the user.</param>
+        /// <returns>A token string for the authenticated user.</returns>
+        Task<string> GetTokenAsync(bool silentOnly = false);
+
+        /// <summary>
+        /// Sign in the user.
         /// </summary>
         /// <returns><see cref="Task"/>.</returns>
         Task SignInAsync();
 
         /// <summary>
-        /// Logout the user.
+        /// Sign out the user.
         /// </summary>
         /// <returns><see cref="Task"/>.</returns>
         Task SignOutAsync();
