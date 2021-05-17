@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Net.Authentication;
-using CommunityToolkit.Net.Graph.Extensions;
+using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp.Helpers;
 

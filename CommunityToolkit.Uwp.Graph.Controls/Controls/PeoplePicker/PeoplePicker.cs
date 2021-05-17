@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Net.Authentication;
-using CommunityToolkit.Net.Graph.Extensions;
+using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp.UI;
 using Microsoft.Toolkit.Uwp.UI.Controls;

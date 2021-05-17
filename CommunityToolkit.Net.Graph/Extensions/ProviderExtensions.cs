@@ -5,7 +5,7 @@
 using CommunityToolkit.Net.Authentication;
 using Microsoft.Graph;
 
-namespace CommunityToolkit.Net.Graph.Extensions
+namespace CommunityToolkit.Graph.Extensions
 {
     /// <summary>
     /// Extension method for enabled Graph client access from an IProvider implementation.

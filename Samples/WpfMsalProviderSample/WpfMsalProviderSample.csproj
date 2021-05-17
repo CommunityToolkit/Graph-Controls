@@ -9,7 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\CommunityToolkit.Net.Authentication.Msal\CommunityToolkit.Net.Authentication.Msal.csproj" />
     <ProjectReference Include="..\..\CommunityToolkit.Net.Authentication\CommunityToolkit.Net.Authentication.csproj" />
-    <ProjectReference Include="..\..\CommunityToolkit.Net.Graph\CommunityToolkit.Net.Graph.csproj" />
+    <ProjectReference Include="..\..\CommunityToolkit.Graph\CommunityToolkit.Graph.csproj" />
   </ItemGroup>
 
 </Project>

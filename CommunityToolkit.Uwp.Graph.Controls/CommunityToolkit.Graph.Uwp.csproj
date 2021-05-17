@@ -41,7 +41,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CommunityToolkit.Net.Authentication\CommunityToolkit.Net.Authentication.csproj" />
-    <ProjectReference Include="..\CommunityToolkit.Net.Graph\CommunityToolkit.Net.Graph.csproj" />
+    <ProjectReference Include="..\CommunityToolkit.Net.Graph\CommunityToolkit.Graph.csproj" />
   </ItemGroup>
  
   <ItemGroup>

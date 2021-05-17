@@ -4,7 +4,7 @@
 
 using Microsoft.Graph;
 
-namespace CommunityToolkit.Net.Graph.Extensions
+namespace CommunityToolkit.Graph.Extensions
 {
     /// <summary>
     /// Extension methods to the Graph SDK used by the controls and helpers.

@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29230.61
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Net.Graph", "CommunityToolkit.Net.Graph\CommunityToolkit.Net.Graph.csproj", "{B2246169-0CD8-473C-AFF6-172310E2C3F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Graph", "CommunityToolkit.Net.Graph\CommunityToolkit.Graph.csproj", "{B2246169-0CD8-473C-AFF6-172310E2C3F6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Graph.Uwp", "CommunityToolkit.Uwp.Graph.Controls\CommunityToolkit.Graph.Uwp.csproj", "{42252EE8-7E68-428F-972B-6D2DD3AA12CC}"
 EndProject

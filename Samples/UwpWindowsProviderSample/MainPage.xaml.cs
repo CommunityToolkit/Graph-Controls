@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Net.Authentication;
-using CommunityToolkit.Net.Graph.Extensions;
+using CommunityToolkit.Graph.Extensions;
 using Windows.UI.Xaml.Controls;
 
 namespace UwpWindowsProviderSample
