@@ -4,7 +4,7 @@ VisualStudioVersion = 16.0.29230.61
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Net.Graph", "CommunityToolkit.Net.Graph\CommunityToolkit.Net.Graph.csproj", "{B2246169-0CD8-473C-AFF6-172310E2C3F6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Uwp.Graph.Controls", "CommunityToolkit.Uwp.Graph.Controls\CommunityToolkit.Uwp.Graph.Controls.csproj", "{42252EE8-7E68-428F-972B-6D2DD3AA12CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkit.Graph.Uwp", "CommunityToolkit.Uwp.Graph.Controls\CommunityToolkit.Graph.Uwp.csproj", "{42252EE8-7E68-428F-972B-6D2DD3AA12CC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build Config", "Build Config", "{B7903632-1BFF-4BA6-BD7A-9F8A897F7542}"
 	ProjectSection(SolutionItems) = preProject

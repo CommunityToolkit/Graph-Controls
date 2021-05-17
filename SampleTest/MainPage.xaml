@@ -7,7 +7,7 @@
       xmlns:local="using:SampleTest"
       xmlns:samples="using:SampleTest.Samples"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:wgt="using:CommunityToolkit.Uwp.Graph.Controls" 
+      xmlns:wgt="using:CommunityToolkit.Graph.Uwp" 
       xmlns:toolkit="using:Microsoft.Toolkit"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
       mc:Ignorable="d">

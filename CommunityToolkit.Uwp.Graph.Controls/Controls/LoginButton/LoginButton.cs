@@ -12,7 +12,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 
-namespace CommunityToolkit.Uwp.Graph.Controls
+namespace CommunityToolkit.Graph.Uwp
 {
     /// <summary>
     /// The <see cref="LoginButton"/> control is a button which can be used to sign the user in or show them profile details.

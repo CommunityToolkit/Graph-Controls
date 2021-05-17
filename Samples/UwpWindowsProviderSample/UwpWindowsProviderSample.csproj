@@ -167,9 +167,9 @@
       <Project>{2E4A708A-DF53-4863-B797-E14CDC6B90FA}</Project>
       <Name>CommunityToolkit.Uwp.Authentication</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\CommunityToolkit.Uwp.Graph.Controls\CommunityToolkit.Uwp.Graph.Controls.csproj">
+    <ProjectReference Include="..\..\CommunityToolkit.Uwp.Graph.Controls\CommunityToolkit.Graph.Uwp.csproj">
       <Project>{42252ee8-7e68-428f-972b-6d2dd3aa12cc}</Project>
-      <Name>CommunityToolkit.Uwp.Graph.Controls</Name>
+      <Name>CommunityToolkit.Graph.Uwp</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

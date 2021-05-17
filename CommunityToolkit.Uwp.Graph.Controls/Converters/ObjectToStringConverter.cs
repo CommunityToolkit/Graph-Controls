@@ -5,7 +5,7 @@
 using System;
 using Windows.UI.Xaml.Data;
 
-namespace CommunityToolkit.Uwp.Graph.Controls.Converters
+namespace CommunityToolkit.Graph.Uwp.Converters
 {
     /// <summary>
     /// Converts any object to a string representation.

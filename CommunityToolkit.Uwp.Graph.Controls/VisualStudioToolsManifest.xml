@@ -1,9 +1,9 @@
 <FileList>
   <File Reference="CommunityToolkit.Uwp.Graph.UI.dll">
     <ToolboxItems VSCategory="Windows Community Toolkit Graph Controls" BlendCategory="Windows Community Toolkit Graph Controls">
-      <Item Type="CommunityToolkit.Uwp.Graph.Controls.LoginButton" />
-      <Item Type="CommunityToolkit.Uwp.Graph.Controls.PeoplePicker" />
-      <Item Type="CommunityToolkit.Uwp.Graph.Controls.PersonView" />
+      <Item Type="CommunityToolkit.Graph.Uwp.LoginButton" />
+      <Item Type="CommunityToolkit.Graph.Uwp.PeoplePicker" />
+      <Item Type="CommunityToolkit.Graph.Uwp.PersonView" />
     </ToolboxItems>
   </File>
 </FileList>

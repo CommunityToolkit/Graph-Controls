@@ -5,7 +5,7 @@ Here are some quick setup steps for using the WindowsProvider in a UWP app:
  
 2. Add the following nuget packages (Nuget feed: [WindowsCommunityToolkit-MainLatest](https://pkgs.dev.azure.com/dotnet/WindowsCommunityToolkit/_packaging/WindowsCommunityToolkit-MainLatest/nuget/v3/index.json)):
     * `CommunityToolkit.Uwp.Authentication` – For the WindowsProvider
-    * `CommunityToolkit.Uwp.Graph.Controls` – For the LoginButton
+    * `CommunityToolkit.Graph.Uwp` – For the LoginButton
  
 3. Open the App.xaml.cs and add the following code to the bottom of the OnLaunched. You’ll need to make the method async as well.
 
@@ -20,7 +20,7 @@ ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes);
 4. Add a LoginButton to the MainPage.xaml
 
 ```
-xmlns:graphcontrols="using:CommunityToolkit.Uwp.Graph.Controls"
+xmlns:graphcontrols="using:CommunityToolkit.Graph.Uwp"
  
 <graphcontrols:LoginButton />
 ```
