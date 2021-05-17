@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\CommunityToolkit.Authentication\CommunityToolkit.Authentication.csproj" />
     <ProjectReference Include="..\..\CommunityToolkit.Authentication.Msal\CommunityToolkit.Authentication.Msal.csproj" />
-    <ProjectReference Include="..\..\CommunityToolkit.Net.Authentication\CommunityToolkit.Net.Authentication.csproj" />
     <ProjectReference Include="..\..\CommunityToolkit.Graph\CommunityToolkit.Graph.csproj" />
   </ItemGroup>
 

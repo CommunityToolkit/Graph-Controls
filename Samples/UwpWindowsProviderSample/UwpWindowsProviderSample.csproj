@@ -155,19 +155,19 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CommunityToolkit.Net.Authentication\CommunityToolkit.Net.Authentication.csproj">
+    <ProjectReference Include="..\..\CommunityToolkit.Authentication\CommunityToolkit.Authentication.csproj">
       <Project>{B323A2E1-66EF-4037-95B7-2DEFA051B4B1}</Project>
-      <Name>CommunityToolkit.Net.Authentication</Name>
+      <Name>CommunityToolkit.Authentication</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\CommunityToolkit.Net.Graph\CommunityToolkit.Graph.csproj">
+    <ProjectReference Include="..\..\CommunityToolkit.Graph\CommunityToolkit.Graph.csproj">
       <Project>{b2246169-0cd8-473c-aff6-172310e2c3f6}</Project>
       <Name>CommunityToolkit.Graph</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\CommunityToolkit.Uwp.Authentication\CommunityToolkit.Authentication.Uwp.csproj">
+    <ProjectReference Include="..\..\CommunityToolkit.Authentication.Uwp\CommunityToolkit.Authentication.Uwp.csproj">
       <Project>{2E4A708A-DF53-4863-B797-E14CDC6B90FA}</Project>
       <Name>CommunityToolkit.Authentication.Uwp</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\CommunityToolkit.Uwp.Graph.Controls\CommunityToolkit.Graph.Uwp.csproj">
+    <ProjectReference Include="..\..\CommunityToolkit.Graph.Uwp\CommunityToolkit.Graph.Uwp.csproj">
       <Project>{42252ee8-7e68-428f-972b-6d2dd3aa12cc}</Project>
       <Name>CommunityToolkit.Graph.Uwp</Name>
     </ProjectReference>
