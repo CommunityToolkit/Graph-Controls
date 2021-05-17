@@ -163,6 +163,10 @@
       <Project>{B323A2E1-66EF-4037-95B7-2DEFA051B4B1}</Project>
       <Name>CommunityToolkit.Net.Authentication</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\CommunityToolkit.Net.Graph\CommunityToolkit.Net.Graph.csproj">
+      <Project>{b2246169-0cd8-473c-aff6-172310e2c3f6}</Project>
+      <Name>CommunityToolkit.Net.Graph</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\CommunityToolkit.Uwp.Graph.Controls\CommunityToolkit.Uwp.Graph.Controls.csproj">
       <Project>{42252ee8-7e68-428f-972b-6d2dd3aa12cc}</Project>
       <Name>CommunityToolkit.Uwp.Graph.Controls</Name>

@@ -134,7 +134,14 @@ namespace CommunityToolkit.Uwp.Authentication
 
             // The state will get updated as part of the auth flow.
             var token = await GetTokenAsync(true);
-            return token != null;
+
+            if (token == null)
+            {
+                State = ProviderState.SignedOut;
+                return false;
+            }
+
+            return true;
         }
 
         /// <inheritdoc />
@@ -215,9 +222,9 @@ namespace CommunityToolkit.Uwp.Authentication
             }
             catch
             {
-                await SignOutAsync();
             }
 
+            await SignOutAsync();
             return null;
         }
 
