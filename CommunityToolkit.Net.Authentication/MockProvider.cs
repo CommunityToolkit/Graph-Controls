@@ -12,6 +12,7 @@ namespace CommunityToolkit.Net.Authentication
     /// <summary>
     /// Provider to connect to the example data set for Microsoft Graph. Useful for prototyping and samples.
     /// </summary>
+    [Obsolete("MockProvider is meant for prototyping and demonstration purposes only. Not for use in production applications.")]
     public class MockProvider : BaseProvider
     {
         private const string GRAPH_PROXY_URL = "https://proxy.apisandbox.msdn.microsoft.com/svc?url=";
@@ -39,6 +40,12 @@ namespace CommunityToolkit.Net.Authentication
             request.RequestUri = new Uri(GRAPH_PROXY_URL + Uri.EscapeDataString(requestUri));
 
             return Task.FromResult(0);
+        }
+
+        /// <inheritdoc/>
+        public override Task<string> GetTokenAsync(bool silentOnly = false)
+        {
+            return Task.FromResult("<mock-provider-token>");
         }
 
         /// <inheritdoc/>

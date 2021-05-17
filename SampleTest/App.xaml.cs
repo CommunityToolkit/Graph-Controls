@@ -70,7 +70,7 @@ namespace SampleTest
 
                     // Windows provider
                     case ProviderType.Windows:
-                        var webAccountProviderConfig = new WebAccountProviderConfig(WebAccountProviderType.MSA, clientId);
+                        var webAccountProviderConfig = new WebAccountProviderConfig(WebAccountProviderType.Msa, clientId);
                         ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes, webAccountProviderConfig: webAccountProviderConfig, autoSignIn: autoSignIn);
                         break;
                 }
