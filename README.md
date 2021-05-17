@@ -18,7 +18,13 @@ For more info on our roadmap, check out the current [Release Plan](https://githu
 
 ## <a name="supported"></a> Supported SDKs
 
-* UWP Windows 10 18362 (🚧 TODO: Check Lower SDKs for UWP)
+| Package | Min Supported |
+|--|--|
+| `CommunityToolkit.Net.Authentication` | NetStandard 2.0 |
+| `CommunityToolkit.Net.Authentication.Msal` | NetStandard 2.0 |
+| `CommunityToolkit.Uwp.Authentication` | UWP Windows 10 17134 |
+| `CommunityTookit.Net.Graph` | NetStandard 2.0 |
+| `CommunityToolkit.Uwp.Graph.Controls` | UWP Windows 10 17763 |
 
 ## <a name="documentation"></a> Getting Started
 
@@ -92,31 +98,34 @@ if (provider != null && provider.State == ProviderState.SignedIn)
 You can use the `ProviderManager.Instance` to listen to changes in authentication status with the `ProviderUpdated` event or get direct access to the [.NET Graph Beta API](https://github.com/microsoftgraph/msgraph-beta-sdk-dotnet) through `ProviderManager.Instance.GlobalProvider.GetBetaClient()`, just be sure to check if the `GlobalProvider` has been set first and its `State` is `SignedIn`:
 
 ```csharp
-// Get a my photo from the Graph beta endpoint as a BitmapSource.
-public BitmapSource GetMyPhotoAsync()
-{
-    var provider = ProviderManager.Instance.GlobalProvider;
+using CommunityToolkit.Net.Authentication;
+using CommunityToolkit.Net.Graph.Extensions;
 
-    if (provider != null && provider.State == ProviderState.SignedIn)
-    {
-        var betaGraphClient = provider.GetBetaClient();
+public ImageSource GetMyPhoto()
+{
+    IProvider provider = ProviderManager.Instance.GlobalProvider;
     
+    if (provider?.State == ProviderState.SignedIn)
+    {
+        // Get the beta client
+        GraphServiceClient betaGraphClient = provider.GetBetaClient();
+
         try
         {
+            // Make a request to the beta endpoint for the current user's photo.
             var photoStream = await betaGraphClient.Me.Photo.Content.Request().GetAsync();
+
             using var ras = photoStream.AsRandomAccessStream();
-            
             var bitmap = new BitmapImage();
             await bitmap.SetSourceAsync(ras);
-    
+
             return bitmap;
         }
         catch
         {
+            return null;
         }
     }
-    
-    return null;
 }
 ```
 
