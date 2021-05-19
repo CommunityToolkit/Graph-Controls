@@ -61,10 +61,10 @@ namespace CommunityToolkit.Authentication
         /// </summary>
         protected IDictionary<string, object> Settings => ApplicationData.Current.LocalSettings.Values;
 
-        private string[] _scopes;
+        private readonly string[] _scopes;
+        private readonly AccountsSettingsPaneConfig? _accountsSettingsPaneConfig;
+        private readonly WebAccountProviderConfig _webAccountProviderConfig;
         private WebAccount _webAccount;
-        private AccountsSettingsPaneConfig? _accountsSettingsPaneConfig;
-        private WebAccountProviderConfig _webAccountProviderConfig;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WindowsProvider"/> class.
@@ -118,10 +118,7 @@ namespace CommunityToolkit.Authentication
             }
         }
 
-        /// <summary>
-        /// Tries to check if the user is logged in without prompting to login.
-        /// </summary>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <inheritdoc />
         public override async Task<bool> TrySilentSignInAsync()
         {
             if (_webAccount != null && State == ProviderState.SignedIn)
