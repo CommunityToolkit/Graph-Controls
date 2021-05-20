@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 
-namespace CommunityToolkit.Graph.Uwp
+namespace CommunityToolkit.Graph.Uwp.Controls
 {
     /// <summary>
     /// XAML Proxy for <see cref="Microsoft.Graph.QueryOption"/>.
