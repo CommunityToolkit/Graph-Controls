@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>uap10.0.17134</TargetFramework>
     <Title>Windows Community Toolkit Graph Uwp Authentication Provider</Title>
-    <PackageId>CommunityToolkit.Uwp.Authentication</PackageId>
+    <PackageId>CommunityToolkit.Authentication.Uwp</PackageId>
     <Description>
       This library provides an authentication provider based on the native Windows dialogues. It is part of the Windows Community Toolkit.
 
