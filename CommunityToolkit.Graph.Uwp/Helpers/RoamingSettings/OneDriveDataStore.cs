@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
 
-namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
+namespace CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings
 {
     /// <summary>
     /// A DataStore for managing roaming settings in OneDrive.

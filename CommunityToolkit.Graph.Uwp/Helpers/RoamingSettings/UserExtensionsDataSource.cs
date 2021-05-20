@@ -10,7 +10,7 @@ using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
 
-namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
+namespace CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings
 {
     /// <summary>
     /// Manages Graph interaction with open extensions on the user.

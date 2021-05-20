@@ -10,7 +10,7 @@ using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp.Helpers;
 
-namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
+namespace CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings
 {
     /// <summary>
     /// Helpers for interacting with files in the special OneDrive AppRoot folder.

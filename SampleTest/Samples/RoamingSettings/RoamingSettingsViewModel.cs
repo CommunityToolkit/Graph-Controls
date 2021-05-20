@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Authentication;
-using CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings;
+using CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

@@ -10,7 +10,7 @@ using CommunityToolkit.Graph.Extensions;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
 
-namespace CommunityToolkit.Uwp.Graph.Helpers.RoamingSettings
+namespace CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings
 {
     /// <summary>
     /// An enumeration of the available data storage methods for roaming data.
