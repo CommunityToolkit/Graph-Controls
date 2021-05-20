@@ -5,6 +5,7 @@
     <Title>Windows Community Toolkit .NET Standard Auth Services</Title>
     <Description>
         This package includes .NET Standard authentication helpers such as:
+        
         - MsalProvider:
     </Description>
     <PackageTags>Community Toolkit Provider Authentication Auth Msal</PackageTags>
