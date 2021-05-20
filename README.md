@@ -20,11 +20,11 @@ For more info on our roadmap, check out the current [Release Plan](https://githu
 
 | Package | Min Supported |
 |--|--|
-| `CommunityToolkit.Net.Authentication` | NetStandard 2.0 |
-| `CommunityToolkit.Net.Authentication.Msal` | NetStandard 2.0 |
-| `CommunityToolkit.Uwp.Authentication` | UWP Windows 10 17134 |
-| `CommunityTookit.Net.Graph` | NetStandard 2.0 |
-| `CommunityToolkit.Uwp.Graph.Controls` | UWP Windows 10 17763 |
+| `CommunityToolkit.Authentication` | NetStandard 2.0 |
+| `CommunityToolkit.Authentication.Msal` | NetStandard 2.0 |
+| `CommunityToolkit.Authentication.Uwp` | UWP Windows 10 17134 |
+| `CommunityTookit.Graph` | NetStandard 2.0 |
+| `CommunityToolkit.Graph.Uwp` | UWP Windows 10 17763 |
 
 ## <a name="documentation"></a> Getting Started
 
@@ -42,12 +42,11 @@ Leverage the official Microsoft Authentication Library (MSAL) to enable authenti
 
     > After finishing the initial registration page, you will also need to add an additional redirect URI. Click on "Add a Redirect URI", then "Add a platform", and then on "Mobile and desktop applications". Check the `https://login.microsoftonline.com/common/oauth2/nativeclient` checkbox on that page. Then click "Configure".
 
-3. Install the `CommunityToolkit.Net.Authentication.Msal` package.
+3. Install the `CommunityToolkit.Authentication.Msal` package.
 4. Set the GlobalProvder to a new instance of MsalProvider with clientId and pre-configured scopes:
     
     ```csharp
-    using CommunityToolkit.Net.Authentication;
-    using CommunityToolkit.Net.Authentication.Msal;
+    using CommunityToolkit.Authentication;
 
     string clientId = "YOUR-CLIENT-ID-HERE";
     string[] scopes = new string[] { "User.Read" };
@@ -62,12 +61,11 @@ Leverage the official Microsoft Authentication Library (MSAL) to enable authenti
 Try out the WindowsProvider to enable authentication based on the native Windows Account Manager (WAM) APIs in your UWP apps, without requiring a dependency on MSAL.
 
 1. Associate your app with the Microsoft Store. The app association will act as our minimal app registration for authenticating consumer MSAs. See the [WindowsProvider docs](https://github.com/windows-toolkit/Graph-Controls/edit/main/Docs/WindowsProvider.md) for more details.
-1. Install the `CommunityToolkit.Uwp.Authentication` package
+1. Install the `CommunityToolkit.Authentication.Uwp` package
 1. Set the GlobalProvider to a new instance of WindowsProvider with pre-configured scopes:
 
     ```csharp
-    using CommunityToolkit.Net.Authentication;
-    using CommunityToolkit.Uwp.Authentication;
+    using CommunityToolkit.Authentication;
 
     string[] scopes = new string[] { "User.Read" };
 
@@ -78,11 +76,11 @@ Try out the WindowsProvider to enable authentication based on the native Windows
 
 Once you are authenticated, you can then make requests to the Graph using the GraphServiceClient instance.
 
-> Install the `CommunityToolkit.Net.Graph` package.
+> Install the `CommunityToolkit.Graph` package.
 
 ```
-using CommunityToolkit.Net.Authentication;
-using CommunityToolkit.Net.Graph.Extensions;
+using CommunityToolkit.Authentication;
+using CommunityToolkit.Graph.Extensions;
 
 var provider = ProviderManager.Instance.GlobalProvider;
 
