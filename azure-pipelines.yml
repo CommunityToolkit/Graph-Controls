@@ -1,11 +1,13 @@
 # Control which branches get CI triggers (defaults to all branches if this parameter is not set)
 trigger:
   - main
+  - dev/*
   - rel/*
 
 # Specify the target branches for pull request builds
 pr:
   - main
+  - dev/*
   - rel/*
 
 # Microsoft-hosted agent pool for Visual Studio 2019
