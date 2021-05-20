@@ -119,6 +119,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="LoginButton.xaml.cs">
+      <DependentUpon>LoginButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -144,6 +147,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="LoginButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -166,10 +173,6 @@
     <ProjectReference Include="..\..\CommunityToolkit.Graph\CommunityToolkit.Graph.csproj">
       <Project>{b2246169-0cd8-473c-aff6-172310e2c3f6}</Project>
       <Name>CommunityToolkit.Graph</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\CommunityToolkit.Graph.Uwp\CommunityToolkit.Graph.Uwp.csproj">
-      <Project>{42252ee8-7e68-428f-972b-6d2dd3aa12cc}</Project>
-      <Name>CommunityToolkit.Graph.Uwp</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

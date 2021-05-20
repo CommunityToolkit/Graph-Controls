@@ -6,7 +6,6 @@
     <Title>Windows Community Toolkit .NET Standard Graph Services</Title>
     <Description>
       This package includes .NET Standard code helpers such as:
-      - GraphExtensions: Helpers for common tasks related to the Microsoft Graph used by the Microsoft.Toolkit.Graph.Controls.
       - ProviderExtensions: Extension on IProvider for accessing a pre-configured GraphServiceClient instance.
     </Description>
     <PackageTags>Windows Community Toolkit Graph Provider Extensions</PackageTags>

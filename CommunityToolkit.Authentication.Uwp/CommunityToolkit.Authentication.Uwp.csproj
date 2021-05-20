@@ -8,7 +8,7 @@
       This library provides an authentication provider based on the native Windows dialogues. It is part of the Windows Community Toolkit.
 
       Classes:
-      - WindowsProvider: 
+      - WindowsProvider: Lightweight authentication provider built around the native Windows Account Manager (WAM) APIs.
     </Description>
     <PackageTags>UWP Toolkit Windows Microsoft Graph AadLogin Authentication Login</PackageTags>
     <SignAssembly>false</SignAssembly>
