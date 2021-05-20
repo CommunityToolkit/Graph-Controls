@@ -12,7 +12,7 @@ namespace UwpWindowsProviderSample
     {
         public MainPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
             
             ProviderManager.Instance.ProviderUpdated += OnProviderUpdated;
         }

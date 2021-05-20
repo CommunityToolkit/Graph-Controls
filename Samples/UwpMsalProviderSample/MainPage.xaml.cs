@@ -12,7 +12,7 @@ namespace UwpMsalProviderSample
     {
         public MainPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             ProviderManager.Instance.ProviderUpdated += OnProviderUpdated;
         }
