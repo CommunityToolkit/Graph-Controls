@@ -10,8 +10,9 @@ If you need similar controls for the Web, please use the [Microsoft Graph Toolki
 
 We've overhauled our approach and introduced some big improvements:
 
-- Authentication packages are split per provider and all are netstandard 🎉
-- Access to the GraphServiceClient now lives in a sparate package. This means no dependency on the Graph SDK for simple auth scenarios and apps that perform Graph requests manually (sans SDK) 🥳
+- The new WindowsProvivder enables basic consumer login without AAD configuration 🎊
+- Authentication packages are now split per provider 🎉
+- Access to the GraphServiceClient now lives in a separate package. This means no dependency on the Graph SDK for simple auth scenarios and apps that perform Graph requests manually (sans SDK) 🥳
 - Removed Beta Graph SDK, but enabled access with V1 SDK types. This is so our controls and helpers can be based on the stable Graph endpoint, while also allowing for requests to the beta endpoint in some circumstances (Such as retrieving a user's photo) 🎈
 
 For more info on our roadmap, check out the current [Release Plan](https://github.com/windows-toolkit/Graph-Controls/issues/81)
@@ -96,8 +97,8 @@ if (provider != null && provider.State == ProviderState.SignedIn)
 You can use the `ProviderManager.Instance` to listen to changes in authentication status with the `ProviderUpdated` event or get direct access to the [.NET Graph Beta API](https://github.com/microsoftgraph/msgraph-beta-sdk-dotnet) through `ProviderManager.Instance.GlobalProvider.GetBetaClient()`, just be sure to check if the `GlobalProvider` has been set first and its `State` is `SignedIn`:
 
 ```csharp
-using CommunityToolkit.Net.Authentication;
-using CommunityToolkit.Net.Graph.Extensions;
+using CommunityToolkit.Authentication;
+using CommunityToolkit.Graph.Extensions;
 
 public ImageSource GetMyPhoto()
 {
@@ -130,7 +131,7 @@ public ImageSource GetMyPhoto()
 ## Build Status
 | Target | Branch | Status | Recommended package version |
 | ------ | ------ | ------ | ------ |
-| Pre-release beta testing | master | [![Build Status](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_apis/build/status/windows-toolkit.Graph-Controls?branchName=master)](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_build/latest?definitionId=102&branchName=master) | [![MyGet](https://img.shields.io/dotnet.myget/uwpcommunitytoolkit/vpre/Microsoft.Toolkit.Graph.svg)](https://dotnet.myget.org/gallery/uwpcommunitytoolkit) |
+| Pre-release beta testing | master | [![Build Status](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_apis/build/status/windows-toolkit.Graph-Controls?branchName=main)](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_build/latest?definitionId=102&branchName=main) | [![MyGet](https://img.shields.io/dotnet.myget/uwpcommunitytoolkit/vpre/Microsoft.Toolkit.Graph.svg)](https://dotnet.myget.org/gallery/uwpcommunitytoolkit) |
 
 ## Feedback and Requests
 Please use [GitHub Issues](https://github.com/windows-toolkit/Graph-Controls/issues) for bug reports and feature requests.
