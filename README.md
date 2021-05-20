@@ -131,7 +131,7 @@ public ImageSource GetMyPhoto()
 ## Build Status
 | Target | Branch | Status | Recommended package version |
 | ------ | ------ | ------ | ------ |
-| Pre-release beta testing | master | [![Build Status](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_apis/build/status/windows-toolkit.Graph-Controls?branchName=main)](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_build/latest?definitionId=102&branchName=main) | [![MyGet](https://img.shields.io/dotnet.myget/uwpcommunitytoolkit/vpre/Microsoft.Toolkit.Graph.svg)](https://dotnet.myget.org/gallery/uwpcommunitytoolkit) |
+| Pre-release beta testing | main | [![Build Status](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_apis/build/status/windows-toolkit.Graph-Controls?branchName=main)](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_build/latest?definitionId=102&branchName=main) | [![MyGet](https://img.shields.io/dotnet.myget/uwpcommunitytoolkit/vpre/Microsoft.Toolkit.Graph.svg)](https://dotnet.myget.org/gallery/uwpcommunitytoolkit) |
 
 ## Feedback and Requests
 Please use [GitHub Issues](https://github.com/windows-toolkit/Graph-Controls/issues) for bug reports and feature requests.
