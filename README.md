@@ -26,6 +26,14 @@ For more info on our roadmap, check out the current [Release Plan](https://githu
 | `CommunityTookit.Net.Graph` | NetStandard 2.0 |
 | `CommunityToolkit.Uwp.Graph.Controls` | UWP Windows 10 17763 |
 
+## Samples
+
+Check out our samples for getting started with authentication providers and making call to Microsoft Graph:
+
+- [UwpWindowsProviderSample](./Samples/UwpWindowsProviderSample)
+- [UwpMsalProviderSample](./Samples/UwpMsalProviderSample)
+- [WpfMsalProviderSample](./Samples/WpfMsalProviderSample)
+
 ## <a name="documentation"></a> Getting Started
 
 To get started using Graph data in your application, you'll first need to enable authentication.
