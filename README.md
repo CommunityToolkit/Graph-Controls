@@ -34,6 +34,7 @@ Check out our samples for getting started with authentication providers and maki
 - [UwpWindowsProviderSample](./Samples/UwpWindowsProviderSample)
 - [UwpMsalProviderSample](./Samples/UwpMsalProviderSample)
 - [WpfMsalProviderSample](./Samples/WpfMsalProviderSample)
+- [ManualGraphRequestSample](./Samples/ManualGraphRequestSample)
 
 ## <a name="documentation"></a> Getting Started
 
