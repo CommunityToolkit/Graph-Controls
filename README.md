@@ -10,8 +10,9 @@ If you need similar controls for the Web, please use the [Microsoft Graph Toolki
 
 We've overhauled our approach and introduced some big improvements:
 
-- Authentication packages are split per provider and all are netstandard 🎉
-- Access to the GraphServiceClient now lives in a sparate package. This means no dependency on the Graph SDK for simple auth scenarios and apps that perform Graph requests manually (sans SDK) 🥳
+- The new WindowsProvivder enables basic consumer login without AAD configuration 🎊
+- Authentication packages are now split per provider 🎉
+- Access to the GraphServiceClient now lives in a separate package. This means no dependency on the Graph SDK for simple auth scenarios and apps that perform Graph requests manually (sans SDK) 🥳
 - Removed Beta Graph SDK, but enabled access with V1 SDK types. This is so our controls and helpers can be based on the stable Graph endpoint, while also allowing for requests to the beta endpoint in some circumstances (Such as retrieving a user's photo) 🎈
 
 For more info on our roadmap, check out the current [Release Plan](https://github.com/windows-toolkit/Graph-Controls/issues/81)
@@ -20,11 +21,11 @@ For more info on our roadmap, check out the current [Release Plan](https://githu
 
 | Package | Min Supported |
 |--|--|
-| `CommunityToolkit.Net.Authentication` | NetStandard 2.0 |
-| `CommunityToolkit.Net.Authentication.Msal` | NetStandard 2.0 |
-| `CommunityToolkit.Uwp.Authentication` | UWP Windows 10 17134 |
-| `CommunityTookit.Net.Graph` | NetStandard 2.0 |
-| `CommunityToolkit.Uwp.Graph.Controls` | UWP Windows 10 17763 |
+| `CommunityToolkit.Authentication` | NetStandard 2.0 |
+| `CommunityToolkit.Authentication.Msal` | NetStandard 2.0 |
+| `CommunityToolkit.Authentication.Uwp` | UWP Windows 10 17134 |
+| `CommunityTookit.Graph` | NetStandard 2.0 |
+| `CommunityToolkit.Graph.Uwp` | UWP Windows 10 17763 |
 
 ## Samples
 
@@ -33,6 +34,7 @@ Check out our samples for getting started with authentication providers and maki
 - [UwpWindowsProviderSample](./Samples/UwpWindowsProviderSample)
 - [UwpMsalProviderSample](./Samples/UwpMsalProviderSample)
 - [WpfMsalProviderSample](./Samples/WpfMsalProviderSample)
+- [ManualGraphRequestSample](./Samples/ManualGraphRequestSample)
 
 ## <a name="documentation"></a> Getting Started
 
@@ -50,12 +52,11 @@ Leverage the official Microsoft Authentication Library (MSAL) to enable authenti
 
     > After finishing the initial registration page, you will also need to add an additional redirect URI. Click on "Add a Redirect URI", then "Add a platform", and then on "Mobile and desktop applications". Check the `https://login.microsoftonline.com/common/oauth2/nativeclient` checkbox on that page. Then click "Configure".
 
-3. Install the `CommunityToolkit.Net.Authentication.Msal` package.
+3. Install the `CommunityToolkit.Authentication.Msal` package.
 4. Set the GlobalProvder to a new instance of MsalProvider with clientId and pre-configured scopes:
     
     ```csharp
-    using CommunityToolkit.Net.Authentication;
-    using CommunityToolkit.Net.Authentication.Msal;
+    using CommunityToolkit.Authentication;
 
     string clientId = "YOUR-CLIENT-ID-HERE";
     string[] scopes = new string[] { "User.Read" };
@@ -70,27 +71,26 @@ Leverage the official Microsoft Authentication Library (MSAL) to enable authenti
 Try out the WindowsProvider to enable authentication based on the native Windows Account Manager (WAM) APIs in your UWP apps, without requiring a dependency on MSAL.
 
 1. Associate your app with the Microsoft Store. The app association will act as our minimal app registration for authenticating consumer MSAs. See the [WindowsProvider docs](https://github.com/windows-toolkit/Graph-Controls/edit/main/Docs/WindowsProvider.md) for more details.
-1. Install the `CommunityToolkit.Uwp.Authentication` package
+1. Install the `CommunityToolkit.Authentication.Uwp` package
 1. Set the GlobalProvider to a new instance of WindowsProvider with pre-configured scopes:
 
     ```csharp
-    using CommunityToolkit.Net.Authentication;
-    using CommunityToolkit.Uwp.Authentication;
+    using CommunityToolkit.Authentication;
 
     string[] scopes = new string[] { "User.Read" };
 
     ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes);
     ```
 
-### 2. Make a Graph call
+### 2. Make a Graph request with the Graph SDK
 
 Once you are authenticated, you can then make requests to the Graph using the GraphServiceClient instance.
 
-> Install the `CommunityToolkit.Net.Graph` package.
+> Install the `CommunityToolkit.Graph` package.
 
 ```
-using CommunityToolkit.Net.Authentication;
-using CommunityToolkit.Net.Graph.Extensions;
+using CommunityToolkit.Authentication;
+using CommunityToolkit.Graph.Extensions;
 
 var provider = ProviderManager.Instance.GlobalProvider;
 
@@ -101,13 +101,50 @@ if (provider != null && provider.State == ProviderState.SignedIn)
 }
 ```
 
+#### Make a Graph request manually
+
+Alternatively if you do not wish to use the Graph SDK you can make requests to Microsoft Graph manually instead:
+
+```
+using CommunityToolkit.Authentication;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+private async Task<IList<TodoTask>> GetDefaultTaskListAsync()
+{
+    var httpClient = new HttpClient();
+    var requestUri = "https://graph.microsoft.com/v1.0/me/todo/lists/tasks/tasks";
+
+    var getRequest = new HttpRequestMessage(HttpMethod.Get, requestUri);
+    await ProviderManager.Instance.GlobalProvider.AuthenticateRequestAsync(getRequest);
+
+    using (httpClient)
+    {
+        var response = await httpClient.SendAsync(getRequest);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var jObject = JObject.Parse(jsonResponse);
+            if (jObject.ContainsKey("value"))
+            {
+                var tasks = JsonConvert.DeserializeObject<List<TodoTask>>(jObject["value"].ToString());
+                return tasks;
+            }
+        }
+    }
+
+    return null;
+}
+```
+
 **That's all you need to get started!**
 
 You can use the `ProviderManager.Instance` to listen to changes in authentication status with the `ProviderUpdated` event or get direct access to the [.NET Graph Beta API](https://github.com/microsoftgraph/msgraph-beta-sdk-dotnet) through `ProviderManager.Instance.GlobalProvider.GetBetaClient()`, just be sure to check if the `GlobalProvider` has been set first and its `State` is `SignedIn`:
 
 ```csharp
-using CommunityToolkit.Net.Authentication;
-using CommunityToolkit.Net.Graph.Extensions;
+using CommunityToolkit.Authentication;
+using CommunityToolkit.Graph.Extensions;
 
 public ImageSource GetMyPhoto()
 {
@@ -140,7 +177,7 @@ public ImageSource GetMyPhoto()
 ## Build Status
 | Target | Branch | Status | Recommended package version |
 | ------ | ------ | ------ | ------ |
-| Pre-release beta testing | master | [![Build Status](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_apis/build/status/windows-toolkit.Graph-Controls?branchName=master)](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_build/latest?definitionId=102&branchName=master) | [![MyGet](https://img.shields.io/dotnet.myget/uwpcommunitytoolkit/vpre/Microsoft.Toolkit.Graph.svg)](https://dotnet.myget.org/gallery/uwpcommunitytoolkit) |
+| Pre-release beta testing | main | [![Build Status](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_apis/build/status/windows-toolkit.Graph-Controls?branchName=main)](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_build/latest?definitionId=102&branchName=main) | [![MyGet](https://img.shields.io/dotnet.myget/uwpcommunitytoolkit/vpre/Microsoft.Toolkit.Graph.svg)](https://dotnet.myget.org/gallery/uwpcommunitytoolkit) |
 
 ## Feedback and Requests
 Please use [GitHub Issues](https://github.com/windows-toolkit/Graph-Controls/issues) for bug reports and feature requests.
