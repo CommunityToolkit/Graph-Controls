@@ -82,7 +82,7 @@ Try out the WindowsProvider to enable authentication based on the native Windows
     ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes);
     ```
 
-### 2. Make a Graph call
+### 2. Make a Graph request with the Graph SDK
 
 Once you are authenticated, you can then make requests to the Graph using the GraphServiceClient instance.
 
@@ -98,6 +98,43 @@ if (provider != null && provider.State == ProviderState.SignedIn)
 {
     var graphClient = provider.GetClient();
     var me = await graphClient.Me.Request().GetAsync();
+}
+```
+
+#### Make a Graph request manually
+
+Alternatively if you do not wish to use the Graph SDK you can make requests to Microsoft Graph manually instead:
+
+```
+using CommunityToolkit.Authentication;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+private async Task<IList<TodoTask>> GetDefaultTaskListAsync()
+{
+    var httpClient = new HttpClient();
+    var requestUri = "https://graph.microsoft.com/v1.0/me/todo/lists/tasks/tasks";
+
+    var getRequest = new HttpRequestMessage(HttpMethod.Get, requestUri);
+    await ProviderManager.Instance.GlobalProvider.AuthenticateRequestAsync(getRequest);
+
+    using (httpClient)
+    {
+        var response = await httpClient.SendAsync(getRequest);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var jObject = JObject.Parse(jsonResponse);
+            if (jObject.ContainsKey("value"))
+            {
+                var tasks = JsonConvert.DeserializeObject<List<TodoTask>>(jObject["value"].ToString());
+                return tasks;
+            }
+        }
+    }
+
+    return null;
 }
 ```
 
