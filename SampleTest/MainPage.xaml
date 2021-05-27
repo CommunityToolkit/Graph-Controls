@@ -2,13 +2,12 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:global="using:System.Globalization"
       xmlns:graph="using:Microsoft.Graph"
       xmlns:local="using:SampleTest"
       xmlns:samples="using:SampleTest.Samples"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:wgt="using:CommunityToolkit.Graph.Uwp.Controls" 
-      xmlns:toolkit="using:Microsoft.Toolkit"
+      xmlns:controls="using:CommunityToolkit.Graph.Uwp.Controls" 
+      xmlns:toolkit="using:Microsoft.Toolkit" xmlns:global="using:System.Globalization"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
       mc:Ignorable="d">
     
@@ -20,7 +19,7 @@
         </Pivot.ItemContainerStyle>
         <PivotItem Header="LoginButton">
             <StackPanel>
-                <wgt:LoginButton HorizontalAlignment="Left"
+                <controls:LoginButton HorizontalAlignment="Left"
                                  VerticalAlignment="Top" />
                 <TextBlock TextWrapping="WrapWholeWords">
                     The `LoginButton` above allows your user and application to easily connect to the Microsoft Graph. They can then also easily logout from the drop-down menu.
@@ -36,7 +35,7 @@
                            TextWrapping="WrapWholeWords">
                     The `PeoplePicker` lets a logged in user easily search for familiar people they interact with or contacts. Great for emails or messages.
                 </TextBlock>
-                <wgt:PeoplePicker x:Name="PeopleChooser" />
+                <controls:PeoplePicker x:Name="PeopleChooser" />
                 <TextBlock Margin="0,8,0,0"
                            FontWeight="Bold">
                     Picked People:
@@ -79,19 +78,19 @@
                                     My Upcoming Calendar Events:
                                 </TextBlock>
                             </StackPanel>
-                            <wgt:GraphPresenter Grid.Row="1"
+                            <controls:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
                                                 OrderBy="start/dateTime"
                                                 RequestBuilder="{x:Bind CalendarViewBuilder, Mode=OneWay}"
                                                 ResponseType="graph:Event">
-                                <wgt:GraphPresenter.QueryOptions>
+                                <controls:GraphPresenter.QueryOptions>
                                     <!--  Need to create separate Properties as multiple functions not supported in x:Bind see https://github.com/microsoft/microsoft-ui-xaml/issues/2407  -->
-                                    <wgt:QueryOption Name="startDateTime"
+                                    <controls:QueryOption Name="startDateTime"
                                                      Value="{x:Bind Today.ToString('o', global:CultureInfo.InvariantCulture)}" />
-                                    <wgt:QueryOption Name="endDateTime"
+                                    <controls:QueryOption Name="endDateTime"
                                                      Value="{x:Bind ThreeDaysFromNow.ToString('o', global:CultureInfo.InvariantCulture)}" />
-                                </wgt:GraphPresenter.QueryOptions>
-                                <wgt:GraphPresenter.ContentTemplate>
+                                </controls:GraphPresenter.QueryOptions>
+                                <controls:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
                                         <!--  Return result is a collection of Event's as we used 'IsCollection', so bind that first.  -->
                                         <ScrollViewer HorizontalScrollMode="Disabled"
@@ -124,8 +123,8 @@
                                             </ItemsControl>
                                         </ScrollViewer>
                                     </DataTemplate>
-                                </wgt:GraphPresenter.ContentTemplate>
-                            </wgt:GraphPresenter>
+                                </controls:GraphPresenter.ContentTemplate>
+                            </controls:GraphPresenter>
                         </Grid>
                     </PivotItem>
                     <PivotItem Header="(Mail) Messages">
@@ -141,11 +140,11 @@
                                     My Messages:
                                 </TextBlock>
                             </StackPanel>
-                            <wgt:GraphPresenter Grid.Row="1"
+                            <controls:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
                                                 RequestBuilder="{x:Bind MessagesBuilder, Mode=OneWay}"
                                                 ResponseType="graph:Message">
-                                <wgt:GraphPresenter.ContentTemplate>
+                                <controls:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
                                         <ScrollViewer HorizontalScrollMode="Disabled"
                                                       VerticalScrollBarVisibility="Auto">
@@ -153,7 +152,7 @@
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate x:DataType="graph:Message">
                                                         <StackPanel>
-                                                            <wgt:PersonView Margin="-4"
+                                                            <controls:PersonView Margin="-4"
                                                                             PersonQuery="{x:Bind Sender.EmailAddress.Address}"
                                                                             PersonViewType="OneLine" />
                                                             <TextBlock Padding="0"
@@ -172,8 +171,8 @@
                                             </ItemsControl>
                                         </ScrollViewer>
                                     </DataTemplate>
-                                </wgt:GraphPresenter.ContentTemplate>
-                            </wgt:GraphPresenter>
+                                </controls:GraphPresenter.ContentTemplate>
+                            </controls:GraphPresenter>
                         </Grid>
                     </PivotItem>
                     <PivotItem Header="Tasks">
@@ -189,11 +188,11 @@
                                     My Tasks:
                                 </TextBlock>
                             </StackPanel>
-                            <wgt:GraphPresenter Grid.Row="1"
+                            <controls:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
                                                 RequestBuilder="{x:Bind PlannerTasksBuilder, Mode=OneWay}"
                                                 ResponseType="graph:PlannerTask">
-                                <wgt:GraphPresenter.ContentTemplate>
+                                <controls:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
                                         <ScrollViewer HorizontalScrollMode="Disabled"
                                                       VerticalScrollBarVisibility="Auto">
@@ -222,7 +221,7 @@
                                                                 <ItemsControl.ItemTemplate>
                                                                     <DataTemplate>
                                                                         <!--  We're getting a KVP from the PlannerAssignments type, the Key is the UserId string, we'll use that to look-up our user info.  -->
-                                                                        <wgt:PersonView Margin="-4"
+                                                                        <controls:PersonView Margin="-4"
                                                                                         UserId="{Binding Key}" />
                                                                     </DataTemplate>
                                                                 </ItemsControl.ItemTemplate>
@@ -249,8 +248,8 @@
                                             </ItemsControl>
                                         </ScrollViewer>
                                     </DataTemplate>
-                                </wgt:GraphPresenter.ContentTemplate>
-                            </wgt:GraphPresenter>
+                                </controls:GraphPresenter.ContentTemplate>
+                            </controls:GraphPresenter>
                         </Grid>
                     </PivotItem>
                     <PivotItem Header="Teams Messages">
@@ -266,11 +265,11 @@
                                     My Chat Messages:
                                 </TextBlock>
                             </StackPanel>
-                            <wgt:GraphPresenter Grid.Row="1"
+                            <controls:GraphPresenter Grid.Row="1"
                                                 IsCollection="True"
                                                 RequestBuilder="{x:Bind TeamsChannelMessagesBuilder, Mode=OneWay}"
                                                 ResponseType="graph:ChatMessage">
-                                <wgt:GraphPresenter.ContentTemplate>
+                                <controls:GraphPresenter.ContentTemplate>
                                     <DataTemplate>
                                         <ScrollViewer HorizontalScrollMode="Disabled"
                                                       VerticalScrollBarVisibility="Auto">
@@ -282,7 +281,7 @@
                                                                 <ColumnDefinition Width="Auto" />
                                                                 <ColumnDefinition Width="*" />
                                                             </Grid.ColumnDefinitions>
-                                                            <wgt:PersonView Margin="-4,-4,8,-4"
+                                                            <controls:PersonView Margin="-4,-4,8,-4"
                                                                             UserId="{x:Bind From.User.Id, Mode=OneWay}" />
                                                             <TextBlock Grid.Column="1"
                                                                        Text="{x:Bind toolkit:StringExtensions.DecodeHtml(Body.Content), Mode=OneWay}"
@@ -298,8 +297,8 @@
                                             </ItemsControl>
                                         </ScrollViewer>
                                     </DataTemplate>
-                                </wgt:GraphPresenter.ContentTemplate>
-                            </wgt:GraphPresenter>
+                                </controls:GraphPresenter.ContentTemplate>
+                            </controls:GraphPresenter>
                         </Grid>
                     </PivotItem>
                 </Pivot>
