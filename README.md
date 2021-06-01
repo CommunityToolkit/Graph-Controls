@@ -1,4 +1,4 @@
-# Windows Community Toolkit - Graph Helpers and Controls
+# (Preview) Windows Community Toolkit - Graph Helpers and Controls
 
 Welcome! This is a sub-repo for the [Windows Community Toolkit](https://aka.ms/wct) focused on [Microsoft Graph](https://developer.microsoft.com/en-us/graph/) providing a set of Helpers and Controls for netstandard and UWP apps.
 
@@ -35,12 +35,14 @@ Check out our samples for getting started with authentication providers and maki
 - [UwpMsalProviderSample](./Samples/UwpMsalProviderSample)
 - [WpfMsalProviderSample](./Samples/WpfMsalProviderSample)
 - [ManualGraphRequestSample](./Samples/ManualGraphRequestSample)
+- [Sample-Graph-ContosoNotes](https://github.com/windows-toolkit/Sample-Graph-ContosoNotes)
 
 ## <a name="documentation"></a> Getting Started
 
 To get started using Graph data in your application, you'll first need to enable authentication.
 
-> Note: The nuget packages metioned are not yet released, and can be accessed from using our dedicated Nuget feed: [WindowsCommunityToolkit-MainLatest](https://pkgs.dev.azure.com/dotnet/WindowsCommunityToolkit/_packaging/WindowsCommunityToolkit-MainLatest/nuget/v3/index.json)
+> IMPORTANT:
+> Windows Community Toolkit - Graph Controls and Helpers packages are in preview. To get started using WCT preview packages visit the [WCT Preview Packages wiki page](https://aka.ms/wct/wiki/previewpackages).
 
 ### 1A. Setup authentication with MSAL
 
