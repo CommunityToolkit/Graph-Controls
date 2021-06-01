@@ -10,12 +10,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 
 namespace ManualGraphRequestSample
 {
-    public sealed partial class MainPage : Page
+    public sealed partial class MainPage : Windows.UI.Xaml.Controls.Page
     {
         public ObservableCollection<TodoTask> TaskCollection = new ObservableCollection<TodoTask>();
 
@@ -30,30 +28,16 @@ namespace ManualGraphRequestSample
         private async void OnProviderUpdated(object sender, ProviderUpdatedEventArgs e)
         {
             IProvider provider = ProviderManager.Instance.GlobalProvider;
-            
+
             switch (provider?.State)
             {
-                case ProviderState.Loading:
-                    SignInButton.Content = "Loading...";
-                    SignInLoadingRing.IsActive = true;
-                    SignInButton.IsEnabled = false;
-                    break;
-
                 case ProviderState.SignedOut:
-                    SignInButton.Content = "Sign In";
-                    SignInLoadingRing.IsActive = false;
-                    SignInButton.IsEnabled = true;
-
                     TaskCollection.Clear();
                     break;
 
                 case ProviderState.SignedIn:
-                    SignInButton.Content = "Sign Out";
-                    SignInLoadingRing.IsActive = false;
-                    SignInButton.IsEnabled = true;
-
                     IList<TodoTask> tasks = await GetDefaultTaskListAsync();
-                    if (tasks != null)
+                    if (tasks != default)
                     {
                         foreach (var task in tasks)
                         {
@@ -64,44 +48,39 @@ namespace ManualGraphRequestSample
             }
         }
 
-        private async void OnSignInButtonClick(object sender, RoutedEventArgs e)
-        {
-            IProvider provider = ProviderManager.Instance.GlobalProvider;
-            if (provider?.State == ProviderState.SignedOut)
-            {
-                await ProviderManager.Instance.GlobalProvider.SignInAsync();
-            }
-            else if (provider?.State == ProviderState.SignedIn)
-            {
-                await ProviderManager.Instance.GlobalProvider.SignOutAsync();
-            }
-        }
-
         private async Task<IList<TodoTask>> GetDefaultTaskListAsync()
         {
-            var httpClient = new HttpClient();
-            var requestUri = "https://graph.microsoft.com/v1.0/me/todo/lists/tasks/tasks";
+            return await GetResponseAsync<List<TodoTask>>("https://graph.microsoft.com/v1.0/me/todo/lists/tasks/tasks");
+        }
 
-            var getRequest = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        private async Task<T> GetResponseAsync<T>(string requestUri)
+        {
+            // Build the request
+            HttpRequestMessage getRequest = new HttpRequestMessage(HttpMethod.Get, requestUri);
+
+            // Authenticate the request
             await ProviderManager.Instance.GlobalProvider.AuthenticateRequestAsync(getRequest);
 
+            var httpClient = new HttpClient();
             using (httpClient)
             {
+                // Send the request
                 var response = await httpClient.SendAsync(getRequest);
 
                 if (response.IsSuccessStatusCode)
                 {
+                    // Handle the request response
                     var jsonResponse = await response.Content.ReadAsStringAsync();
                     var jObject = JObject.Parse(jsonResponse);
                     if (jObject.ContainsKey("value"))
                     {
-                        var tasks = JsonConvert.DeserializeObject<List<TodoTask>>(jObject["value"].ToString());
-                        return tasks;
+                        var result = JsonConvert.DeserializeObject<T>(jObject["value"].ToString());
+                        return result;
                     }
                 }
             }
 
-            return null;
+            return default;
         }
     }
 }

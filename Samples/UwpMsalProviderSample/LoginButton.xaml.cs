@@ -3,7 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Authentication;
-using System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -46,25 +45,22 @@ namespace UwpMsalProviderSample
             IsEnabled = true;
         }
 
-        private async void MyButton_Click(object sender, RoutedEventArgs e)
+        private void MyButton_Click(object sender, RoutedEventArgs e)
         {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            var provider = ProviderManager.Instance.GlobalProvider;
+            if (provider != null)
             {
-                var provider = ProviderManager.Instance.GlobalProvider;
-                if (provider != null)
+                switch (provider.State)
                 {
-                    switch (provider.State)
-                    {
-                        case ProviderState.SignedOut:
-                            provider.SignInAsync();
-                            break;
+                    case ProviderState.SignedOut:
+                        provider.SignInAsync();
+                        break;
 
-                        case ProviderState.SignedIn:
-                            provider.SignOutAsync();
-                            break;
-                    }
+                    case ProviderState.SignedIn:
+                        provider.SignOutAsync();
+                        break;
                 }
-            });
+            }
         }
     }
 }

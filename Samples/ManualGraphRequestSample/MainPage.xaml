@@ -9,50 +9,15 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     mc:Ignorable="d">
 
-    <Grid ColumnSpacing="24">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-
-        <StackPanel
-            HorizontalAlignment="Right"
-            VerticalAlignment="Center"
-            Orientation="Horizontal">
-            <Button
-                x:Name="SignInButton"
-                VerticalAlignment="Center"
-                Click="OnSignInButtonClick"
-                Content="Sign In" />
-            <ProgressRing
-                x:Name="SignInLoadingRing"
-                Width="24"
-                Height="24"
-                Margin="8,0,0,0"
-                VerticalAlignment="Center"
-                IsActive="False" />
-        </StackPanel>
-
-
-        <ListView
-            Grid.Column="1"
-            Width="300"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Center"
-            ItemsSource="{x:Bind TaskCollection}">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
+    <StackPanel>
+        <local:LoginButton />
+        <TextBlock x:Name="SignedInUserTextBlock" />
+        <ListView ItemsSource="{x:Bind TaskCollection}">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="models:TodoTask">
-                    <Grid Padding="12,8">
-                        <TextBlock Text="{x:Bind Title}" TextTrimming="CharacterEllipsis" />
-                    </Grid>
+                    <TextBlock Text="{x:Bind Title}" Margin="12,8" />
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-    </Grid>
+    </StackPanel>
 </Page>

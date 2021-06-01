@@ -6,7 +6,7 @@ using CommunityToolkit.Authentication;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace UwpWindowsProviderSample
+namespace ManualGraphRequestSample
 {
     /// <summary>
     /// A simple button for triggering the globally configured IProvider to sign in and out.
