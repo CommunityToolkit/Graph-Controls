@@ -13,6 +13,18 @@ namespace CommunityToolkit.Graph.Uwp
     /// </summary>
     public class ElementExtensions : DependencyObject
     {
+        private static readonly IList<FrameworkElement> _listeningElements = new List<FrameworkElement>();
+
+        private static readonly DependencyProperty _isVisibleWhenSignedInProperty =
+            DependencyProperty.RegisterAttached("IsVisibleWhenSignedIn", typeof(bool?), typeof(FrameworkElement), new PropertyMetadata(null, OnIsVisibleWhenSignedInPropertyChanged));
+
+        static ElementExtensions()
+        {
+            _listeningElements = new List<FrameworkElement>();
+
+            ProviderManager.Instance.ProviderUpdated += OnProviderUpdated;
+        }
+
         /// <summary>
         /// Sets a value indicating whether an element should update its visibility based on provider state changes.
         /// </summary>
@@ -33,11 +45,6 @@ namespace CommunityToolkit.Graph.Uwp
             return (bool?)element.GetValue(_isVisibleWhenSignedInProperty);
         }
 
-        private static readonly IList<FrameworkElement> _listeningElements = new List<FrameworkElement>();
-
-        private static readonly DependencyProperty _isVisibleWhenSignedInProperty =
-            DependencyProperty.RegisterAttached("IsVisibleWhenSignedIn", typeof(bool?), typeof(FrameworkElement), new PropertyMetadata(null, OnIsVisibleWhenSignedInPropertyChanged));
-
         private static void OnIsVisibleWhenSignedInPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is FrameworkElement element)
@@ -56,14 +63,6 @@ namespace CommunityToolkit.Graph.Uwp
             }
         }
 
-        private static void OnElementUnloaded(object sender, RoutedEventArgs e)
-        {
-            if (sender is FrameworkElement element)
-            {
-                DeregisterElement(element);
-            }
-        }
-
         private static void OnProviderUpdated(object sender, ProviderUpdatedEventArgs e)
         {
             var provider = ProviderManager.Instance.GlobalProvider;
@@ -75,16 +74,22 @@ namespace CommunityToolkit.Graph.Uwp
             }
         }
 
+        private static void OnElementUnloaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement element)
+            {
+                DeregisterElement(element);
+            }
+        }
+
         private static void RegisterElement(FrameworkElement element)
         {
-            ProviderManager.Instance.ProviderUpdated += OnProviderUpdated;
             element.Unloaded += OnElementUnloaded;
             _listeningElements.Add(element);
         }
 
         private static void DeregisterElement(FrameworkElement element)
         {
-            ProviderManager.Instance.ProviderUpdated -= OnProviderUpdated;
             element.Unloaded -= OnElementUnloaded;
             _listeningElements.Remove(element);
         }
