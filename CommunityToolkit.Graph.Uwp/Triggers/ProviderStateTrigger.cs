@@ -29,7 +29,7 @@ namespace CommunityToolkit.Graph.Uwp
             }
         }
 
-        private DispatcherQueue _dispatcherQueue;
+        private readonly DispatcherQueue _dispatcherQueue;
 
         /// <summary>
         /// Gets or sets the expected ProviderState.
@@ -66,7 +66,11 @@ namespace CommunityToolkit.Graph.Uwp
             var provider = ProviderManager.Instance.GlobalProvider;
             if (State != null && provider?.State != null)
             {
-                SetActive(provider.State == State);
+                SetActive(provider?.State == State);
+            }
+            else
+            {
+                SetActive(false);
             }
         }
     }
