@@ -1,4 +1,4 @@
-# Windows Community Toolkit - Graph Helpers and Controls
+# (Preview) Windows Community Toolkit - Graph Helpers and Controls
 
 Welcome! This is a sub-repo for the [Windows Community Toolkit](https://aka.ms/wct) focused on [Microsoft Graph](https://developer.microsoft.com/en-us/graph/) providing a set of Helpers and Controls for netstandard and UWP apps.
 
@@ -34,12 +34,15 @@ Check out our samples for getting started with authentication providers and maki
 - [UwpWindowsProviderSample](./Samples/UwpWindowsProviderSample)
 - [UwpMsalProviderSample](./Samples/UwpMsalProviderSample)
 - [WpfMsalProviderSample](./Samples/WpfMsalProviderSample)
+- [ManualGraphRequestSample](./Samples/ManualGraphRequestSample)
+- [Sample-Graph-ContosoNotes](https://github.com/windows-toolkit/Sample-Graph-ContosoNotes)
 
 ## <a name="documentation"></a> Getting Started
 
 To get started using Graph data in your application, you'll first need to enable authentication.
 
-> Note: The nuget packages metioned are not yet released, and can be accessed from using our dedicated Nuget feed: [WindowsCommunityToolkit-MainLatest](https://pkgs.dev.azure.com/dotnet/WindowsCommunityToolkit/_packaging/WindowsCommunityToolkit-MainLatest/nuget/v3/index.json)
+> IMPORTANT:
+> Windows Community Toolkit - Graph Controls and Helpers packages are in preview. To get started using WCT preview packages visit the [WCT Preview Packages wiki page](https://aka.ms/wct/wiki/previewpackages).
 
 ### 1A. Setup authentication with MSAL
 
@@ -81,7 +84,7 @@ Try out the WindowsProvider to enable authentication based on the native Windows
     ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes);
     ```
 
-### 2. Make a Graph call
+### 2. Make a Graph request with the Graph SDK
 
 Once you are authenticated, you can then make requests to the Graph using the GraphServiceClient instance.
 
@@ -97,6 +100,43 @@ if (provider != null && provider.State == ProviderState.SignedIn)
 {
     var graphClient = provider.GetClient();
     var me = await graphClient.Me.Request().GetAsync();
+}
+```
+
+#### Make a Graph request manually
+
+Alternatively if you do not wish to use the Graph SDK you can make requests to Microsoft Graph manually instead:
+
+```
+using CommunityToolkit.Authentication;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+private async Task<IList<TodoTask>> GetDefaultTaskListAsync()
+{
+    var httpClient = new HttpClient();
+    var requestUri = "https://graph.microsoft.com/v1.0/me/todo/lists/tasks/tasks";
+
+    var getRequest = new HttpRequestMessage(HttpMethod.Get, requestUri);
+    await ProviderManager.Instance.GlobalProvider.AuthenticateRequestAsync(getRequest);
+
+    using (httpClient)
+    {
+        var response = await httpClient.SendAsync(getRequest);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var jObject = JObject.Parse(jsonResponse);
+            if (jObject.ContainsKey("value"))
+            {
+                var tasks = JsonConvert.DeserializeObject<List<TodoTask>>(jObject["value"].ToString());
+                return tasks;
+            }
+        }
+    }
+
+    return null;
 }
 ```
 
