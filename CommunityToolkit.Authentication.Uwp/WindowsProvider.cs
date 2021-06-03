@@ -41,6 +41,9 @@ namespace CommunityToolkit.Authentication
         // The default account providers available in the AccountsSettingsPane.
         private static readonly WebAccountProviderType DefaultWebAccountsProviderType = WebAccountProviderType.All;
 
+        /// <inheritdoc />
+        public override string CurrentAccountId => _webAccount?.Id;
+
         /// <summary>
         /// Gets the list of scopes to pre-authorize during authentication.
         /// </summary>
