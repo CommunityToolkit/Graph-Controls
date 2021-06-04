@@ -13,9 +13,14 @@ namespace CommunityToolkit.Authentication
     public struct AccountsSettingsPaneConfig
     {
         /// <summary>
-        /// Gets or sets the header text for the accounts settings pane.
+        /// Gets or sets the header text for the add accounts settings pane.
         /// </summary>
-        public string HeaderText { get; set; }
+        public string AddAccountHeaderText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the header text for the manage accounts settings pane.
+        /// </summary>
+        public string ManageAccountHeaderText { get; set; }
 
         /// <summary>
         /// Gets or sets the SettingsCommand collection for the account settings pane.
@@ -23,14 +28,27 @@ namespace CommunityToolkit.Authentication
         public IList<SettingsCommand> Commands { get; set; }
 
         /// <summary>
+        /// Gets or sets the WebAccountCommandParameter collection for the account settings pane.
+        /// </summary>
+        public WebAccountCommandParameter AccountCommandParameter { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AccountsSettingsPaneConfig"/> struct.
         /// </summary>
-        /// <param name="headerText">The header text for the accounts settings pane.</param>
+        /// <param name="addAccountHeaderText">The header text for the add accounts settings pane.</param>
+        /// <param name="manageAccountHeaderText">The header text for the manage accounts settings pane.</param>
         /// <param name="commands">The SettingsCommand collection for the account settings pane.</param>
-        public AccountsSettingsPaneConfig(string headerText = null, IList<SettingsCommand> commands = null)
+        /// <param name="accountCommandParameter">The WebAccountCommandParameter for the account settings pane.</param>
+        public AccountsSettingsPaneConfig(
+            string addAccountHeaderText = null,
+            string manageAccountHeaderText = null,
+            IList<SettingsCommand> commands = null,
+            WebAccountCommandParameter accountCommandParameter = null)
         {
-            HeaderText = headerText;
+            AddAccountHeaderText = addAccountHeaderText;
+            ManageAccountHeaderText = manageAccountHeaderText;
             Commands = commands;
+            AccountCommandParameter = accountCommandParameter;
         }
     }
 }

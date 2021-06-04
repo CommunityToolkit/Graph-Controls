@@ -23,9 +23,11 @@ namespace UwpWindowsProviderSample
             if (provider == null || provider.State != ProviderState.SignedIn)
             {
                 SignedInUserTextBlock.Text = "Please sign in.";
+                ManagerButton.IsEnabled = false;
             }
             else
             {
+                ManagerButton.IsEnabled = true;
                 SignedInUserTextBlock.Text = "Signed in as...";
 
                 var graphClient = provider.GetClient();
