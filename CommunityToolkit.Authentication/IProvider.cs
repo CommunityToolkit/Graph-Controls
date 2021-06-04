@@ -19,6 +19,11 @@ namespace CommunityToolkit.Authentication
         ProviderState State { get; }
 
         /// <summary>
+        /// Gets the id of the currently signed in user account.
+        /// </summary>
+        string CurrentAccountId { get; }
+
+        /// <summary>
         /// Event called when the login <see cref="State"/> changes.
         /// </summary>
         event EventHandler<ProviderStateChangedEventArgs> StateChanged;
