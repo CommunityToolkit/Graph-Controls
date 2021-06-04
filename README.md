@@ -88,16 +88,20 @@ Once you are authenticated, you can then make requests to the Graph using the Gr
 
 > Install the `CommunityToolkit.Graph` package.
 
-```
+```csharp
 using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Extensions;
 
-var provider = ProviderManager.Instance.GlobalProvider;
+ProviderManager.Instance.ProviderUpdated += OnProviderUpdated;
 
-if (provider != null && provider.State == ProviderState.SignedIn)
+void OnProviderUpdated(object sender, ProviderUpdatedEventArgs e)
 {
-    var graphClient = provider.GetClient();
-    var me = await graphClient.Me.Request().GetAsync();
+    var provider = ProviderMananager.Instance.GlobalProvider;
+    if (e.Reason == ProviderManagerChangedState.ProviderStateChanged && provider?.State == ProviderState.SignedIn)
+    {
+        var graphClient = provider.GetClient();
+        var me = await graphClient.Me.Request().GetAsync();
+    }
 }
 ```
 
@@ -105,7 +109,7 @@ if (provider != null && provider.State == ProviderState.SignedIn)
 
 Alternatively if you do not wish to use the Graph SDK you can make requests to Microsoft Graph manually instead:
 
-```
+```csharp
 using CommunityToolkit.Authentication;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -168,9 +172,10 @@ public ImageSource GetMyPhoto()
         }
         catch
         {
-            return null;
         }
     }
+
+    return null;
 }
 ```
 

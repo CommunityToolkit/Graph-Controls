@@ -61,9 +61,9 @@ namespace CommunityToolkit.Authentication
                     _provider.StateChanged += ProviderStateChanged;
                 }
 
-                ProviderUpdated?.Invoke(this, new ProviderUpdatedEventArgs(ProviderManagerChangedState.ProviderChanged));
-
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GlobalProvider)));
+                ProviderUpdated?.Invoke(this, new ProviderUpdatedEventArgs(ProviderManagerChangedState.ProviderChanged));
+                ProviderUpdated?.Invoke(this, new ProviderUpdatedEventArgs(ProviderManagerChangedState.ProviderStateChanged));
             }
         }
 

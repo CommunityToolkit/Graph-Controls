@@ -139,7 +139,7 @@ namespace UnitTests.UWP.Helpers
                 ProviderManager.Instance.ProviderUpdated += (s, e) =>
                 {
                     var providerManager = s as ProviderManager;
-                    if (providerManager.GlobalProvider.State == ProviderState.SignedIn)
+                    if (e.Reason == ProviderManagerChangedState.ProviderStateChanged && providerManager.GlobalProvider.State == ProviderState.SignedIn)
                     {
                         test.Invoke();
                     }
