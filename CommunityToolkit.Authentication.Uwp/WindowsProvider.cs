@@ -224,13 +224,94 @@ namespace CommunityToolkit.Authentication
             return null;
         }
 
+        /// <summary>
+        /// Display AccountSettingsPane for the management of logged-in users.
+        /// </summary>
+        /// <returns><see cref="Task"/>.</returns>
+        public async Task ShowAccountManagementPaneAsync()
+        {
+            if (_webAccount == null)
+            {
+                throw new InvalidOperationException("Display account management pane requires at least one logged in account.");
+            }
+
+            if (_accountsSettingsPaneConfig?.AccountCommandParameter == null)
+            {
+                throw new ArgumentNullException("At least one account command is required to display the account management pane.");
+            }
+
+            // Build the AccountSettingsPane and configure it with available account commands.
+            void OnAccountCommandsRequested(AccountsSettingsPane sender, AccountsSettingsPaneCommandsRequestedEventArgs e)
+            {
+                AccountsSettingsPaneEventDeferral deferral = e.GetDeferral();
+
+                // Apply the configured header.
+                var headerText = _accountsSettingsPaneConfig?.ManageAccountHeaderText;
+                if (!string.IsNullOrWhiteSpace(headerText))
+                {
+                    e.HeaderText = headerText;
+                }
+
+                // Generate account command.
+                var commandParameter = _accountsSettingsPaneConfig?.AccountCommandParameter;
+                var webAccountCommand = new WebAccountCommand(
+                            _webAccount,
+                            async (command, args) =>
+                            {
+                                commandParameter.Invoked?.Invoke(command, args);
+
+                                // When the logout command is triggered, we also need to modify the state of the Provider.
+                                if (args.Action == WebAccountAction.Remove)
+                                {
+                                    await SignOutAsync();
+                                }
+                            },
+                            commandParameter.Actions);
+
+                e.WebAccountCommands.Add(webAccountCommand);
+
+                // Apply any configured setting commands.
+                var commands = _accountsSettingsPaneConfig?.Commands;
+                if (commands != null)
+                {
+                    foreach (var command in commands)
+                    {
+                        e.Commands.Add(command);
+                    }
+                }
+
+                deferral.Complete();
+            }
+
+            AccountsSettingsPane pane = null;
+            try
+            {
+                // GetForCurrentView may throw an exception if the current view isn't ready yet.
+                pane = AccountsSettingsPane.GetForCurrentView();
+                pane.AccountCommandsRequested += OnAccountCommandsRequested;
+
+                // Show the AccountSettingsPane and wait for the result.
+                await AccountsSettingsPane.ShowManageAccountsAsync();
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                if (pane != null)
+                {
+                    pane.AccountCommandsRequested -= OnAccountCommandsRequested;
+                }
+            }
+        }
+
         private async Task SetAccountAsync(WebAccount account)
         {
             if (account == null)
             {
                 // Clear account
-                 await SignOutAsync();
-                 return;
+                await SignOutAsync();
+                return;
             }
             else if (account.Id == _webAccount?.Id)
             {
@@ -353,7 +434,7 @@ namespace CommunityToolkit.Authentication
                     }
 
                     // Apply the configured header.
-                    var headerText = _accountsSettingsPaneConfig?.HeaderText;
+                    var headerText = _accountsSettingsPaneConfig?.AddAccountHeaderText;
                     if (!string.IsNullOrWhiteSpace(headerText))
                     {
                         e.HeaderText = headerText;

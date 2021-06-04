@@ -3,8 +3,12 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Authentication;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using Windows.ApplicationModel.Activation;
 using Windows.System;
+using Windows.UI.ApplicationSettings;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -32,10 +36,30 @@ namespace UwpWindowsProviderSample
                 if (ProviderManager.Instance.GlobalProvider == null)
                 {
                     string[] scopes = new string[] { "User.Read" };
-                    ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes);
+                    var paneConfig = GetAccountsSettingsPaneConfig();
+                    ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes, accountsSettingsPaneConfig: paneConfig);
                 }
             });
         }
+
+        AccountsSettingsPaneConfig GetAccountsSettingsPaneConfig()
+        {
+            void OnAccountCommandInvoked(WebAccountCommand command, WebAccountInvokedArgs args)
+            {
+                Debug.WriteLine($"Action: {args.Action}");
+            }
+
+            var accountCommandParameter = new WebAccountCommandParameter(
+                OnAccountCommandInvoked,
+                SupportedWebAccountActions.Remove | SupportedWebAccountActions.Manage);
+
+            var addAccountHeaderText = "Login account";
+            var manageAccountHeaderText = "Account management";
+
+            return new AccountsSettingsPaneConfig(addAccountHeaderText, manageAccountHeaderText, accountCommandParameter: accountCommandParameter);
+        }
+
+
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
