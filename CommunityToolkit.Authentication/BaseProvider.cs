@@ -34,6 +34,9 @@ namespace CommunityToolkit.Authentication
             }
         }
 
+        /// <inheritdoc />
+        public abstract string CurrentAccountId { get; }
+
         /// <inheritdoc/>
         public event EventHandler<ProviderStateChangedEventArgs> StateChanged;
 
