@@ -270,6 +270,16 @@ namespace CommunityToolkit.Authentication
 
                 e.WebAccountCommands.Add(webAccountCommand);
 
+                // Apply any configured setting commands.
+                var commands = _accountsSettingsPaneConfig?.Commands;
+                if (commands != null)
+                {
+                    foreach (var command in commands)
+                    {
+                        e.Commands.Add(command);
+                    }
+                }
+
                 deferral.Complete();
             }
 
