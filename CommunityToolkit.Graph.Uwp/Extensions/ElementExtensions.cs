@@ -15,8 +15,8 @@ namespace CommunityToolkit.Graph.Uwp
     {
         private static readonly IList<FrameworkElement> _listeningElements = new List<FrameworkElement>();
 
-        private static readonly DependencyProperty _isVisibleWhenSignedInProperty =
-            DependencyProperty.RegisterAttached("IsVisibleWhenSignedIn", typeof(bool?), typeof(FrameworkElement), new PropertyMetadata(null, OnIsVisibleWhenSignedInPropertyChanged));
+        private static readonly DependencyProperty _isVisibleWhenProperty =
+            DependencyProperty.RegisterAttached("IsVisibleWhen", typeof(ProviderState), typeof(FrameworkElement), new PropertyMetadata(null, OnIsVisibleWhenPropertyChanged));
 
         static ElementExtensions()
         {
@@ -30,9 +30,9 @@ namespace CommunityToolkit.Graph.Uwp
         /// </summary>
         /// <param name="element">The target element.</param>
         /// <param name="value">A nullable bool value.</param>
-        public static void SetIsVisibleWhenSignedIn(FrameworkElement element, bool? value)
+        public static void SetIsVisibleWhen(FrameworkElement element, ProviderState value)
         {
-            element.SetValue(_isVisibleWhenSignedInProperty, value);
+            element.SetValue(_isVisibleWhenProperty, value);
         }
 
         /// <summary>
@@ -40,12 +40,12 @@ namespace CommunityToolkit.Graph.Uwp
         /// </summary>
         /// <param name="element">The target element.</param>
         /// <returns>A nullable bool value.</returns>
-        public static bool? GetIsVisibleWhenSignedIn(FrameworkElement element)
+        public static ProviderState GetIsVisibleWhen(FrameworkElement element)
         {
-            return (bool?)element.GetValue(_isVisibleWhenSignedInProperty);
+            return (ProviderState)element.GetValue(_isVisibleWhenProperty);
         }
 
-        private static void OnIsVisibleWhenSignedInPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIsVisibleWhenPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is FrameworkElement element)
             {
@@ -96,25 +96,9 @@ namespace CommunityToolkit.Graph.Uwp
 
         private static void UpdateElementVisibility(FrameworkElement element, ProviderState? providerState)
         {
-            var isVisibleWhenSignedIn = GetIsVisibleWhenSignedIn(element);
+            var isVisibleWhen = GetIsVisibleWhen(element);
 
-            switch (isVisibleWhenSignedIn)
-            {
-                case true:
-                    // When signed in, show the element.
-                    element.Visibility = providerState == ProviderState.SignedIn ? Visibility.Visible : Visibility.Collapsed;
-                    break;
-
-                case false:
-                    // When signed in, hide the element.
-                    element.Visibility = providerState == ProviderState.SignedIn ? Visibility.Collapsed : Visibility.Visible;
-                    break;
-
-                default:
-                    // Show the default visibility state.
-                    element.Visibility = default;
-                    break;
-            }
+            element.Visibility = isVisibleWhen == providerState ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }
