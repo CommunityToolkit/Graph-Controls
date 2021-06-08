@@ -91,7 +91,7 @@ namespace CommunityToolkit.Graph.Uwp.Controls
 
             _defaultImage = new BitmapImage(new Uri(_defaultImageSource));
 
-            ProviderManager.Instance.ProviderUpdated += (sender, args) => LoadData();
+            ProviderManager.Instance.ProviderStateChanged += (sender, args) => LoadData();
         }
 
         /// <inheritdoc/>

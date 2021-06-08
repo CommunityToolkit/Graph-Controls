@@ -23,15 +23,13 @@ namespace ManualGraphRequestSample
         {
             InitializeComponent();
 
-            ProviderManager.Instance.ProviderUpdated += OnProviderUpdated;
+            ProviderManager.Instance.ProviderStateChanged += OnProviderStateChanged;
             ProviderManager.Instance.GlobalProvider = new WindowsProvider(new string[] { "User.Read", "Tasks.ReadWrite" });
         }
 
-        private async void OnProviderUpdated(object sender, ProviderUpdatedEventArgs e)
+        private async void OnProviderStateChanged(object sender, ProviderStateChangedEventArgs e)
         {
-            IProvider provider = ProviderManager.Instance.GlobalProvider;
-            
-            switch (provider?.State)
+            switch (e.NewState)
             {
                 case ProviderState.Loading:
                     SignInButton.Content = "Loading...";

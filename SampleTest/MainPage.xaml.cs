@@ -33,13 +33,12 @@ namespace SampleTest
             this.InitializeComponent();
 
             ProviderManager.Instance.ProviderUpdated += this.OnProviderUpdated;
+            ProviderManager.Instance.ProviderStateChanged += this.OnProviderStateChanged;
         }
 
-        private void OnProviderUpdated(object sender, ProviderUpdatedEventArgs e)
+        private void OnProviderStateChanged(object sender, ProviderStateChangedEventArgs e)
         {
-            if (e.Reason == ProviderManagerChangedState.ProviderStateChanged 
-                && sender is ProviderManager pm 
-                && pm.GlobalProvider.State == ProviderState.SignedIn)
+            if (e.NewState == ProviderState.SignedIn)
             {
                 var graphClient = ProviderManager.Instance.GlobalProvider.GetClient();
 
@@ -50,11 +49,24 @@ namespace SampleTest
             }
             else
             {
-                CalendarViewBuilder = null;
-                MessagesBuilder = null;
-                PlannerTasksBuilder = null;
-                TeamsChannelMessagesBuilder = null;
+                ClearRequestBuilders();
             }
+        }
+
+        private void OnProviderUpdated(object sender, IProvider provider)
+        {
+            if (provider == null)
+            {
+                ClearRequestBuilders();
+            }
+        }
+
+        private void ClearRequestBuilders()
+        {
+            CalendarViewBuilder = null;
+            MessagesBuilder = null;
+            PlannerTasksBuilder = null;
+            TeamsChannelMessagesBuilder = null;
         }
 
         public static string ToLocalTime(DateTimeTimeZone value)

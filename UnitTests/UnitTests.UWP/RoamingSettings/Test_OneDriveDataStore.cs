@@ -136,7 +136,7 @@ namespace UnitTests.UWP.Helpers
             {
                 var provider = new WindowsProvider(new string[] { "User.Read", "Files.ReadWrite" }, autoSignIn: false);
 
-                ProviderManager.Instance.ProviderUpdated += (s, e) =>
+                ProviderManager.Instance.ProviderStateChanged += (s, e) =>
                 {
                     var providerManager = s as ProviderManager;
                     if (providerManager.GlobalProvider.State == ProviderState.SignedIn)

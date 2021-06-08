@@ -14,26 +14,25 @@ namespace UwpWindowsProviderSample
         {
             this.InitializeComponent();
             
-            ProviderManager.Instance.ProviderUpdated += OnProviderUpdated;
+            ProviderManager.Instance.ProviderStateChanged += OnProviderStateChanged;
         }
 
-        private async void OnProviderUpdated(object sender, ProviderUpdatedEventArgs e)
+        private async void OnProviderStateChanged(object sender, ProviderStateChangedEventArgs e)
         {
-            var provider = ProviderManager.Instance.GlobalProvider;
-            if (provider == null || provider.State != ProviderState.SignedIn)
-            {
-                SignedInUserTextBlock.Text = "Please sign in.";
-                ManagerButton.IsEnabled = false;
-            }
-            else
+            if (e.NewState == ProviderState.SignedIn)
             {
                 ManagerButton.IsEnabled = true;
                 SignedInUserTextBlock.Text = "Signed in as...";
 
-                var graphClient = provider.GetClient();
+                var graphClient = ProviderManager.Instance.GlobalProvider.GetClient();
                 var me = await graphClient.Me.Request().GetAsync();
 
                 SignedInUserTextBlock.Text = "Signed in as: " + me.DisplayName;
+            }
+            else
+            {
+                SignedInUserTextBlock.Text = "Please sign in.";
+                ManagerButton.IsEnabled = false;
             }
         }
     }

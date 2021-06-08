@@ -34,7 +34,7 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         {
             this.DefaultStyleKey = typeof(LoginButton);
 
-            ProviderManager.Instance.ProviderUpdated += (sender, args) => LoadData();
+            ProviderManager.Instance.ProviderStateChanged += (sender, args) => LoadData();
         }
 
         /// <inheritdoc/>

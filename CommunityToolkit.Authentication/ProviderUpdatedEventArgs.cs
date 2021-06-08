@@ -14,15 +14,15 @@ namespace CommunityToolkit.Authentication
         /// <summary>
         /// Initializes a new instance of the <see cref="ProviderUpdatedEventArgs"/> class.
         /// </summary>
-        /// <param name="reason"><see cref="ProviderManagerChangedState"/> value for reason for update.</param>
-        public ProviderUpdatedEventArgs(ProviderManagerChangedState reason)
+        /// <param name="provider">The newly configured provider.</param>
+        public ProviderUpdatedEventArgs(IProvider provider)
         {
-            Reason = reason;
+            Provider = provider;
         }
 
         /// <summary>
-        /// Gets the reason for the provider update.
+        /// Gets the updated provider.
         /// </summary>
-        public ProviderManagerChangedState Reason { get; private set; }
+        public IProvider Provider { get; private set; }
     }
 }
