@@ -16,6 +16,9 @@ namespace CommunityToolkit.Authentication
     /// </summary>
     public class MsalProvider : BaseProvider
     {
+        /// <inheritdoc />
+        public override string CurrentAccountId => _account?.HomeAccountId?.Identifier;
+
         /// <summary>
         /// Gets the MSAL.NET Client used to authenticate the user.
         /// </summary>
@@ -25,6 +28,8 @@ namespace CommunityToolkit.Authentication
         /// Gets an array of scopes to use for accessing Graph resources.
         /// </summary>
         protected string[] Scopes { get; private set; }
+
+        private IAccount _account;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MsalProvider"/> class.
@@ -62,9 +67,7 @@ namespace CommunityToolkit.Authentication
         /// <inheritdoc/>
         public override async Task<bool> TrySilentSignInAsync()
         {
-            var account = (await Client.GetAccountsAsync()).FirstOrDefault();
-
-            if (account != null && State == ProviderState.SignedIn)
+            if (_account != null && State == ProviderState.SignedIn)
             {
                 return true;
             }
@@ -85,8 +88,7 @@ namespace CommunityToolkit.Authentication
         /// <inheritdoc/>
         public override async Task SignInAsync()
         {
-            var account = (await Client.GetAccountsAsync()).FirstOrDefault();
-            if (account != null || State != ProviderState.SignedOut)
+            if (_account != null || State != ProviderState.SignedOut)
             {
                 return;
             }
@@ -107,10 +109,10 @@ namespace CommunityToolkit.Authentication
         /// <inheritdoc />
         public override async Task SignOutAsync()
         {
-            // Forcibly remove each user.
-            foreach (var user in await Client.GetAccountsAsync())
+            if (_account != null)
             {
-                await Client.RemoveAsync(user);
+                await Client.RemoveAsync(_account);
+                _account = null;
             }
 
             State = ProviderState.SignedOut;
@@ -122,7 +124,7 @@ namespace CommunityToolkit.Authentication
             AuthenticationResult authResult = null;
             try
             {
-                var account = (await Client.GetAccountsAsync()).FirstOrDefault();
+                var account = _account ?? (await Client.GetAccountsAsync()).FirstOrDefault();
                 if (account != null)
                 {
                     authResult = await Client.AcquireTokenSilent(Scopes, account).ExecuteAsync();
@@ -141,7 +143,7 @@ namespace CommunityToolkit.Authentication
             {
                 try
                 {
-                    authResult = await Client.AcquireTokenInteractive(Scopes).ExecuteAsync();
+                    authResult = await Client.AcquireTokenInteractive(Scopes).WithPrompt(Prompt.SelectAccount).ExecuteAsync();
                 }
                 catch
                 {
@@ -149,6 +151,8 @@ namespace CommunityToolkit.Authentication
                     // TODO: Send exception to a logger.
                 }
             }
+
+            _account = authResult?.Account;
 
             return authResult?.AccessToken;
         }
