@@ -18,7 +18,7 @@
             <VisualStateGroup>
                 <VisualState>
                     <VisualState.StateTriggers>
-                        <uwp:ProviderStateTrigger ActiveState="SignedIn" />
+                        <uwp:ProviderStateTrigger State="SignedIn" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
                         <Setter Target="ContentPivot.Visibility" Value="Visible" />

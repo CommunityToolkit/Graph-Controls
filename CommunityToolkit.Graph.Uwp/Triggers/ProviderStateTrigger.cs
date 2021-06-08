@@ -16,10 +16,10 @@ namespace CommunityToolkit.Graph.Uwp
     public class ProviderStateTrigger : StateTriggerBase
     {
         /// <summary>
-        /// Identifies the <see cref="ActiveState"/> DependencyProperty.
+        /// Identifies the <see cref="State"/> DependencyProperty.
         /// </summary>
-        public static readonly DependencyProperty ActiveStateProperty =
-            DependencyProperty.Register(nameof(ActiveState), typeof(ProviderState), typeof(ProviderStateTrigger), new PropertyMetadata(null, OnStateChanged));
+        public static readonly DependencyProperty StateProperty =
+            DependencyProperty.Register(nameof(State), typeof(ProviderState), typeof(ProviderStateTrigger), new PropertyMetadata(null, OnStateChanged));
 
         private static void OnStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -34,10 +34,10 @@ namespace CommunityToolkit.Graph.Uwp
         /// <summary>
         /// Gets or sets the expected ProviderState.
         /// </summary>
-        public ProviderState? ActiveState
+        public ProviderState? State
         {
-            get => (ProviderState?)GetValue(ActiveStateProperty);
-            set => SetValue(ActiveStateProperty, value);
+            get => (ProviderState?)GetValue(StateProperty);
+            set => SetValue(StateProperty, value);
         }
 
         /// <summary>
@@ -64,9 +64,9 @@ namespace CommunityToolkit.Graph.Uwp
         private void UpdateState()
         {
             var provider = ProviderManager.Instance.GlobalProvider;
-            if (ActiveState != null && provider?.State != null)
+            if (State != null && provider?.State != null)
             {
-                SetActive(provider?.State == ActiveState);
+                SetActive(provider?.State == State);
             }
             else
             {
