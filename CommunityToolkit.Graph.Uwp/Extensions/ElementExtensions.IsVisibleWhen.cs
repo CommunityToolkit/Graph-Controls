@@ -2,26 +2,25 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using CommunityToolkit.Authentication;
 using Windows.UI.Xaml;
 
 namespace CommunityToolkit.Graph.Uwp
 {
     /// <summary>
-    /// Extensions on FrameworkElement for responding to authentication changes from XAML.
+    /// IsVisibleWhen extension on FrameworkElement for decaring element visibility behavior in response to authentication changes.
     /// </summary>
-    public class ElementExtensions : DependencyObject
+    public static partial class ElementExtensions
     {
-        private static readonly IList<FrameworkElement> _listeningElements = new List<FrameworkElement>();
+        private static readonly object _updateLock = new ();
+        private static readonly ConcurrentDictionary<FrameworkElement, ProviderState> _listeningElements = new ();
 
         private static readonly DependencyProperty _isVisibleWhenProperty =
             DependencyProperty.RegisterAttached("IsVisibleWhen", typeof(ProviderState), typeof(FrameworkElement), new PropertyMetadata(null, OnIsVisibleWhenPropertyChanged));
 
         static ElementExtensions()
         {
-            _listeningElements = new List<FrameworkElement>();
-
             ProviderManager.Instance.ProviderUpdated += OnProviderUpdated;
         }
 
@@ -29,7 +28,7 @@ namespace CommunityToolkit.Graph.Uwp
         /// Sets a value indicating whether an element should update its visibility based on provider state changes.
         /// </summary>
         /// <param name="element">The target element.</param>
-        /// <param name="value">A nullable bool value.</param>
+        /// <param name="value">The state in which to be visible.</param>
         public static void SetIsVisibleWhen(FrameworkElement element, ProviderState value)
         {
             element.SetValue(_isVisibleWhenProperty, value);
@@ -39,7 +38,7 @@ namespace CommunityToolkit.Graph.Uwp
         /// Gets a value indicating whether an element should update its visibility based on provider state changes.
         /// </summary>
         /// <param name="element">The target element.</param>
-        /// <returns>A nullable bool value.</returns>
+        /// <returns>The state in which to be visible.</returns>
         public static ProviderState GetIsVisibleWhen(FrameworkElement element)
         {
             return (ProviderState)element.GetValue(_isVisibleWhenProperty);
@@ -49,13 +48,13 @@ namespace CommunityToolkit.Graph.Uwp
         {
             if (d is FrameworkElement element)
             {
-                if (e.NewValue == null)
+                if (e.NewValue is ProviderState newState)
                 {
-                    DeregisterElement(element);
+                    RegisterElement(element, newState);
                 }
                 else
                 {
-                    RegisterElement(element);
+                    DeregisterElement(element);
                 }
 
                 var providerState = ProviderManager.Instance.GlobalProvider?.State;
@@ -65,12 +64,13 @@ namespace CommunityToolkit.Graph.Uwp
 
         private static void OnProviderUpdated(object sender, ProviderUpdatedEventArgs e)
         {
-            var provider = ProviderManager.Instance.GlobalProvider;
-            var providerState = provider?.State;
-
-            foreach (var element in _listeningElements)
+            lock (_updateLock)
             {
-                UpdateElementVisibility(element, providerState);
+                var providerState = ProviderManager.Instance.GlobalProvider?.State;
+                foreach (var kvp in _listeningElements)
+                {
+                    UpdateElementVisibility(kvp.Key, providerState);
+                }
             }
         }
 
@@ -82,23 +82,23 @@ namespace CommunityToolkit.Graph.Uwp
             }
         }
 
-        private static void RegisterElement(FrameworkElement element)
+        private static void RegisterElement(FrameworkElement element, ProviderState providerState)
         {
             element.Unloaded += OnElementUnloaded;
-            _listeningElements.Add(element);
+            _listeningElements.TryAdd(element, providerState);
         }
 
         private static void DeregisterElement(FrameworkElement element)
         {
             element.Unloaded -= OnElementUnloaded;
-            _listeningElements.Remove(element);
+            _listeningElements.TryRemove(element, out ProviderState providerState);
         }
 
-        private static void UpdateElementVisibility(FrameworkElement element, ProviderState? providerState)
+        private static void UpdateElementVisibility(FrameworkElement element, ProviderState? state)
         {
             var isVisibleWhen = GetIsVisibleWhen(element);
 
-            element.Visibility = isVisibleWhen == providerState ? Visibility.Visible : Visibility.Collapsed;
+            element.Visibility = isVisibleWhen == state ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }
