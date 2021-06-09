@@ -35,12 +35,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.UWP", "UnitTests\UnitTests.UWP\UnitTests.UWP.csproj", "{6B33B26C-008B-4ADB-B317-EF996CD6755B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{EACBCDF3-8CCC-4A30-87E9-75FCA815831E}"
-	ProjectSection(SolutionItems) = preProject
-		Docs\QuickStart-WindowsProvider.md = Docs\QuickStart-WindowsProvider.md
-		Docs\WindowsProvider.md = Docs\WindowsProvider.md
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{022BF202-8D0D-4A6B-8A5B-92376D2EB5DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UwpMsalProviderSample", "Samples\UwpMsalProviderSample\UwpMsalProviderSample.csproj", "{D0F6A1EB-806E-424A-BDCA-9F749F12774F}"

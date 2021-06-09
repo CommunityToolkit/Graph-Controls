@@ -26,6 +26,9 @@ namespace CommunityToolkit.Authentication
             State = signedIn ? ProviderState.SignedIn : ProviderState.SignedOut;
         }
 
+        /// <inheritdoc />
+        public override string CurrentAccountId => State == ProviderState.SignedIn ? "mock-account-id" : null;
+
         /// <inheritdoc/>
         public override Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
