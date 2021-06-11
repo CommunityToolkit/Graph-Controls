@@ -169,7 +169,7 @@ namespace CommunityToolkit.Authentication
         }
 
         /// <inheritdoc />
-        public override async Task<string> GetTokenAsync(bool silentOnly = false)
+        public override async Task<string> GetTokenAsync(bool silentOnly = false, string[] scopes = null)
         {
             var internetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
             if (internetConnectionProfile == null)
@@ -181,8 +181,10 @@ namespace CommunityToolkit.Authentication
 
             try
             {
+                var tokenScopes = scopes ?? _scopes;
+
                 // Attempt to authenticate silently.
-                var authResult = await AuthenticateSilentAsync();
+                var authResult = await AuthenticateSilentAsync(tokenScopes);
 
                 // Authenticate with user interaction as appropriate.
                 if (authResult?.ResponseStatus != WebTokenRequestStatus.Success)
@@ -194,7 +196,7 @@ namespace CommunityToolkit.Authentication
                     }
 
                     // Attempt to authenticate interactively.
-                    authResult = await AuthenticateInteractiveAsync();
+                    authResult = await AuthenticateInteractiveAsync(tokenScopes);
                 }
 
                 if (authResult?.ResponseStatus == WebTokenRequestStatus.Success)
@@ -223,7 +225,6 @@ namespace CommunityToolkit.Authentication
             {
             }
 
-            await SignOutAsync();
             return null;
         }
 
@@ -330,7 +331,7 @@ namespace CommunityToolkit.Authentication
             State = ProviderState.SignedIn;
         }
 
-        private async Task<WebTokenRequestResult> AuthenticateSilentAsync()
+        private async Task<WebTokenRequestResult> AuthenticateSilentAsync(string[] scopes)
         {
             try
             {
@@ -351,7 +352,7 @@ namespace CommunityToolkit.Authentication
                 if (account != null)
                 {
                     // Prepare a request to get a token.
-                    var webTokenRequest = GetWebTokenRequest(account.WebAccountProvider);
+                    var webTokenRequest = GetWebTokenRequest(account.WebAccountProvider, _webAccountProviderConfig.ClientId, scopes);
                     authResult = await WebAuthenticationCoreManager.GetTokenSilentlyAsync(webTokenRequest, account);
                 }
 
@@ -363,7 +364,7 @@ namespace CommunityToolkit.Authentication
             }
         }
 
-        private async Task<WebTokenRequestResult> AuthenticateInteractiveAsync()
+        private async Task<WebTokenRequestResult> AuthenticateInteractiveAsync(string[] scopes)
         {
             try
             {
@@ -374,14 +375,14 @@ namespace CommunityToolkit.Authentication
                 {
                     // We already have the account.
                     var webAccountProvider = account.WebAccountProvider;
-                    var webTokenRequest = GetWebTokenRequest(webAccountProvider);
+                    var webTokenRequest = GetWebTokenRequest(webAccountProvider, _webAccountProviderConfig.ClientId, scopes);
                     authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest, account);
                 }
                 else
                 {
                     // We don't have an account. Prompt the user to provide one.
                     var webAccountProvider = await ShowAccountSettingsPaneAndGetProviderAsync();
-                    var webTokenRequest = GetWebTokenRequest(webAccountProvider);
+                    var webTokenRequest = GetWebTokenRequest(webAccountProvider, _webAccountProviderConfig.ClientId, scopes);
                     authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest);
                 }
 
@@ -498,14 +499,13 @@ namespace CommunityToolkit.Authentication
             }
         }
 
-        private WebTokenRequest GetWebTokenRequest(WebAccountProvider provider)
+        private WebTokenRequest GetWebTokenRequest(WebAccountProvider provider, string clientId, string[] scopes)
         {
-            string clientId = _webAccountProviderConfig.ClientId;
-            string scopes = string.Join(',', _scopes);
+            string scopesString = string.Join(',', scopes);
 
             WebTokenRequest webTokenRequest = clientId != null
-                ? new WebTokenRequest(provider, scopes, clientId)
-                : new WebTokenRequest(provider, scopes);
+                ? new WebTokenRequest(provider, scopesString, clientId)
+                : new WebTokenRequest(provider, scopesString);
 
             webTokenRequest.Properties.Add(GraphResourcePropertyKey, GraphResourcePropertyValue);
 
