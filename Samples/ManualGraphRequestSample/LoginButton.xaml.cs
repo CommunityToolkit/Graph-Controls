@@ -17,7 +17,7 @@ namespace ManualGraphRequestSample
         {
             InitializeComponent();
 
-            ProviderManager.Instance.ProviderUpdated += (s, e) => UpdateState();
+            ProviderManager.Instance.ProviderStateChanged += (s, e) => UpdateState();
             UpdateState();
         }
 

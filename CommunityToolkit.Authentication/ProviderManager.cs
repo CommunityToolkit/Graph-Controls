@@ -15,7 +15,7 @@ namespace CommunityToolkit.Authentication
     /// ProviderManager.Instance.GlobalProvider = await MsalProvider.CreateAsync(...);
     /// </code>
     /// </example>
-    public partial class ProviderManager : INotifyPropertyChanged
+    public partial class ProviderManager
     {
         /// <summary>
         /// Gets the name of the toolkit client to identify self in Graph calls.
@@ -28,12 +28,14 @@ namespace CommunityToolkit.Authentication
         public static ProviderManager Instance { get; } = new ProviderManager();
 
         /// <summary>
-        /// Event called when the <see cref="IProvider"/> changes.
+        /// Event called when the <see cref="IProvider"/> instance changes.
         /// </summary>
-        public event EventHandler<ProviderUpdatedEventArgs> ProviderUpdated;
+        public event EventHandler<IProvider> ProviderUpdated;
 
-        /// <inheritdoc/>
-        public event PropertyChangedEventHandler PropertyChanged;
+        /// <summary>
+        /// Event called when the <see cref="IProvider"/> state changes.
+        /// </summary>
+        public event EventHandler<ProviderStateChangedEventArgs> ProviderStateChanged;
 
         private IProvider _provider;
 
@@ -49,6 +51,7 @@ namespace CommunityToolkit.Authentication
 
             set
             {
+                var oldState = _provider?.State;
                 if (_provider != null)
                 {
                     _provider.StateChanged -= ProviderStateChanged;
@@ -56,25 +59,20 @@ namespace CommunityToolkit.Authentication
 
                 _provider = value;
 
+                var newState = _provider?.State;
                 if (_provider != null)
                 {
                     _provider.StateChanged += ProviderStateChanged;
                 }
 
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GlobalProvider)));
-                ProviderUpdated?.Invoke(this, new ProviderUpdatedEventArgs(ProviderManagerChangedState.ProviderChanged));
-                ProviderUpdated?.Invoke(this, new ProviderUpdatedEventArgs(ProviderManagerChangedState.ProviderStateChanged));
+                ProviderUpdated?.Invoke(this, _provider);
+                ProviderStateChanged?.Invoke(this, new ProviderStateChangedEventArgs(oldState, newState));
             }
         }
 
         private ProviderManager()
         {
             // Use Instance
-        }
-
-        private void ProviderStateChanged(object sender, ProviderStateChangedEventArgs e)
-        {
-            ProviderUpdated?.Invoke(this, new ProviderUpdatedEventArgs(ProviderManagerChangedState.ProviderStateChanged));
         }
     }
 }
