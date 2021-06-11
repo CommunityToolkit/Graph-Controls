@@ -34,6 +34,7 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         {
             this.DefaultStyleKey = typeof(LoginButton);
 
+            ProviderManager.Instance.ProviderUpdated += (sender, args) => LoadData();
             ProviderManager.Instance.ProviderStateChanged += (sender, args) => LoadData();
         }
 
@@ -102,38 +103,44 @@ namespace CommunityToolkit.Graph.Uwp.Controls
 
             if (provider == null)
             {
+                UserDetails = null;
                 return;
             }
 
-            if (provider.State == ProviderState.Loading)
+            switch (provider.State)
             {
-                IsLoading = true;
-            }
-            else if (provider.State == ProviderState.SignedIn)
-            {
-                try
-                {
-                    // https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-login/mgt-login.ts#L139
-                    // TODO: Batch with photo request later? https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
-                    UserDetails = await provider.GetClient().GetMeAsync();
-                }
-                catch (Exception e)
-                {
-                    LoginFailed?.Invoke(this, new LoginFailedEventArgs(e));
-                }
+                case ProviderState.Loading:
+                    IsLoading = true;
+                    break;
 
-                IsLoading = false;
-            }
-            else if (provider.State == ProviderState.SignedOut)
-            {
-                UserDetails = null; // What if this was user provided? Should we not hook into these events then?
+                case ProviderState.SignedIn:
+                    try
+                    {
+                        // https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-login/mgt-login.ts#L139
+                        // TODO: Batch with photo request later? https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
+                        UserDetails = await provider.GetClient().GetMeAsync();
 
-                IsLoading = false;
-            }
-            else
-            {
-                // Provider in Loading state
-                Debug.Fail("unsupported state");
+                        LoginCompleted?.Invoke(this, new EventArgs());
+                    }
+                    catch (Exception e)
+                    {
+                        LoginFailed?.Invoke(this, new LoginFailedEventArgs(e));
+                    }
+
+                    IsLoading = false;
+                    break;
+
+                case ProviderState.SignedOut:
+                    UserDetails = null;
+                    LogoutCompleted?.Invoke(this, new EventArgs());
+
+                    IsLoading = false;
+                    break;
+
+                default:
+                    // Provider in Loading state
+                    Debug.Fail("unsupported state");
+                    break;
             }
         }
 
@@ -157,17 +164,12 @@ namespace CommunityToolkit.Graph.Uwp.Controls
                     IsLoading = true;
                     await provider.SignInAsync();
 
-                    if (provider.State == ProviderState.SignedIn)
+                    if (provider.State != ProviderState.SignedIn)
                     {
-                        // TODO: include user details?
-                        LoginCompleted?.Invoke(this, new EventArgs());
+                        throw new TimeoutException("Login did not complete.");
+                    }
 
-                        LoadData();
-                    }
-                    else
-                    {
-                        LoginFailed?.Invoke(this, new LoginFailedEventArgs(new TimeoutException("Login did not complete.")));
-                    }
+                    LoadData();
                 }
                 catch (Exception e)
                 {
@@ -221,8 +223,6 @@ namespace CommunityToolkit.Graph.Uwp.Controls
                 IsLoading = true;
                 await provider.SignOutAsync();
                 IsLoading = false;
-
-                LogoutCompleted?.Invoke(this, new EventArgs());
             }
         }
     }
