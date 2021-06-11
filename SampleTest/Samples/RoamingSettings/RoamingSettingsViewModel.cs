@@ -55,7 +55,7 @@ namespace SampleTest.Samples
             _keyInputText = string.Empty;
             _valueInputText = string.Empty;
 
-            ProviderManager.Instance.ProviderUpdated += (s, e) => CheckState();
+            ProviderManager.Instance.ProviderStateChanged += (s, e) => CheckState();
             CheckState();
         }
 

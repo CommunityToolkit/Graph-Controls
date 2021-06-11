@@ -7,12 +7,10 @@
         This package includes .NET Standard authentication helpers such as:
         - BaseProvider:
         - IProvider:
-        - MockPRovider:
+        - MockProvider:
         - ProviderManager:
-        - ProviderManagerChangedState:
         - ProviderState:
         - ProviderStateChangedEventArgs:
-        - ProviderUpdatedEventArgs:
     </Description>
     <PackageTags>Community Toolkit Provider Authentication Auth</PackageTags>
   </PropertyGroup>

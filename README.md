@@ -144,7 +144,7 @@ private async Task<IList<TodoTask>> GetDefaultTaskListAsync()
 
 **That's all you need to get started!**
 
-You can use the `ProviderManager.Instance` to listen to changes in authentication status with the `ProviderUpdated` event or get direct access to the [.NET Graph Beta API](https://github.com/microsoftgraph/msgraph-beta-sdk-dotnet) through `ProviderManager.Instance.GlobalProvider.GetBetaClient()`, just be sure to check if the `GlobalProvider` has been set first and its `State` is `SignedIn`:
+You can use the `ProviderManager.Instance` to listen to changes in authentication status with the `ProviderStateChanged` event or get direct access to the [.NET Graph Beta API](https://github.com/microsoftgraph/msgraph-beta-sdk-dotnet) through `ProviderManager.Instance.GlobalProvider.GetBetaClient()`, just be sure to check if the `GlobalProvider` has been set first and its `State` is `SignedIn`:
 
 ```csharp
 using CommunityToolkit.Authentication;

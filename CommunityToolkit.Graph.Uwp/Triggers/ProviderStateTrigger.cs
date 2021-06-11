@@ -47,16 +47,16 @@ namespace CommunityToolkit.Graph.Uwp
         {
             _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
             var weakEvent =
-                new WeakEventListener<ProviderStateTrigger, object, ProviderUpdatedEventArgs>(this)
+                new WeakEventListener<ProviderStateTrigger, object, ProviderStateChangedEventArgs>(this)
                 {
-                    OnEventAction = (instance, source, args) => OnProviderUpdated(source, args),
-                    OnDetachAction = (weakEventListener) => ProviderManager.Instance.ProviderUpdated -= weakEventListener.OnEvent,
+                    OnEventAction = (instance, source, args) => OnProviderStateChanged(source, args),
+                    OnDetachAction = (weakEventListener) => ProviderManager.Instance.ProviderStateChanged -= weakEventListener.OnEvent,
                 };
-            ProviderManager.Instance.ProviderUpdated += weakEvent.OnEvent;
+            ProviderManager.Instance.ProviderStateChanged += weakEvent.OnEvent;
             UpdateState();
         }
 
-        private void OnProviderUpdated(object sender, ProviderUpdatedEventArgs e)
+        private void OnProviderStateChanged(object sender, ProviderStateChangedEventArgs e)
         {
             _ = _dispatcherQueue.EnqueueAsync(UpdateState, DispatcherQueuePriority.Normal);
         }
