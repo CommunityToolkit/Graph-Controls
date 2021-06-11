@@ -21,7 +21,7 @@ namespace CommunityToolkit.Graph.Uwp
 
         static ElementExtensions()
         {
-            ProviderManager.Instance.ProviderUpdated += OnProviderUpdated;
+            ProviderManager.Instance.ProviderStateChanged += OnProviderStateChanged;
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace CommunityToolkit.Graph.Uwp
             }
         }
 
-        private static void OnProviderUpdated(object sender, ProviderUpdatedEventArgs e)
+        private static void OnProviderStateChanged(object sender, ProviderStateChangedEventArgs e)
         {
             lock (_updateLock)
             {
