@@ -16,7 +16,7 @@ namespace CommunityToolkit.Authentication
         /// </summary>
         /// <param name="oldState">Previous <see cref="ProviderState"/>.</param>
         /// <param name="newState">Current <see cref="ProviderState"/>.</param>
-        public ProviderStateChangedEventArgs(ProviderState oldState, ProviderState newState)
+        public ProviderStateChangedEventArgs(ProviderState? oldState, ProviderState? newState)
         {
             OldState = oldState;
             NewState = newState;
@@ -25,11 +25,11 @@ namespace CommunityToolkit.Authentication
         /// <summary>
         /// Gets the previous state of the <see cref="IProvider"/>.
         /// </summary>
-        public ProviderState OldState { get; private set; }
+        public ProviderState? OldState { get; private set; }
 
         /// <summary>
         /// Gets the new state of the <see cref="IProvider"/>.
         /// </summary>
-        public ProviderState NewState { get; private set; }
+        public ProviderState? NewState { get; private set; }
     }
 }
