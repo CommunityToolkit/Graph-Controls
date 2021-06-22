@@ -42,7 +42,6 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         {
             base.OnApplyTemplate();
 
-            IsLoading = true;
             LoadData();
 
             if (_loginButton != null)
@@ -99,41 +98,37 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         private async void LoadData()
         {
             var provider = ProviderManager.Instance.GlobalProvider;
+            switch (provider?.State)
+            {
+                case ProviderState.Loading:
+                    IsLoading = true;
+                    break;
 
-            if (provider == null)
-            {
-                return;
-            }
+                case ProviderState.SignedIn:
+                    try
+                    {
+                        IsLoading = true;
 
-            if (provider.State == ProviderState.Loading)
-            {
-                IsLoading = true;
-            }
-            else if (provider.State == ProviderState.SignedIn)
-            {
-                try
-                {
-                    // https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-login/mgt-login.ts#L139
-                    // TODO: Batch with photo request later? https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
-                    UserDetails = await provider.GetClient().GetMeAsync();
-                }
-                catch (Exception e)
-                {
-                    LoginFailed?.Invoke(this, new LoginFailedEventArgs(e));
-                }
+                        // https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-login/mgt-login.ts#L139
+                        // TODO: Batch with photo request later? https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
+                        UserDetails = await provider.GetClient().GetMeAsync();
+                    }
+                    catch (Exception e)
+                    {
+                        LoginFailed?.Invoke(this, new LoginFailedEventArgs(e));
+                    }
+                    finally
+                    {
+                        IsLoading = false;
+                    }
 
-                IsLoading = false;
-            }
-            else if (provider.State == ProviderState.SignedOut)
-            {
-                UserDetails = null; // What if this was user provided? Should we not hook into these events then?
+                    break;
 
-                IsLoading = false;
-            }
-            else
-            {
-                // Provider in Loading state
-                Debug.Fail("unsupported state");
+                case ProviderState.SignedOut:
+                default:
+                    UserDetails = null; // What if this was user provided? Should we not hook into these events then?
+                    IsLoading = false;
+                    break;
             }
         }
 
