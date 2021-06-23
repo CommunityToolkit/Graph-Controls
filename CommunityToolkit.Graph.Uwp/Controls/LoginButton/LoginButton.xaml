@@ -22,8 +22,7 @@
                     <Button x:Name="PART_LoginButton"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}, RelativeSource={RelativeSource TemplatedParent}}">
+                            BorderThickness="{TemplateBinding BorderThickness}">
 
                         <!-- Grid matches the height of the PersonView in OneLine view.
                              This prevents the vertical height from changing when transitioning between states. -->

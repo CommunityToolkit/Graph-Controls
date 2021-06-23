@@ -33,7 +33,6 @@
                 IsActive="False" />
         </StackPanel>
 
-
         <ListView
             Grid.Column="1"
             Width="300"
