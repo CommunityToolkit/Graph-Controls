@@ -8,11 +8,11 @@ using System.ComponentModel;
 namespace CommunityToolkit.Authentication
 {
     /// <summary>
-    /// Shared provider manager used by controls in Microsoft.Toolkit.Graph.Controls to authenticate and call the Microsoft Graph.
+    /// Shared provider manager used by controls and helpers to authenticate and call the Microsoft Graph.
     /// </summary>
     /// <example>To set your own existing provider:
     /// <code>
-    /// ProviderManager.Instance.GlobalProvider = await MsalProvider.CreateAsync(...);
+    /// ProviderManager.Instance.GlobalProvider = await new MsalProvider(clientId, scopes);
     /// </code>
     /// </example>
     public partial class ProviderManager : INotifyPropertyChanged
@@ -69,7 +69,7 @@ namespace CommunityToolkit.Authentication
                 ProviderUpdated?.Invoke(this, _provider);
                 ProviderStateChanged?.Invoke(this, new ProviderStateChangedEventArgs(oldState, newState));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GlobalProvider)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GlobalProviderState)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(State)));
             }
         }
 
@@ -77,7 +77,7 @@ namespace CommunityToolkit.Authentication
         /// Gets the ProviderState of the current GlobalProvider instance.
         /// Use for binding scenarios instead of ProviderManager.Instance.GlobalProvider.State.
         /// </summary>
-        public ProviderState? GlobalProviderState => GlobalProvider?.State;
+        public ProviderState? State => GlobalProvider?.State;
 
         private IProvider _provider;
 
@@ -89,7 +89,7 @@ namespace CommunityToolkit.Authentication
         private void OnProviderStateChanged(object sender, ProviderStateChangedEventArgs args)
         {
             ProviderStateChanged?.Invoke(sender, args);
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GlobalProviderState)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(State)));
         }
     }
 }
