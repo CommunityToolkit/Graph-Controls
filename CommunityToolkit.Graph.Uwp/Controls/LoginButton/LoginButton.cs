@@ -4,7 +4,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Extensions;
@@ -27,6 +26,21 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         private Button _loginButton;
         private ButtonBase _signOutButton;
 
+        private bool _isLoading;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the control is loading and has not established a sign-in state.
+        /// </summary>
+        protected bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                _isLoading = value;
+                UpdateButtonEnablement();
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LoginButton"/> class.
         /// </summary>
@@ -38,13 +52,21 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             ProviderManager.Instance.ProviderStateChanged += (sender, args) => LoadData();
         }
 
+        /// <summary>
+        /// Update the enablement state of the button in relation to the _isLoading property.
+        /// </summary>
+        protected void UpdateButtonEnablement()
+        {
+            if (_loginButton != null)
+            {
+                _loginButton.IsEnabled = !_isLoading;
+            }
+        }
+
         /// <inheritdoc/>
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-
-            IsLoading = true;
-            LoadData();
 
             if (_loginButton != null)
             {
@@ -69,6 +91,8 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             {
                 _signOutButton.Click += SignOutButton_Click;
             }
+
+            LoadData();
         }
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
@@ -100,14 +124,7 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         private async void LoadData()
         {
             var provider = ProviderManager.Instance.GlobalProvider;
-
-            if (provider == null)
-            {
-                UserDetails = null;
-                return;
-            }
-
-            switch (provider.State)
+            switch (provider?.State)
             {
                 case ProviderState.Loading:
                     IsLoading = true;
@@ -116,30 +133,24 @@ namespace CommunityToolkit.Graph.Uwp.Controls
                 case ProviderState.SignedIn:
                     try
                     {
+                        IsLoading = true;
+
                         // https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-login/mgt-login.ts#L139
                         // TODO: Batch with photo request later? https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
                         UserDetails = await provider.GetClient().GetMeAsync();
-
-                        LoginCompleted?.Invoke(this, new EventArgs());
                     }
                     catch (Exception e)
                     {
                         LoginFailed?.Invoke(this, new LoginFailedEventArgs(e));
                     }
-
+                    
                     IsLoading = false;
                     break;
 
                 case ProviderState.SignedOut:
-                    UserDetails = null;
-                    LogoutCompleted?.Invoke(this, new EventArgs());
-
-                    IsLoading = false;
-                    break;
-
                 default:
-                    // Provider in Loading state
-                    Debug.Fail("unsupported state");
+                    UserDetails = null; // What if this was user provided? Should we not hook into these events then?
+                    IsLoading = false;
                     break;
             }
         }

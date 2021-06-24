@@ -8,14 +8,14 @@ using System.ComponentModel;
 namespace CommunityToolkit.Authentication
 {
     /// <summary>
-    /// Shared provider manager used by controls in Microsoft.Toolkit.Graph.Controls to authenticate and call the Microsoft Graph.
+    /// Shared provider manager used by controls and helpers to authenticate and call the Microsoft Graph.
     /// </summary>
     /// <example>To set your own existing provider:
     /// <code>
-    /// ProviderManager.Instance.GlobalProvider = await MsalProvider.CreateAsync(...);
+    /// ProviderManager.Instance.GlobalProvider = await new MsalProvider(clientId, scopes);
     /// </code>
     /// </example>
-    public partial class ProviderManager
+    public partial class ProviderManager : INotifyPropertyChanged
     {
         /// <summary>
         /// Gets the name of the toolkit client to identify self in Graph calls.
@@ -37,7 +37,8 @@ namespace CommunityToolkit.Authentication
         /// </summary>
         public event EventHandler<ProviderStateChangedEventArgs> ProviderStateChanged;
 
-        private IProvider _provider;
+        /// <inheritdoc />
+        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// Gets or sets the global provider used by all Microsoft.Toolkit.Graph.Controls.
@@ -54,7 +55,7 @@ namespace CommunityToolkit.Authentication
                 var oldState = _provider?.State;
                 if (_provider != null)
                 {
-                    _provider.StateChanged -= ProviderStateChanged;
+                    _provider.StateChanged -= OnProviderStateChanged;
                 }
 
                 _provider = value;
@@ -62,17 +63,33 @@ namespace CommunityToolkit.Authentication
                 var newState = _provider?.State;
                 if (_provider != null)
                 {
-                    _provider.StateChanged += ProviderStateChanged;
+                    _provider.StateChanged += OnProviderStateChanged;
                 }
 
                 ProviderUpdated?.Invoke(this, _provider);
                 ProviderStateChanged?.Invoke(this, new ProviderStateChangedEventArgs(oldState, newState));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GlobalProvider)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(State)));
             }
         }
+
+        /// <summary>
+        /// Gets the ProviderState of the current GlobalProvider instance.
+        /// Use for binding scenarios instead of ProviderManager.Instance.GlobalProvider.State.
+        /// </summary>
+        public ProviderState? State => GlobalProvider?.State;
+
+        private IProvider _provider;
 
         private ProviderManager()
         {
             // Use Instance
+        }
+
+        private void OnProviderStateChanged(object sender, ProviderStateChangedEventArgs args)
+        {
+            ProviderStateChanged?.Invoke(sender, args);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(State)));
         }
     }
 }

@@ -29,23 +29,5 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         /// </returns>
         public static readonly DependencyProperty UserDetailsProperty =
             DependencyProperty.Register(nameof(UserDetails), typeof(User), typeof(LoginButton), new PropertyMetadata(null));
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the control is loading and has not established a sign-in state.
-        /// </summary>
-        public bool IsLoading
-        {
-            get { return (bool)GetValue(IsLoadingProperty); }
-            protected set { SetValue(IsLoadingProperty, value); }
-        }
-
-        /// <summary>
-        /// Identifies the <see cref="IsLoading"/> dependency property.
-        /// </summary>
-        /// <returns>
-        /// The identifier for the <see cref="IsLoading"/> dependency property.
-        /// </returns>
-        public static readonly DependencyProperty IsLoadingProperty =
-            DependencyProperty.Register(nameof(IsLoading), typeof(bool), typeof(LoginButton), new PropertyMetadata(true));
     }
 }

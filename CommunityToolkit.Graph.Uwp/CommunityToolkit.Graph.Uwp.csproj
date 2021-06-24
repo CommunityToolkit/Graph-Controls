@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>uap10.0.17763</TargetFramework>
     <Title>Windows Community Toolkit Graph Uwp Controls and Helpers</Title>
-    <PackageId>CommunityToolkit.Graph.Uwp</PackageId>
     <Description>
       This library provides Microsoft Graph UWP XAML controls. It is part of the Windows Community Toolkit.
 
@@ -14,25 +13,27 @@
       - PeoplePicker: The PeoplePicker Control is a simple control that allows for selection of one or more users.
     </Description>
     <PackageTags>UWP Toolkit Windows Controls MSAL Microsoft Graph AadLogin ProfileCard Person PeoplePicker Login</PackageTags>
-    <SignAssembly>false</SignAssembly>
-    <GenerateLibraryLayout>true</GenerateLibraryLayout>
     <LangVersion>9.0</LangVersion>
-    <Configurations>Debug;Release;CI</Configurations>
-    <Platforms>AnyCPU;ARM;ARM64;x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Assets\person.png" />
-  </ItemGroup> 
-
+    <ProjectReference Include="..\CommunityToolkit.Authentication\CommunityToolkit.Authentication.csproj" />
+    <ProjectReference Include="..\CommunityToolkit.Graph\CommunityToolkit.Graph.csproj" />
+  </ItemGroup>
+    
 	<ItemGroup>
     <PackageReference Include="Microsoft.Graph" Version="3.31.0" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="7.0.1" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.Input" Version="7.0.1" />
   </ItemGroup>
- 
+      
+  <ItemGroup>
+    <Content Include="Assets\person.png" />
+  </ItemGroup> 
+
   <ItemGroup>
     <None Include="VisualStudioToolsManifest.xml" Pack="true" PackagePath="tools" />
+    <None Include="$(OutDir)\Design\$(MSBuildProjectName).Design*.dll;$(OutDir)\Design\$(MSBuildProjectName).Design*.pdb" Pack="true" PackagePath="lib\$(TargetFramework)\Design" />
   </ItemGroup>
  
   <ItemGroup>
@@ -40,25 +41,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CommunityToolkit.Authentication\CommunityToolkit.Authentication.csproj" />
-    <ProjectReference Include="..\CommunityToolkit.Graph\CommunityToolkit.Graph.csproj" />
-  </ItemGroup>
- 
-  <ItemGroup>
-    <Page Update="Controls\PersonView\PersonView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
- 
-  <ItemGroup>
     <Folder Include="Triggers\" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0.17763'">
-    <DefineConstants Condition="'$(DisableImplicitFrameworkDefines)' != 'true'">$(DefineConstants);WINRT</DefineConstants>
-  </PropertyGroup>
-
-    <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
   <!-- https://weblogs.asp.net/rweigelt/disable-warnings-in-generated-c-files-of-uwp-app -->
   <Target Name="PragmaWarningDisablePrefixer" AfterTargets="MarkupCompilePass2">
     <ItemGroup>
