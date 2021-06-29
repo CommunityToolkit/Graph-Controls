@@ -23,7 +23,7 @@ namespace CommunityToolkit.Authentication
     {
         /// <summary>
         /// Gets the redirect uri value based on the current app callback uri.
-        /// Used for configuring in Azure app registration.
+        /// Used for configuring the Azure app registration.
         /// </summary>
         public static string RedirectUri => string.Format("ms-appx-web://Microsoft.AAD.BrokerPlugIn/{0}", WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper());
 
@@ -522,21 +522,21 @@ namespace CommunityToolkit.Authentication
             var providers = new List<WebAccountProvider>();
 
             // MSA
-            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.All ||
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Any ||
                 _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Msa)
             {
                 providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
             }
 
             // AAD
-            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.All ||
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Any ||
                 _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Aad)
             {
                 providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, AadAuthority));
             }
 
             // Local
-            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.All ||
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Any ||
                 _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Local)
             {
                 providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(LocalProviderId));
