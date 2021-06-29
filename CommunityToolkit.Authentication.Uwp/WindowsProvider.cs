@@ -522,21 +522,21 @@ namespace CommunityToolkit.Authentication
             var providers = new List<WebAccountProvider>();
 
             // MSA
-            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.All ||
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Any ||
                 _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Msa)
             {
                 providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
             }
 
             // AAD
-            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.All ||
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Any ||
                 _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Aad)
             {
                 providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, AadAuthority));
             }
 
             // Local
-            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.All ||
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Any ||
                 _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Local)
             {
                 providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(LocalProviderId));

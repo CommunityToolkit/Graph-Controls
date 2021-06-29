@@ -10,9 +10,9 @@ namespace CommunityToolkit.Authentication
     public enum WebAccountProviderType
     {
         /// <summary>
-        /// Authenticate all available accounts.
+        /// Authenticate any and all available accounts. Client id required to support organizational accounts.
         /// </summary>
-        All,
+        Any,
 
         /// <summary>
         /// Authenticate public/consumer MSA accounts.
@@ -20,12 +20,12 @@ namespace CommunityToolkit.Authentication
         Msa,
 
         /// <summary>
-        /// Authenticate organizational AAD accounts.
+        /// Authenticate organizational AAD accounts. Client id required.
         /// </summary>
         Aad,
 
         /// <summary>
-        /// Authenticate the active local account.
+        /// Authenticate the active local account, regardless of type (consumer/organizational). Client id required to support organizational accounts.
         /// </summary>
         Local,
     }

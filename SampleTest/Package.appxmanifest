@@ -7,15 +7,15 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="54b2f5a5-a4ed-4158-b816-d7a6a07d85e5"
-    Publisher="CN=Microsoft"
+    Name="1206Weaver.Graph-ControlsSampleTest"
+    Publisher="CN=837C3C71-9A7D-469F-8F51-7E72CC6915ED"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="54b2f5a5-a4ed-4158-b816-d7a6a07d85e5" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="15ad03fa-1af3-41da-bc7d-b53a67f3bf5c" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>SampleTest</DisplayName>
-    <PublisherDisplayName>Microsoft</PublisherDisplayName>
+    <DisplayName>Graph-Controls SampleTest</DisplayName>
+    <PublisherDisplayName>Weaver</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
