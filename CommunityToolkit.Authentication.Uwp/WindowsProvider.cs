@@ -31,6 +31,8 @@ namespace CommunityToolkit.Authentication
         private const string GraphResourcePropertyKey = "resource";
         private const string GraphResourcePropertyValue = "https://graph.microsoft.com";
         private const string MicrosoftAccountAuthority = "consumers";
+        private const string AadAuthority = "organizations";
+        private const string LocalProviderId = "https://login.windows.local";
         private const string MicrosoftProviderId = "https://login.microsoft.com";
         private const string SettingsKeyAccountId = "WindowsProvider_AccountId";
         private const string SettingsKeyProviderId = "WindowsProvider_ProviderId";
@@ -39,7 +41,8 @@ namespace CommunityToolkit.Authentication
         private static readonly string[] DefaultScopes = { "User.Read" };
 
         // The default account providers available in the AccountsSettingsPane.
-        private static readonly WebAccountProviderType DefaultWebAccountsProviderType = WebAccountProviderType.All;
+        // Default is Msa because it does not require any additional configuration
+        private static readonly WebAccountProviderType DefaultWebAccountsProviderType = WebAccountProviderType.Msa;
 
         /// <inheritdoc />
         public override string CurrentAccountId => _webAccount?.Id;
@@ -221,8 +224,10 @@ namespace CommunityToolkit.Authentication
                     throw new Exception("Authentication response was not successful, but is also missing a ResponseError.");
                 }
             }
-            catch
+            catch (Exception e)
             {
+                // TODO: Log failure
+                System.Diagnostics.Debug.WriteLine(e.Message);
             }
 
             return null;
@@ -521,6 +526,20 @@ namespace CommunityToolkit.Authentication
                 _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Msa)
             {
                 providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
+            }
+
+            // AAD
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.All ||
+                _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Aad)
+            {
+                providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, AadAuthority));
+            }
+
+            // Local
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.All ||
+                _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Local)
+            {
+                providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(LocalProviderId));
             }
 
             return providers;

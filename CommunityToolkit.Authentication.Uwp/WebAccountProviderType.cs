@@ -18,5 +18,15 @@ namespace CommunityToolkit.Authentication
         /// Authenticate public/consumer MSA accounts.
         /// </summary>
         Msa,
+
+        /// <summary>
+        /// Authenticate organizational AAD accounts.
+        /// </summary>
+        Aad,
+
+        /// <summary>
+        /// Authenticate the active local account.
+        /// </summary>
+        Local,
     }
 }
