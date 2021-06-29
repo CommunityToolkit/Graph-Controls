@@ -28,7 +28,7 @@ namespace SampleTest
         }
 
         // Which provider should be used for authentication?
-        private readonly ProviderType _providerType = ProviderType.Windows;
+        private readonly ProviderType _providerType = ProviderType.Mock;
 
         // List of available authentication providers.
         private enum ProviderType
@@ -51,8 +51,8 @@ namespace SampleTest
             await Window.Current.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
                 // Provider config
-                string clientId = "aadc2533-e272-4e43-b3c6-cd40e6d08a74";
-                string[] scopes = { "User.Read", "People.Read", "Calendars.Read", "Mail.Read" };
+                string clientId = "YOUR_CLIENT_ID_HERE";
+                string[] scopes = { "User.Read", "User.ReadBasic.All", "People.Read", "Calendars.Read", "Mail.Read", "Group.Read.All", "ChannelMessage.Read.All" };
                 bool autoSignIn = true;
 
                 switch (_providerType)
@@ -69,7 +69,7 @@ namespace SampleTest
 
                     // Windows provider
                     case ProviderType.Windows:
-                        var webAccountProviderConfig = new WebAccountProviderConfig(WebAccountProviderType.Any, clientId);
+                        var webAccountProviderConfig = new WebAccountProviderConfig(WebAccountProviderType.Msa, clientId);
                         ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes, webAccountProviderConfig: webAccountProviderConfig, autoSignIn: autoSignIn);
                         break;
                 }
