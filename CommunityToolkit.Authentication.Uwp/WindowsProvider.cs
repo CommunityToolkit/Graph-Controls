@@ -78,7 +78,7 @@ namespace CommunityToolkit.Authentication
         /// <param name="scopes">List of Scopes to initially request.</param>
         /// <param name="accountsSettingsPaneConfig">Configuration values for the AccountsSettingsPane.</param>
         /// <param name="webAccountProviderConfig">Configuration value for determining the available web account providers.</param>
-        /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon instantionation.</param>
+        /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon construction.</param>
         public WindowsProvider(string[] scopes = null, WebAccountProviderConfig? webAccountProviderConfig = null, AccountsSettingsPaneConfig? accountsSettingsPaneConfig = null, bool autoSignIn = true)
         {
             _scopes = scopes ?? DefaultScopes;
@@ -508,9 +508,9 @@ namespace CommunityToolkit.Authentication
         {
             string scopesString = string.Join(',', scopes);
 
-            WebTokenRequest webTokenRequest = clientId != null
-                ? new WebTokenRequest(provider, scopesString, clientId)
-                : new WebTokenRequest(provider, scopesString);
+            WebTokenRequest webTokenRequest = string.IsNullOrWhiteSpace(clientId)
+                ? new WebTokenRequest(provider, scopesString)
+                : new WebTokenRequest(provider, scopesString, clientId);
 
             webTokenRequest.Properties.Add(GraphResourcePropertyKey, GraphResourcePropertyValue);
 
