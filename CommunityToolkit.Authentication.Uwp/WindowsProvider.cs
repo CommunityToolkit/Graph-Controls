@@ -23,7 +23,7 @@ namespace CommunityToolkit.Authentication
     {
         /// <summary>
         /// Gets the redirect uri value based on the current app callback uri.
-        /// Used for configuring in Azure app registration.
+        /// Used for configuring the Azure app registration.
         /// </summary>
         public static string RedirectUri => string.Format("ms-appx-web://Microsoft.AAD.BrokerPlugIn/{0}", WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper());
 
@@ -31,6 +31,8 @@ namespace CommunityToolkit.Authentication
         private const string GraphResourcePropertyKey = "resource";
         private const string GraphResourcePropertyValue = "https://graph.microsoft.com";
         private const string MicrosoftAccountAuthority = "consumers";
+        private const string AadAuthority = "organizations";
+        private const string LocalProviderId = "https://login.windows.local";
         private const string MicrosoftProviderId = "https://login.microsoft.com";
         private const string SettingsKeyAccountId = "WindowsProvider_AccountId";
         private const string SettingsKeyProviderId = "WindowsProvider_ProviderId";
@@ -39,7 +41,8 @@ namespace CommunityToolkit.Authentication
         private static readonly string[] DefaultScopes = { "User.Read" };
 
         // The default account providers available in the AccountsSettingsPane.
-        private static readonly WebAccountProviderType DefaultWebAccountsProviderType = WebAccountProviderType.All;
+        // Default is Msa because it does not require any additional configuration
+        private static readonly WebAccountProviderType DefaultWebAccountsProviderType = WebAccountProviderType.Msa;
 
         /// <inheritdoc />
         public override string CurrentAccountId => _webAccount?.Id;
@@ -75,7 +78,7 @@ namespace CommunityToolkit.Authentication
         /// <param name="scopes">List of Scopes to initially request.</param>
         /// <param name="accountsSettingsPaneConfig">Configuration values for the AccountsSettingsPane.</param>
         /// <param name="webAccountProviderConfig">Configuration value for determining the available web account providers.</param>
-        /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon instantionation.</param>
+        /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon construction.</param>
         public WindowsProvider(string[] scopes = null, WebAccountProviderConfig? webAccountProviderConfig = null, AccountsSettingsPaneConfig? accountsSettingsPaneConfig = null, bool autoSignIn = true)
         {
             _scopes = scopes ?? DefaultScopes;
@@ -218,14 +221,15 @@ namespace CommunityToolkit.Authentication
                 else
                 {
                     // Authentication response was not successful or cancelled, but is also missing a ResponseError.
-                    throw new Exception("Authentication response was not successful, but is also missing a ResponseError.");
+                    throw new Exception("Token request was not successful, but is also missing an error message.");
                 }
             }
-            catch
+            catch (Exception e)
             {
+                // TODO: Log failure
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                throw e;
             }
-
-            return null;
         }
 
         /// <summary>
@@ -236,12 +240,7 @@ namespace CommunityToolkit.Authentication
         {
             if (_webAccount == null)
             {
-                throw new InvalidOperationException("Display account management pane requires at least one logged in account.");
-            }
-
-            if (_accountsSettingsPaneConfig?.AccountCommandParameter == null)
-            {
-                throw new ArgumentNullException("At least one account command is required to display the account management pane.");
+                throw new InvalidOperationException("A logged in account is required to display the account management pane.");
             }
 
             // Build the AccountSettingsPane and configure it with available account commands.
@@ -256,23 +255,28 @@ namespace CommunityToolkit.Authentication
                     e.HeaderText = headerText;
                 }
 
-                // Generate account command.
-                var commandParameter = _accountsSettingsPaneConfig?.AccountCommandParameter;
-                var webAccountCommand = new WebAccountCommand(
+                // Generate any account commands.
+                if (_accountsSettingsPaneConfig?.AccountCommandParameters != null)
+                {
+                    foreach (var commandParameter in _accountsSettingsPaneConfig?.AccountCommandParameters)
+                    {
+                        var webAccountCommand = new WebAccountCommand(
                             _webAccount,
                             async (command, args) =>
                             {
-                                commandParameter.Invoked?.Invoke(command, args);
-
                                 // When the logout command is triggered, we also need to modify the state of the Provider.
                                 if (args.Action == WebAccountAction.Remove)
                                 {
                                     await SignOutAsync();
                                 }
+
+                                commandParameter.Invoked?.Invoke(command, args);
                             },
                             commandParameter.Actions);
 
-                e.WebAccountCommands.Add(webAccountCommand);
+                        e.WebAccountCommands.Add(webAccountCommand);
+                    }
+                }
 
                 // Apply any configured setting commands.
                 var commands = _accountsSettingsPaneConfig?.Commands;
@@ -297,8 +301,10 @@ namespace CommunityToolkit.Authentication
                 // Show the AccountSettingsPane and wait for the result.
                 await AccountsSettingsPane.ShowManageAccountsAsync();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                // TODO: Log exception
+                System.Diagnostics.Debug.WriteLine(e.Message);
             }
             finally
             {
@@ -503,9 +509,9 @@ namespace CommunityToolkit.Authentication
         {
             string scopesString = string.Join(',', scopes);
 
-            WebTokenRequest webTokenRequest = clientId != null
-                ? new WebTokenRequest(provider, scopesString, clientId)
-                : new WebTokenRequest(provider, scopesString);
+            WebTokenRequest webTokenRequest = string.IsNullOrWhiteSpace(clientId)
+                ? new WebTokenRequest(provider, scopesString)
+                : new WebTokenRequest(provider, scopesString, clientId);
 
             webTokenRequest.Properties.Add(GraphResourcePropertyKey, GraphResourcePropertyValue);
 
@@ -517,10 +523,24 @@ namespace CommunityToolkit.Authentication
             var providers = new List<WebAccountProvider>();
 
             // MSA
-            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.All ||
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Any ||
                 _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Msa)
             {
                 providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
+            }
+
+            // AAD
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Any ||
+                _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Aad)
+            {
+                providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, AadAuthority));
+            }
+
+            // Local
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Any ||
+                _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Local)
+            {
+                providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(LocalProviderId));
             }
 
             return providers;

@@ -30,7 +30,7 @@ namespace CommunityToolkit.Authentication
         /// <summary>
         /// Gets or sets the WebAccountCommandParameter collection for the account settings pane.
         /// </summary>
-        public WebAccountCommandParameter AccountCommandParameter { get; set; }
+        public IList<WebAccountCommandParameter> AccountCommandParameters { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountsSettingsPaneConfig"/> struct.
@@ -38,17 +38,17 @@ namespace CommunityToolkit.Authentication
         /// <param name="addAccountHeaderText">The header text for the add accounts settings pane.</param>
         /// <param name="manageAccountHeaderText">The header text for the manage accounts settings pane.</param>
         /// <param name="commands">The SettingsCommand collection for the account settings pane.</param>
-        /// <param name="accountCommandParameter">The WebAccountCommandParameter for the account settings pane.</param>
+        /// <param name="accountCommandParameters">The WebAccountCommandParameter for the account settings pane.</param>
         public AccountsSettingsPaneConfig(
             string addAccountHeaderText = null,
             string manageAccountHeaderText = null,
             IList<SettingsCommand> commands = null,
-            WebAccountCommandParameter accountCommandParameter = null)
+            IList<WebAccountCommandParameter> accountCommandParameters = null)
         {
             AddAccountHeaderText = addAccountHeaderText;
             ManageAccountHeaderText = manageAccountHeaderText;
             Commands = commands;
-            AccountCommandParameter = accountCommandParameter;
+            AccountCommandParameters = accountCommandParameters;
         }
     }
 }
