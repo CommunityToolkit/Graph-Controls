@@ -221,16 +221,15 @@ namespace CommunityToolkit.Authentication
                 else
                 {
                     // Authentication response was not successful or cancelled, but is also missing a ResponseError.
-                    throw new Exception("Authentication response was not successful, but is also missing a ResponseError.");
+                    throw new Exception("Token request was not successful, but is also missing an error message.");
                 }
             }
             catch (Exception e)
             {
                 // TODO: Log failure
                 System.Diagnostics.Debug.WriteLine(e.Message);
+                throw e;
             }
-
-            return null;
         }
 
         /// <summary>
@@ -241,12 +240,7 @@ namespace CommunityToolkit.Authentication
         {
             if (_webAccount == null)
             {
-                throw new InvalidOperationException("Display account management pane requires at least one logged in account.");
-            }
-
-            if (_accountsSettingsPaneConfig?.AccountCommandParameter == null)
-            {
-                throw new ArgumentNullException("At least one account command is required to display the account management pane.");
+                throw new InvalidOperationException("A logged in account is required to display the account management pane.");
             }
 
             // Build the AccountSettingsPane and configure it with available account commands.
@@ -261,23 +255,28 @@ namespace CommunityToolkit.Authentication
                     e.HeaderText = headerText;
                 }
 
-                // Generate account command.
-                var commandParameter = _accountsSettingsPaneConfig?.AccountCommandParameter;
-                var webAccountCommand = new WebAccountCommand(
+                // Generate any account commands.
+                if (_accountsSettingsPaneConfig?.AccountCommandParameters != null)
+                {
+                    foreach (var commandParameter in _accountsSettingsPaneConfig?.AccountCommandParameters)
+                    {
+                        var webAccountCommand = new WebAccountCommand(
                             _webAccount,
                             async (command, args) =>
                             {
-                                commandParameter.Invoked?.Invoke(command, args);
-
                                 // When the logout command is triggered, we also need to modify the state of the Provider.
                                 if (args.Action == WebAccountAction.Remove)
                                 {
                                     await SignOutAsync();
                                 }
+
+                                commandParameter.Invoked?.Invoke(command, args);
                             },
                             commandParameter.Actions);
 
-                e.WebAccountCommands.Add(webAccountCommand);
+                        e.WebAccountCommands.Add(webAccountCommand);
+                    }
+                }
 
                 // Apply any configured setting commands.
                 var commands = _accountsSettingsPaneConfig?.Commands;
@@ -302,8 +301,10 @@ namespace CommunityToolkit.Authentication
                 // Show the AccountSettingsPane and wait for the result.
                 await AccountsSettingsPane.ShowManageAccountsAsync();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                // TODO: Log exception
+                System.Diagnostics.Debug.WriteLine(e.Message);
             }
             finally
             {

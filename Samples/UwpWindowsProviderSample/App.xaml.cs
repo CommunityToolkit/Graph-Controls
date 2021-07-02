@@ -51,15 +51,13 @@ namespace UwpWindowsProviderSample
 
             var accountCommandParameter = new WebAccountCommandParameter(
                 OnAccountCommandInvoked,
-                SupportedWebAccountActions.Remove | SupportedWebAccountActions.Manage);
+                SupportedWebAccountActions.Manage | SupportedWebAccountActions.Remove);
 
             var addAccountHeaderText = "Login account";
             var manageAccountHeaderText = "Account management";
 
-            return new AccountsSettingsPaneConfig(addAccountHeaderText, manageAccountHeaderText, accountCommandParameter: accountCommandParameter);
+            return new AccountsSettingsPaneConfig(addAccountHeaderText, manageAccountHeaderText, accountCommandParameters: new List<WebAccountCommandParameter>() { accountCommandParameter });
         }
-
-
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
