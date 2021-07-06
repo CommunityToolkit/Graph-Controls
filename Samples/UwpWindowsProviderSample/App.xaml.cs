@@ -3,8 +3,6 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Authentication;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Windows.ApplicationModel.Activation;
 using Windows.System;
@@ -56,7 +54,7 @@ namespace UwpWindowsProviderSample
             var addAccountHeaderText = "Login account";
             var manageAccountHeaderText = "Account management";
 
-            return new AccountsSettingsPaneConfig(addAccountHeaderText, manageAccountHeaderText, accountCommandParameters: new List<WebAccountCommandParameter>() { accountCommandParameter });
+            return new AccountsSettingsPaneConfig(addAccountHeaderText, manageAccountHeaderText, accountCommandParameter: accountCommandParameter);
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)

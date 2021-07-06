@@ -256,26 +256,24 @@ namespace CommunityToolkit.Authentication
                 }
 
                 // Generate any account commands.
-                if (_accountsSettingsPaneConfig?.AccountCommandParameters != null)
+                if (_accountsSettingsPaneConfig?.AccountCommandParameter != null)
                 {
-                    foreach (var commandParameter in _accountsSettingsPaneConfig?.AccountCommandParameters)
-                    {
-                        var webAccountCommand = new WebAccountCommand(
-                            _webAccount,
-                            async (command, args) =>
+                    var commandParameter = _accountsSettingsPaneConfig.Value.AccountCommandParameter;
+                    var webAccountCommand = new WebAccountCommand(
+                        _webAccount,
+                        async (command, args) =>
+                        {
+                            // When the logout command is triggered, we also need to modify the state of the Provider.
+                            if (args.Action == WebAccountAction.Remove)
                             {
-                                // When the logout command is triggered, we also need to modify the state of the Provider.
-                                if (args.Action == WebAccountAction.Remove)
-                                {
-                                    await SignOutAsync();
-                                }
+                                await SignOutAsync();
+                            }
 
-                                commandParameter.Invoked?.Invoke(command, args);
-                            },
-                            commandParameter.Actions);
+                            commandParameter.Invoked?.Invoke(command, args);
+                        },
+                        commandParameter.Actions);
 
-                        e.WebAccountCommands.Add(webAccountCommand);
-                    }
+                    e.WebAccountCommands.Add(webAccountCommand);
                 }
 
                 // Apply any configured setting commands.
