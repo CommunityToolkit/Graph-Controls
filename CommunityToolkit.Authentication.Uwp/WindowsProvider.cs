@@ -181,10 +181,8 @@ namespace CommunityToolkit.Authentication
 
             try
             {
-                var tokenScopes = scopes ?? _scopes;
-
                 // Attempt to authenticate silently.
-                var authResult = await AuthenticateSilentAsync(tokenScopes);
+                var authResult = await AuthenticateSilentAsync(_scopes);
 
                 // Authenticate with user interaction as appropriate.
                 if (authResult?.ResponseStatus != WebTokenRequestStatus.Success)
@@ -196,7 +194,7 @@ namespace CommunityToolkit.Authentication
                     }
 
                     // Attempt to authenticate interactively.
-                    authResult = await AuthenticateInteractiveAsync(tokenScopes);
+                    authResult = await AuthenticateInteractiveAsync(_scopes);
                 }
 
                 if (authResult?.ResponseStatus == WebTokenRequestStatus.Success)
