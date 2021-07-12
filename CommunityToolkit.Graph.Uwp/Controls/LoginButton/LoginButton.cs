@@ -74,7 +74,6 @@ namespace CommunityToolkit.Graph.Uwp.Controls
                     LoginInitiated?.Invoke(this, cargs);
                     if (cargs.Cancel)
                     {
-                        IsLoading = false;
                         throw new OperationCanceledException();
                     }
 
@@ -125,7 +124,7 @@ namespace CommunityToolkit.Graph.Uwp.Controls
                         throw new Exception("Logout did not complete.");
                     }
                 }
-                catch
+                finally
                 {
                     // There is no LogoutFailed event, so we do nothing.
                     IsLoading = false;
