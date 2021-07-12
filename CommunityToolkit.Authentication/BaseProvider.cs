@@ -52,7 +52,7 @@ namespace CommunityToolkit.Authentication
         public abstract Task AuthenticateRequestAsync(HttpRequestMessage request);
 
         /// <inheritdoc />
-        public abstract Task<string> GetTokenAsync(bool silentOnly = false, string[] scopes = null);
+        public abstract Task<string> GetTokenAsync(bool silentOnly = false);
 
         /// <inheritdoc />
         public abstract Task SignInAsync();
