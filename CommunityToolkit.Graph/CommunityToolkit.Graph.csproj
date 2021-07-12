@@ -10,6 +10,7 @@
       - ProviderExtensions: Extension on IProvider for accessing a pre-configured GraphServiceClient instance.
     </Description>
     <PackageTags>Windows Community Toolkit Graph Provider Extensions</PackageTags>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

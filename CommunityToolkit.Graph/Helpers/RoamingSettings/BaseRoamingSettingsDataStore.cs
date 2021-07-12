@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
 
-namespace CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings
+namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
     /// A base class for easily building roaming settings helper implementations.

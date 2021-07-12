@@ -5,14 +5,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Toolkit.Uwp.Helpers;
+using CommunityToolkit.Graph.ObjectStorage;
 
-namespace CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings
+namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
     /// Defines the contract for creating storage containers used for roaming data.
     /// </summary>
-    public interface IRoamingSettingsDataStore : IObjectStorageHelper
+    public interface IRoamingSettingsDataStore : IDictionaryStorageHelper, IFileStorageHelper
     {
         /// <summary>
         /// Gets a value indicating whether the values should immediately sync or not.

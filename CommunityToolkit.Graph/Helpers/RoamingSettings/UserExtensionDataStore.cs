@@ -10,7 +10,7 @@ using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.Storage;
 
-namespace CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings
+namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
     /// An IObjectStorageHelper implementation using open extensions on the Graph User for storing key/value pairs.
