@@ -119,7 +119,7 @@ namespace CommunityToolkit.Authentication
         }
 
         /// <inheritdoc/>
-        public override async Task<string> GetTokenAsync(bool silentOnly = false, string[] scopes = null)
+        public override async Task<string> GetTokenAsync(bool silentOnly = false)
         {
             var tokenScopes = scopes ?? Scopes;
 
