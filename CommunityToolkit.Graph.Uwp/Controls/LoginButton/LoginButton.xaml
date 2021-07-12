@@ -45,7 +45,7 @@
                                 <StackPanel>
                                     <local:PersonView PersonDetails="{Binding UserDetails, Converter={StaticResource UserToPersonConverter}, RelativeSource={RelativeSource TemplatedParent}}"
                                                       PersonViewType="TwoLines" />
-                                    <HyperlinkButton x:Name="PART_SignOutButton">
+                                    <HyperlinkButton x:Name="PART_LogoutButton">
                                         <TextBlock Text="Sign Out" />
                                     </HyperlinkButton>
                                 </StackPanel>
