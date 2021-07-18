@@ -54,7 +54,7 @@ namespace CommunityToolkit.Authentication
                 var oldState = _provider?.State;
                 if (_provider != null)
                 {
-                    _provider.StateChanged -= ProviderStateChanged;
+                    _provider.StateChanged -= OnProviderStateChanged;
                 }
 
                 _provider = value;
@@ -62,12 +62,17 @@ namespace CommunityToolkit.Authentication
                 var newState = _provider?.State;
                 if (_provider != null)
                 {
-                    _provider.StateChanged += ProviderStateChanged;
+                    _provider.StateChanged += OnProviderStateChanged;
                 }
 
                 ProviderUpdated?.Invoke(this, _provider);
                 ProviderStateChanged?.Invoke(this, new ProviderStateChangedEventArgs(oldState, newState));
             }
+        }
+
+        private void OnProviderStateChanged(object sender, ProviderStateChangedEventArgs e)
+        {
+            ProviderStateChanged?.Invoke(this, e);
         }
 
         private ProviderManager()
