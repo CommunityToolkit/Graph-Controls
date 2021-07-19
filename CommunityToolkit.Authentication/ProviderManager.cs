@@ -88,7 +88,7 @@ namespace CommunityToolkit.Authentication
 
         private void OnProviderStateChanged(object sender, ProviderStateChangedEventArgs args)
         {
-            ProviderStateChanged?.Invoke(sender, args);
+            ProviderStateChanged?.Invoke(this, args);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(State)));
         }
     }
