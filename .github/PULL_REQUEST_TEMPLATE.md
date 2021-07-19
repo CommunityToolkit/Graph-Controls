@@ -27,9 +27,9 @@ What kind of change does this PR introduce?
 
 Please check if your PR fulfills the following requirements:
 
-- [ ] Tested code with current [supported SDKs](https://github.com/windows-toolkit/Graph-Controls/blob/main/README.md)
+- [ ] Tested code with current [supported SDKs](https://github.com/CommunityToolkit/Graph-Controls/blob/main/README.md)
 - [ ] Sample in sample app has been added / updated (for bug fixes / features)
-  - [ ] Icon has been created (if new sample) following the [Thumbnail Style Guide and templates](https://github.com/windows-toolkit/WindowsCommunityToolkit-design-assets)
+  - [ ] Icon has been created (if new sample) following the [Thumbnail Style Guide and templates](https://github.com/CommunityToolkit/WindowsCommunityToolkit-design-assets)
 - [ ] Tests for the changes have been added (for bug fixes / features) (if applicable)
 - [ ] Header has been added to all new source files (run _build/UpdateHeaders.bat_)
 - [ ] Contains **NO** breaking changes
