@@ -3,9 +3,9 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Authentication;
-using CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings;
+using CommunityToolkit.Graph.Helpers.ObjectStorage;
+using Microsoft.Toolkit.Helpers;
 using Microsoft.Toolkit.Uwp;
-using Microsoft.Toolkit.Uwp.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading.Tasks;
@@ -18,7 +18,7 @@ namespace UnitTests.UWP.Helpers
         /// <summary>
         /// Test the dafault state of a new instance of the UserExtensionDataStore.
         /// </summary>
-        [TestCategory("RoamingSettings")]
+        [TestCategory("ObjectStorage")]
         [TestMethod]
         public async Task Test_Default()
         {
@@ -29,16 +29,14 @@ namespace UnitTests.UWP.Helpers
                 try
                 {
                     string userId = "TestUserId";
-                    string dataStoreId = "RoamingData";
-                    IObjectSerializer serializer = new SystemSerializer();
+                    string extensionId = "RoamingData";
 
-                    IRoamingSettingsDataStore dataStore = new UserExtensionDataStore(userId, dataStoreId, serializer, false);
+                    UserExtensionStorageHelper storageHelper = new UserExtensionStorageHelper(extensionId, userId);
 
-                    // Evaluate the default state is as expected
-                    Assert.IsFalse(dataStore.AutoSync);
-                    Assert.IsNotNull(dataStore.Cache);
-                    Assert.AreEqual(dataStoreId, dataStore.Id);
-                    Assert.AreEqual(userId, dataStore.UserId);
+                    Assert.AreEqual(extensionId, storageHelper.ExtensionId);
+                    Assert.AreEqual(userId, storageHelper.UserId);
+                    Assert.IsNotNull(storageHelper.Serializer);
+                    Assert.IsInstanceOfType(storageHelper.Serializer, typeof(SystemSerializer));
 
                     tcs.SetResult(true);
                 }
@@ -56,7 +54,7 @@ namespace UnitTests.UWP.Helpers
         /// <summary>
         /// Test the dafault state of a new instance of the UserExtensionDataStore.
         /// </summary>
-        [TestCategory("RoamingSettings")]
+        [TestCategory("ObjectStorage")]
         [TestMethod]
         public async Task Test_Sync()
         {
@@ -66,27 +64,17 @@ namespace UnitTests.UWP.Helpers
             {
                 try
                 {
+                    string extensionId = "RoamingData";
                     string userId = "TestUserId";
-                    string dataStoreId = "RoamingData";
-                    IObjectSerializer serializer = new SystemSerializer();
 
-                    IRoamingSettingsDataStore dataStore = new UserExtensionDataStore(userId, dataStoreId, serializer, false);
-
-                    try
-                    {
-                        // Attempt to delete the remote first.
-                        await dataStore.Delete();
-                    }
-                    catch
-                    {
-                    }
+                    IRemoteSettingsStorageHelper dataStore = new UserExtensionStorageHelper(extensionId, userId);
 
                     dataStore.SyncCompleted += async (s, e) =>
                     {
                         try
                         {
                             // Create a second instance to ensure that the Cache doesn't yield a false positive.
-                            IRoamingSettingsDataStore dataStore2 = new OneDriveDataStore(userId, dataStoreId, serializer, false);
+                            IRemoteSettingsStorageHelper dataStore2 = new UserExtensionStorageHelper(extensionId, userId);
                             await dataStore2.Sync();
 
                             var foo = dataStore.Read<string>("foo");

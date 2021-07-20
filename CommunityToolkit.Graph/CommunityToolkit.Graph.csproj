@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Graph" Version="3.31.0" />
+    <PackageReference Include="Microsoft.Toolkit" Version="7.0.0-build.1279.g3aeb5bf8f4" />
   </ItemGroup>
 
   <ItemGroup>
