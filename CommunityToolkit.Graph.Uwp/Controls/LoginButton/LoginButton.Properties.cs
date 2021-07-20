@@ -18,7 +18,7 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         public User UserDetails
         {
             get { return (User)GetValue(UserDetailsProperty); }
-            set { SetValue(UserDetailsProperty, value); }
+            protected set { SetValue(UserDetailsProperty, value); }
         }
 
         /// <summary>

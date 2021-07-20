@@ -17,14 +17,14 @@ namespace CommunityToolkit.Graph.Uwp.Controls
     /// The <see cref="LoginButton"/> control is a button which can be used to sign the user in or show them profile details.
     /// </summary>
     [TemplatePart(Name = LoginButtonPart, Type = typeof(Button))]
-    [TemplatePart(Name = SignOutButtonPart, Type = typeof(ButtonBase))]
+    [TemplatePart(Name = LogoutButtonPart, Type = typeof(ButtonBase))]
     public partial class LoginButton : Control
     {
         private const string LoginButtonPart = "PART_LoginButton";
-        private const string SignOutButtonPart = "PART_SignOutButton";
+        private const string LogoutButtonPart = "PART_LogoutButton";
 
         private Button _loginButton;
-        private ButtonBase _signOutButton;
+        private ButtonBase _logoutButton;
 
         private bool _isLoading;
 
@@ -48,17 +48,87 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         {
             this.DefaultStyleKey = typeof(LoginButton);
 
-            ProviderManager.Instance.ProviderStateChanged += (sender, args) => LoadData();
+            ProviderManager.Instance.ProviderUpdated += OnProviderUpdated;
+            ProviderManager.Instance.ProviderStateChanged += OnProviderStateChanged;
         }
 
         /// <summary>
-        /// Update the enablement state of the button in relation to the _isLoading property.
+        /// Initiates logging in with the current <see cref="IProvider"/> registered in the <see cref="ProviderManager"/>.
         /// </summary>
-        protected void UpdateButtonEnablement()
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public async Task SignInAsync()
         {
-            if (_loginButton != null)
+            if (IsLoading)
             {
-                _loginButton.IsEnabled = !_isLoading;
+                return;
+            }
+
+            var provider = ProviderManager.Instance.GlobalProvider;
+            if (provider != null)
+            {
+                try
+                {
+                    IsLoading = true;
+
+                    var cargs = new CancelEventArgs();
+                    LoginInitiated?.Invoke(this, cargs);
+                    if (cargs.Cancel)
+                    {
+                        throw new OperationCanceledException();
+                    }
+
+                    await provider.SignInAsync();
+
+                    if (provider.State != ProviderState.SignedIn)
+                    {
+                        throw new Exception("Login did not complete.");
+                    }
+                }
+                catch (Exception e)
+                {
+                    IsLoading = false;
+                    LoginFailed?.Invoke(this, new LoginFailedEventArgs(e));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Log a signed-in user out.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public async Task SignOutAsync()
+        {
+            if (IsLoading)
+            {
+                return;
+            }
+
+            IsLoading = true;
+
+            var cargs = new CancelEventArgs();
+            LogoutInitiated?.Invoke(this, cargs);
+            if (cargs.Cancel)
+            {
+                return;
+            }
+
+            var provider = ProviderManager.Instance.GlobalProvider;
+            if (provider != null)
+            {
+                try
+                {
+                    await provider.SignOutAsync();
+
+                    if (provider.State != ProviderState.SignedOut)
+                    {
+                        throw new Exception("Logout did not complete.");
+                    }
+                }
+                finally
+                {
+                    // There is no LogoutFailed event, so we do nothing.
+                    IsLoading = false;
+                }
             }
         }
 
@@ -79,49 +149,114 @@ namespace CommunityToolkit.Graph.Uwp.Controls
                 _loginButton.Click += LoginButton_Click;
             }
 
-            if (_signOutButton != null)
+            if (_logoutButton != null)
             {
-                _signOutButton.Click -= LoginButton_Click;
+                _logoutButton.Click -= LogoutButton_Click;
             }
 
-            _signOutButton = GetTemplateChild(SignOutButtonPart) as ButtonBase;
+            _logoutButton = GetTemplateChild(LogoutButtonPart) as ButtonBase;
 
-            if (_signOutButton != null)
+            if (_logoutButton != null)
             {
-                _signOutButton.Click += SignOutButton_Click;
+                _logoutButton.Click += LogoutButton_Click;
             }
 
             LoadData();
         }
 
-        private async void LoginButton_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Show the user details flyout.
+        /// </summary>
+        protected void ShowFlyout()
         {
-            if (this.UserDetails != null)
+            if (FlyoutBase.GetAttachedFlyout(_loginButton) is FlyoutBase flyout)
             {
-                if (FlyoutBase.GetAttachedFlyout(_loginButton) is FlyoutBase flyout)
-                {
-                    flyout.ShowAt(_loginButton);
-                }
-            }
-            else
-            {
-                var cargs = new CancelEventArgs();
-                LoginInitiated?.Invoke(this, cargs);
-
-                if (!cargs.Cancel)
-                {
-                    await SignInAsync();
-                }
+                flyout.ShowAt(_loginButton);
             }
         }
 
-        private async void SignOutButton_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Hide the user details flyout.
+        /// </summary>
+        protected void HideFlyout()
         {
+            if (FlyoutBase.GetAttachedFlyout(_loginButton) is FlyoutBase flyout)
+            {
+                flyout.Hide();
+            }
+        }
+
+        /// <summary>
+        /// Update the enablement state of the button in relation to the _isLoading property.
+        /// </summary>
+        protected void UpdateButtonEnablement()
+        {
+            if (_loginButton != null)
+            {
+                _loginButton.IsEnabled = !_isLoading;
+            }
+        }
+
+        private void OnProviderUpdated(object sender, IProvider e)
+        {
+            if (e == null)
+            {
+                ClearUserDetails();
+            }
+        }
+
+        private async void OnProviderStateChanged(object sender, ProviderStateChangedEventArgs e)
+        {
+            var provider = ProviderManager.Instance.GlobalProvider;
+            switch (provider.State)
+            {
+                case ProviderState.SignedIn:
+                    IsLoading = true;
+                    await SetUserDetails();
+                    IsLoading = false;
+                    LoginCompleted?.Invoke(this, new EventArgs());
+                    break;
+
+                case ProviderState.SignedOut:
+                    ClearUserDetails();
+                    IsLoading = false;
+                    LogoutCompleted?.Invoke(this, new EventArgs());
+                    break;
+
+                case ProviderState.Loading:
+                    IsLoading = true;
+                    break;
+            }
+        }
+
+        private async void LoginButton_Click(object sender, RoutedEventArgs e)
+        {
+            var provider = ProviderManager.Instance.GlobalProvider;
+            switch (provider.State)
+            {
+                case ProviderState.SignedIn:
+                    ShowFlyout();
+                    break;
+
+                case ProviderState.SignedOut:
+                    await SignInAsync();
+                    break;
+            }
+        }
+
+        private async void LogoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            HideFlyout();
             await SignOutAsync();
         }
 
         private async void LoadData()
         {
+            if (IsLoading)
+            {
+                return;
+            }
+
             var provider = ProviderManager.Instance.GlobalProvider;
             switch (provider?.State)
             {
@@ -130,120 +265,39 @@ namespace CommunityToolkit.Graph.Uwp.Controls
                     break;
 
                 case ProviderState.SignedIn:
-                    try
+                    if (UserDetails == null)
                     {
-                        IsLoading = true;
-
-                        // https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-login/mgt-login.ts#L139
-                        // TODO: Batch with photo request later? https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
-                        UserDetails = await provider.GetClient().GetMeAsync();
-                    }
-                    catch (Exception e)
-                    {
-                        LoginFailed?.Invoke(this, new LoginFailedEventArgs(e));
-                    }
-                    finally
-                    {
-                        IsLoading = false;
+                        await SignInAsync();
                     }
 
+                    IsLoading = false;
                     break;
 
                 case ProviderState.SignedOut:
-                default:
-                    UserDetails = null; // What if this was user provided? Should we not hook into these events then?
+                    if (UserDetails != null)
+                    {
+                        await SignOutAsync();
+                    }
+
                     IsLoading = false;
                     break;
             }
         }
 
-        /// <summary>
-        /// Initiates logging in with the current <see cref="IProvider"/> registered in the <see cref="ProviderManager"/>.
-        /// </summary>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task SignInAsync()
+        private async Task SetUserDetails()
         {
-            if (UserDetails != null || IsLoading)
-            {
-                return;
-            }
-
             var provider = ProviderManager.Instance.GlobalProvider;
-
             if (provider != null)
             {
-                try
-                {
-                    IsLoading = true;
-                    await provider.SignInAsync();
-
-                    if (provider.State == ProviderState.SignedIn)
-                    {
-                        // TODO: include user details?
-                        LoginCompleted?.Invoke(this, new EventArgs());
-
-                        LoadData();
-                    }
-                    else
-                    {
-                        LoginFailed?.Invoke(this, new LoginFailedEventArgs(new TimeoutException("Login did not complete.")));
-                    }
-                }
-                catch (Exception e)
-                {
-                    LoginFailed?.Invoke(this, new LoginFailedEventArgs(e));
-                }
-                finally
-                {
-                    IsLoading = false;
-                }
+                // https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-login/mgt-login.ts#L139
+                // TODO: Batch with photo request later? https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
+                UserDetails = await provider.GetClient().GetMeAsync();
             }
         }
 
-        /// <summary>
-        /// Log a signed-in user out.
-        /// </summary>
-        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task SignOutAsync()
+        private void ClearUserDetails()
         {
-            // Close Menu
-            if (FlyoutBase.GetAttachedFlyout(_loginButton) is FlyoutBase flyout)
-            {
-                flyout.Hide();
-            }
-
-            if (IsLoading)
-            {
-                return;
-            }
-
-            var cargs = new CancelEventArgs();
-            LogoutInitiated?.Invoke(this, cargs);
-
-            if (cargs.Cancel)
-            {
-                return;
-            }
-
-            if (UserDetails != null)
-            {
-                UserDetails = null;
-            }
-            else
-            {
-                return; // No-op
-            }
-
-            var provider = ProviderManager.Instance.GlobalProvider;
-
-            if (provider != null)
-            {
-                IsLoading = true;
-                await provider.SignOutAsync();
-                IsLoading = false;
-
-                LogoutCompleted?.Invoke(this, new EventArgs());
-            }
+            UserDetails = null;
         }
     }
 }

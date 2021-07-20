@@ -15,7 +15,7 @@ We've overhauled our approach and introduced some big improvements:
 - Access to the GraphServiceClient now lives in a separate package. This means no dependency on the Graph SDK for simple auth scenarios and apps that perform Graph requests manually (sans SDK) 🥳
 - Removed Beta Graph SDK, but enabled access with V1 SDK types. This is so our controls and helpers can be based on the stable Graph endpoint, while also allowing for requests to the beta endpoint in some circumstances (Such as retrieving a user's photo) 🎈
 
-For more info on our roadmap, check out the current [Release Plan](https://github.com/windows-toolkit/Graph-Controls/issues/81)
+For more info on our roadmap, check out the current [Release Plan](https://github.com/CommunityToolkit/Graph-Controls/issues/81)
 
 ## <a name="supported"></a> Supported SDKs
 
@@ -40,7 +40,7 @@ Check out our samples for getting started with authentication providers and maki
 
 To get started using Graph data in your application, you'll first need to enable authentication.
 
-> Note: The nuget packages metioned are not yet released, and can be accessed from using our dedicated Nuget feed: [WindowsCommunityToolkit-MainLatest](https://pkgs.dev.azure.com/dotnet/WindowsCommunityToolkit/_packaging/WindowsCommunityToolkit-MainLatest/nuget/v3/index.json)
+> Note: The nuget packages metioned are not yet released, and can be accessed from using our dedicated Nuget feed: [WindowsCommunityToolkit-MainLatest](https://pkgs.dev.azure.com/dotnet/CommunityToolkit/_packaging/WindowsCommunityToolkit-MainLatest/nuget/v3/index.json)
 
 ### 1A. Setup authentication with MSAL
 
@@ -70,7 +70,7 @@ Leverage the official Microsoft Authentication Library (MSAL) to enable authenti
 
 Try out the WindowsProvider to enable authentication based on the native Windows Account Manager (WAM) APIs in your UWP apps, without requiring a dependency on MSAL.
 
-1. Associate your app with the Microsoft Store. The app association will act as our minimal app registration for authenticating consumer MSAs. See the [WindowsProvider docs](https://github.com/windows-toolkit/Graph-Controls/edit/main/Docs/WindowsProvider.md) for more details.
+1. Associate your app with the Microsoft Store. The app association will act as our minimal app registration for authenticating consumer MSAs. See the [WindowsProvider docs](https://github.com/CommunityToolkit/Graph-Controls/edit/main/Docs/WindowsProvider.md) for more details.
 1. Install the `CommunityToolkit.Authentication.Uwp` package
 1. Set the GlobalProvider to a new instance of WindowsProvider with pre-configured scopes:
 
@@ -182,10 +182,10 @@ public ImageSource GetMyPhoto()
 ## Build Status
 | Target | Branch | Status | Recommended package version |
 | ------ | ------ | ------ | ------ |
-| Pre-release beta testing | main | [![Build Status](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_apis/build/status/windows-toolkit.Graph-Controls?branchName=main)](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_build/latest?definitionId=102&branchName=main) | [![MyGet](https://img.shields.io/dotnet.myget/uwpcommunitytoolkit/vpre/Microsoft.Toolkit.Graph.svg)](https://dotnet.myget.org/gallery/uwpcommunitytoolkit) |
+| Pre-release beta testing | main | [![Build Status](https://dev.azure.com/dotnet/CommunityToolkit/_apis/build/status/CommunityToolkit.Graph-Controls?branchName=main)](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_build/latest?definitionId=102&branchName=main) | [![MyGet](https://img.shields.io/dotnet.myget/uwpcommunitytoolkit/vpre/Microsoft.Toolkit.Graph.svg)](https://dotnet.myget.org/gallery/uwpcommunitytoolkit) |
 
 ## Feedback and Requests
-Please use [GitHub Issues](https://github.com/windows-toolkit/Graph-Controls/issues) for bug reports and feature requests.
+Please use [GitHub Issues](https://github.com/CommunityToolkit/Graph-Controls/issues) for bug reports and feature requests.
 
 ## Principles
 This project has adopted the code of conduct defined by the [Contributor Covenant](http://contributor-covenant.org/)

@@ -119,17 +119,15 @@ namespace CommunityToolkit.Authentication
         }
 
         /// <inheritdoc/>
-        public override async Task<string> GetTokenAsync(bool silentOnly = false, string[] scopes = null)
+        public override async Task<string> GetTokenAsync(bool silentOnly = false)
         {
-            var tokenScopes = scopes ?? Scopes;
-
             AuthenticationResult authResult = null;
             try
             {
                 var account = _account ?? (await Client.GetAccountsAsync()).FirstOrDefault();
                 if (account != null)
                 {
-                    authResult = await Client.AcquireTokenSilent(tokenScopes, account).ExecuteAsync();
+                    authResult = await Client.AcquireTokenSilent(Scopes, account).ExecuteAsync();
                 }
             }
             catch (MsalUiRequiredException)
@@ -145,7 +143,7 @@ namespace CommunityToolkit.Authentication
             {
                 try
                 {
-                    authResult = await Client.AcquireTokenInteractive(tokenScopes).WithPrompt(Prompt.SelectAccount).ExecuteAsync();
+                    authResult = await Client.AcquireTokenInteractive(Scopes).WithPrompt(Prompt.SelectAccount).ExecuteAsync();
                 }
                 catch
                 {
