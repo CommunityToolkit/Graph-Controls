@@ -51,6 +51,19 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             if (d is PersonView pv)
             {
                 pv.IsLargeImage = pv.PersonViewType is PersonViewType.TwoLines or PersonViewType.ThreeLines;
+
+                if (pv.IsLargeImage)
+                {
+                    pv._imageDecodePixelHeight = 48;
+                    pv._imageDecodePixelWidth = 48;
+                }
+                else
+                {
+                    pv._imageDecodePixelHeight = 24;
+                    pv._imageDecodePixelWidth = 24;
+                }
+
+                pv.UpdateImageSize();
             }
         }
 
@@ -63,6 +76,8 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         }
 
         private BitmapImage _defaultImage;
+        private int _imageDecodePixelHeight;
+        private int _imageDecodePixelWidth;
         private string _photoId = null;
 
         /// <summary>
@@ -136,7 +151,11 @@ namespace CommunityToolkit.Graph.Uwp.Controls
                     LoadDefaultImage();
 
                     var photoLoaded = await TryLoadUserPhotoAsync();
-                    if (!photoLoaded)
+                    if (photoLoaded)
+                    {
+                        UpdateImageSize();
+                    }
+                    else
                     {
                         var initialsLoaded = TryLoadInitials();
                         if (initialsLoaded)
@@ -157,8 +176,19 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             if (UserPhoto != _defaultImage)
             {
                 UserPhoto = _defaultImage;
+                UpdateImageSize();
+
                 _photoId = null;
                 Initials = null;
+            }
+        }
+
+        private void UpdateImageSize()
+        {
+            if (UserPhoto != null)
+            {
+                UserPhoto.DecodePixelHeight = _imageDecodePixelHeight;
+                UserPhoto.DecodePixelWidth = _imageDecodePixelWidth;
             }
         }
 
