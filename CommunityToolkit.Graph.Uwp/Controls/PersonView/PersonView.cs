@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
@@ -20,48 +21,19 @@ namespace CommunityToolkit.Graph.Uwp.Controls
     /// </summary>
     public partial class PersonView : Control
     {
-        private const string PersonViewDefaultImageSourceResourceName = "PersonViewDefaultImageSource";
-
         /// <summary>
         /// <see cref="PersonQuery"/> value used to retrieve the signed-in user's info.
         /// </summary>
         public const string PersonQueryMe = "me";
 
-        private string _photoId = null;
+        private const string PersonViewDefaultImageSourceResourceName = "PersonViewDefaultImageSource";
+        private const string PackageDefaultImageSource = "ms-appx:///CommunityToolkit.Graph.Uwp/Assets/person.png";
 
-        private string _defaultImageSource = "ms-appx:///Microsoft.Toolkit.Graph.Controls/Assets/person.png";
-
-        private BitmapImage _defaultImage;
-
-        private static async void PersonDetailsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void PersonDetailsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is PersonView pv)
             {
-                if (pv.PersonDetails != null)
-                {
-                    if (pv?.PersonDetails?.GivenName?.Length > 0 && pv?.PersonDetails?.Surname?.Length > 0)
-                    {
-                        pv.Initials = string.Empty + pv.PersonDetails.GivenName[0] + pv.PersonDetails.Surname[0];
-                    }
-                    else if (pv?.PersonDetails?.DisplayName?.Length > 0)
-                    {
-                        // Grab first two initials in name
-                        var initials = pv.PersonDetails.DisplayName.ToUpper().Split(' ').Select(i => i.First());
-                        pv.Initials = string.Join(string.Empty, initials.Where(i => char.IsLetter(i)).Take(2));
-                    }
-
-                    if (pv?.UserPhoto?.UriSource?.AbsoluteUri == pv._defaultImageSource || pv?.PersonDetails?.Id != pv._photoId)
-                    {
-                        // Reload Image
-                        pv.UserPhoto = pv._defaultImage;
-                        await pv.LoadImageAsync(pv.PersonDetails);
-                    }
-                    else if (pv?.PersonDetails?.Id != pv._photoId)
-                    {
-                        pv.UserPhoto = pv._defaultImage;
-                        pv._photoId = null;
-                    }
-                }
+                pv.UpdateVisual();
             }
         }
 
@@ -78,9 +50,20 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         {
             if (d is PersonView pv)
             {
-                pv.IsLargeImage = pv.PersonViewType == PersonViewType.Avatar;
+                pv.IsLargeImage = pv.PersonViewType is PersonViewType.TwoLines or PersonViewType.ThreeLines;
             }
         }
+
+        private static void PersonAvatarTypePropertiesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is PersonView pv)
+            {
+                pv.UpdateVisual();
+            }
+        }
+
+        private BitmapImage _defaultImage;
+        private string _photoId = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonView"/> class.
@@ -88,10 +71,6 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         public PersonView()
         {
             this.DefaultStyleKey = typeof(PersonView);
-
-            _defaultImage = new BitmapImage(new Uri(_defaultImageSource));
-
-            ProviderManager.Instance.ProviderStateChanged += (sender, args) => LoadData();
         }
 
         /// <inheritdoc/>
@@ -99,13 +78,25 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         {
             base.OnApplyTemplate();
 
-            if (Resources.TryGetValue(PersonViewDefaultImageSourceResourceName, out object value) && value is string uri)
+            if (Resources.TryGetValue(PersonViewDefaultImageSourceResourceName, out object value) && value is string uriString)
             {
-                _defaultImageSource = uri;
-                _defaultImage = new BitmapImage(new Uri(_defaultImageSource)); // TODO: Couldn't load image from app package, only remote or in our assembly?
-                UserPhoto = _defaultImage;
+                _defaultImage = new BitmapImage(new Uri(uriString));
+            }
+            else
+            {
+                _defaultImage = new BitmapImage(new Uri(PackageDefaultImageSource));
             }
 
+            ProviderManager.Instance.ProviderStateChanged -= OnProviderStateChanged;
+            ProviderManager.Instance.ProviderStateChanged += OnProviderStateChanged;
+
+            VisualStateManager.GoToState(this, Enum.GetName(typeof(ProviderState), ProviderManager.Instance.State), true);
+            LoadData();
+        }
+
+        private void OnProviderStateChanged(object sender, ProviderStateChangedEventArgs e)
+        {
+            VisualStateManager.GoToState(this, Enum.GetName(typeof(ProviderState), e.NewState), true);
             LoadData();
         }
 
@@ -113,93 +104,147 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         {
             var provider = ProviderManager.Instance.GlobalProvider;
 
-            if (provider == null || provider.State != ProviderState.SignedIn)
+            if (provider?.State == ProviderState.SignedIn)
             {
-                // Set back to Default if not signed-in
-                if (provider != null)
-                {
-                    UserPhoto = _defaultImage;
-                }
-
-                return;
+                await TryLoadPersonDetailsAsync();
+                UpdateVisual();
             }
-
-            if (PersonDetails != null && UserPhoto == null)
+            else
             {
-                await LoadImageAsync(PersonDetails);
-            }
-            else if (!string.IsNullOrWhiteSpace(UserId) || PersonQuery?.ToLowerInvariant() == PersonQueryMe)
-            {
-                User user = null;
-                if (!string.IsNullOrWhiteSpace(UserId))
-                {
-                    // TODO: Batch when API easier https://github.com/microsoftgraph/msgraph-sdk-dotnet-core/issues/29
-                    try
-                    {
-                        user = await provider.GetClient().GetUserAsync(UserId);
-                    }
-                    catch
-                    {
-                    }
-
-                    try
-                    {
-                        // TODO: Move to LoadImage based on previous call?
-                        await DecodeStreamAsync(await provider.GetBetaClient().GetUserPhoto(UserId));
-                        _photoId = UserId;
-                    }
-                    catch
-                    {
-                    }
-                }
-                else
-                {
-                    try
-                    {
-                        user = await provider.GetClient().GetMeAsync();
-                    }
-                    catch
-                    {
-                    }
-
-                    try
-                    {
-                        await DecodeStreamAsync(await provider.GetBetaClient().GetMyPhotoAsync());
-                        _photoId = user.Id;
-                    }
-                    catch
-                    {
-                    }
-                }
-
-                if (user != null)
-                {
-                    PersonDetails = user.ToPerson();
-                }
-            }
-            else if (PersonDetails == null && !string.IsNullOrWhiteSpace(PersonQuery))
-            {
-                var people = await provider.GetClient().FindPersonAsync(PersonQuery);
-                if (people != null && people.Count > 0)
-                {
-                    var person = people.FirstOrDefault();
-                    PersonDetails = person;
-                    await LoadImageAsync(person);
-                }
+                LoadDefaultImage();
             }
         }
 
-        private async Task LoadImageAsync(Person person)
+        private async void UpdateVisual()
         {
+            if (PersonAvatarType is PersonAvatarType.Initials)
+            {
+                var initialsLoaded = TryLoadInitials();
+                if (initialsLoaded)
+                {
+                    ClearUserPhoto();
+                }
+                else
+                {
+                    LoadDefaultImage();
+                }
+            }
+            else if (PersonDetails != null)
+            {
+                if (PersonDetails.Id != _photoId)
+                {
+                    LoadDefaultImage();
+
+                    var photoLoaded = await TryLoadUserPhotoAsync();
+                    if (!photoLoaded)
+                    {
+                        var initialsLoaded = TryLoadInitials();
+                        if (initialsLoaded)
+                        {
+                            ClearUserPhoto();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                LoadDefaultImage();
+            }
+        }
+
+        private void LoadDefaultImage()
+        {
+            if (UserPhoto != _defaultImage)
+            {
+                UserPhoto = _defaultImage;
+                _photoId = null;
+                Initials = null;
+            }
+        }
+
+        private void ClearUserPhoto()
+        {
+            UserPhoto = null;
+            _photoId = null;
+        }
+
+        private async Task<bool> TryLoadPersonDetailsAsync()
+        {
+            if (PersonDetails != null)
+            {
+                return true;
+            }
+
+            var provider = ProviderManager.Instance.GlobalProvider;
+            if (provider?.State != ProviderState.SignedIn)
+            {
+                return false;
+            }
+
             try
             {
-                // TODO: Better guarding
-                var graph = ProviderManager.Instance.GlobalProvider.GetBetaClient();
-
-                if (!string.IsNullOrWhiteSpace(person.UserPrincipalName))
+                if (!string.IsNullOrWhiteSpace(UserId))
                 {
-                    await DecodeStreamAsync(await graph.GetUserPhoto(person.UserPrincipalName));
-                    _photoId = person.Id; // TODO: Only set on success for photo?
+                    var user = await provider.GetClient().GetUserAsync(UserId);
+                    PersonDetails = user.ToPerson();
+                }
+                else if (PersonQuery?.ToLowerInvariant() == PersonQueryMe)
+                {
+                    var user = await provider.GetClient().GetMeAsync();
+                    PersonDetails = user.ToPerson();
+                }
+                else if (!string.IsNullOrWhiteSpace(PersonQuery))
+                {
+                    var people = await provider.GetClient().FindPersonAsync(PersonQuery);
+                    if (people != null && people.Count > 0)
+                    {
+                        var person = people.FirstOrDefault();
+                        PersonDetails = person;
+                    }
+                }
+
+                return PersonDetails != null;
+            }
+            catch
+            {
+                // TODO: Log exception
+            }
+
+            return false;
+        }
+
+        private async Task<bool> TryLoadUserPhotoAsync()
+        {
+            var person = PersonDetails;
+            if (person == null)
+            {
+                return false;
+            }
+
+            if (PersonDetails.Id == _photoId && UserPhoto != null && UserPhoto != _defaultImage)
+            {
+                return true;
+            }
+
+            var provider = ProviderManager.Instance.GlobalProvider;
+            if (provider?.State != ProviderState.SignedIn)
+            {
+                return false;
+            }
+
+            Stream photoStream = null;
+
+            // TODO: Better guarding
+            try
+            {
+                var graph = ProviderManager.Instance.GlobalProvider?.GetBetaClient();
+                if (PersonQuery?.ToLowerInvariant() == PersonQueryMe)
+                {
+                    photoStream = await graph.GetMyPhotoAsync();
+                }
+                else if (!string.IsNullOrWhiteSpace(person.UserPrincipalName))
+                {
+                    photoStream = await graph.GetUserPhoto(person.UserPrincipalName);
                 }
                 else if (!string.IsNullOrWhiteSpace(person.ScoredEmailAddresses.First().Address))
                 {
@@ -208,21 +253,72 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             }
             catch
             {
-                // If we can't load a photo, that's ok.
             }
+
+            if (photoStream != null)
+            {
+                var decodeResults = await TryDecodeStreamAsync(photoStream);
+                if (decodeResults.Success)
+                {
+                    UserPhoto = decodeResults.Image;
+                    _photoId = person.Id;
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
-        private async Task DecodeStreamAsync(Stream photoStream)
+        private bool TryLoadInitials()
+        {
+            if (!string.IsNullOrWhiteSpace(Initials))
+            {
+                return true;
+            }
+
+            if (PersonDetails == null)
+            {
+                Initials = null;
+                return false;
+            }
+
+            string initials = null;
+
+            if (PersonDetails?.GivenName?.Length > 0 && PersonDetails?.Surname?.Length > 0)
+            {
+                initials = string.Empty + PersonDetails.GivenName[0] + PersonDetails.Surname[0];
+            }
+            else if (PersonDetails?.DisplayName?.Length > 0)
+            {
+                // Grab first two initials in name
+                var nameParts = PersonDetails.DisplayName.ToUpper().Split(' ').Select(i => i.First());
+                initials = string.Join(string.Empty, nameParts.Where(i => char.IsLetter(i)).Take(2));
+            }
+
+            Initials = initials;
+
+            return Initials != null;
+        }
+
+        private async Task<(bool Success, BitmapImage Image)> TryDecodeStreamAsync(Stream photoStream)
         {
             if (photoStream != null)
             {
-                using (var ras = photoStream.AsRandomAccessStream())
+                try
                 {
+                    using var ras = photoStream.AsRandomAccessStream();
                     var bitmap = new BitmapImage();
                     await bitmap.SetSourceAsync(ras);
-                    UserPhoto = bitmap;
+
+                    return (true, bitmap);
+                }
+                catch
+                {
                 }
             }
+
+            return (false, null);
         }
     }
 }
