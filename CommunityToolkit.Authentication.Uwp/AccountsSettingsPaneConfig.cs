@@ -28,7 +28,7 @@ namespace CommunityToolkit.Authentication
         public IList<SettingsCommand> Commands { get; set; }
 
         /// <summary>
-        /// Gets or sets the WebAccountCommandParameter collection for the account settings pane.
+        /// Gets or sets the WebAccountCommandParameter for the account settings pane.
         /// </summary>
         public WebAccountCommandParameter AccountCommandParameter { get; set; }
 
