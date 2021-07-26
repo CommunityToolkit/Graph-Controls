@@ -68,12 +68,12 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             DependencyProperty.Register(nameof(UserId), typeof(string), typeof(PersonView), new PropertyMetadata(null, QueryPropertyChanged));
 
         /// <summary>
-        /// Gets the photo of the user to be displayed.
+        /// Gets or sets the photo of the user to be displayed.
         /// </summary>
         public BitmapImage UserPhoto
         {
             get { return (BitmapImage)GetValue(UserPhotoProperty); }
-            internal set { SetValue(UserPhotoProperty, value); }
+            set { SetValue(UserPhotoProperty, value); }
         }
 
         /// <summary>
