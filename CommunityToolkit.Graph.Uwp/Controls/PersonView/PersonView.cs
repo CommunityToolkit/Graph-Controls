@@ -268,20 +268,9 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             try
             {
                 var graph = ProviderManager.Instance.GlobalProvider?.GetBetaClient();
-                if (PersonQuery?.ToLowerInvariant() == PersonQueryMe)
-                {
-                    photoStream = await graph.GetMyPhotoAsync();
-                }
-                else if (!string.IsNullOrWhiteSpace(person.UserPrincipalName))
-                {
-                    photoStream = await graph.GetUserPhoto(person.UserPrincipalName);
-                }
-                else if (!string.IsNullOrWhiteSpace(person.ScoredEmailAddresses.First().Address))
-                {
-                    // TODO https://github.com/microsoftgraph/microsoft-graph-toolkit/blob/master/src/components/mgt-person/mgt-person.ts#L174
-                }
+                photoStream = await graph.GetUserPhoto(person.Id);
             }
-            catch
+            catch (Exception e)
             {
             }
 
