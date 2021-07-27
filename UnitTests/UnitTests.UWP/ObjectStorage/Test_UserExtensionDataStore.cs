@@ -4,6 +4,7 @@
 
 using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Helpers.ObjectStorage;
+using Microsoft.Toolkit.Extensions;
 using Microsoft.Toolkit.Helpers;
 using Microsoft.Toolkit.Uwp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -67,18 +68,21 @@ namespace UnitTests.UWP.Helpers
                     string extensionId = "RoamingData";
                     string userId = "TestUserId";
 
-                    IRemoteSettingsStorageHelper dataStore = new UserExtensionStorageHelper(extensionId, userId);
+                    string testKey = "foo";
+                    string testValue = "bar";
+
+                    var dataStore = new UserExtensionStorageHelper(extensionId, userId);
 
                     dataStore.SyncCompleted += async (s, e) =>
                     {
                         try
                         {
                             // Create a second instance to ensure that the Cache doesn't yield a false positive.
-                            IRemoteSettingsStorageHelper dataStore2 = new UserExtensionStorageHelper(extensionId, userId);
+                            var dataStore2 = new UserExtensionStorageHelper(extensionId, userId);
                             await dataStore2.Sync();
 
-                            var foo = dataStore.Read<string>("foo");
-                            Assert.AreEqual("bar", foo);
+                            Assert.IsTrue(dataStore.TryRead(testKey, out string storedValue));
+                            Assert.AreEqual(testValue, storedValue);
 
                             tcs.SetResult(true);
                         }
@@ -100,7 +104,7 @@ namespace UnitTests.UWP.Helpers
                         }
                     };
 
-                    dataStore.Save("foo", "bar");
+                    dataStore.Save(testKey, testValue);
                     await dataStore.Sync();
                 }
                 catch (Exception ex)

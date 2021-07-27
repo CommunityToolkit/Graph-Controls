@@ -68,11 +68,11 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
             await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(folderPath).Request().CreateAsync(folderDriveItem);
         }
 
-        public static async Task<IList<Tuple<DirectoryItemType, string>>> ReadFolderAsync(string userId, string folderPath)
+        public static async Task<IEnumerable<(DirectoryItemType, string)>> ReadFolderAsync(string userId, string folderPath)
         {
             IDriveItemChildrenCollectionPage folderContents = await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(folderPath).Children.Request().GetAsync();
 
-            var results = new List<Tuple<DirectoryItemType, string>>();
+            var results = new List<(DirectoryItemType, string)>();
             foreach (var item in folderContents)
             {
                 var itemType = (item.Folder != null)
@@ -83,7 +83,7 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
 
                 var itemName = item.Name;
 
-                results.Add(new Tuple<DirectoryItemType, string>(itemType, itemName));
+                results.Add((itemType, itemName));
             }
 
             return results;

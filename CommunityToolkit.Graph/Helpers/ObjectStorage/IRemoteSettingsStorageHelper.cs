@@ -13,7 +13,8 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
     /// <summary>
     /// Describes a remote settings storage location with basic sync support.
     /// </summary>
-    public interface IRemoteSettingsStorageHelper : ISettingsStorageHelper
+    /// <typeparam name="TKey">The type of keys to use for accessing values.</typeparam>
+    public interface IRemoteSettingsStorageHelper<TKey> : ISettingsStorageHelper<TKey>
     {
         /// <summary>
         /// Gets or sets an event that fires whenever a sync request has completed.
@@ -21,14 +22,9 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
         EventHandler SyncCompleted { get; set; }
 
         /// <summary>
-        /// gets or sets an event that fires whenever a remote sync request has failed.
+        /// Gets or sets a value an event that fires whenever a remote sync request has failed.
         /// </summary>
         EventHandler SyncFailed { get; set; }
-
-        /// <summary>
-        /// Gets a cache of the stored values, converted using the provided serializer.
-        /// </summary>
-        IDictionary<string, object> Cache { get; }
 
         /// <summary>
         /// Update the remote extension to match the local cache and retrieve any new keys. Any existing remote values are replaced.

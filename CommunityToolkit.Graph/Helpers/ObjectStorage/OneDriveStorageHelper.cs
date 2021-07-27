@@ -59,20 +59,13 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
         }
 
         /// <inheritdoc />
-        public async Task<bool> ItemExistsAsync(string itemName)
-        {
-            var result = await OneDriveDataSource.GetFileAsync<object>(UserId, itemName, Serializer);
-            return result != null;
-        }
-
-        /// <inheritdoc />
         public async Task<T> ReadFileAsync<T>(string filePath, T @default = default)
         {
             return await OneDriveDataSource.GetFileAsync<T>(UserId, filePath, Serializer) ?? @default;
         }
 
         /// <inheritdoc />
-        public Task<IList<Tuple<DirectoryItemType, string>>> ReadFolderAsync(string folderPath)
+        public Task<IEnumerable<(DirectoryItemType ItemType, string Name)>> ReadFolderAsync(string folderPath)
         {
             return OneDriveDataSource.ReadFolderAsync(UserId, folderPath);
         }

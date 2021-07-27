@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
+using Microsoft.Toolkit.Extensions;
 using Microsoft.Toolkit.Helpers;
 
 namespace CommunityToolkit.Graph.Helpers.ObjectStorage
@@ -18,7 +19,7 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
     /// <summary>
     /// An IObjectStorageHelper implementation using open extensions on the Graph User for storing key/value pairs.
     /// </summary>
-    public class UserExtensionStorageHelper : IRemoteSettingsStorageHelper
+    public class UserExtensionStorageHelper : IRemoteSettingsStorageHelper<string>
     {
         private static readonly IList<string> ReservedKeys = new List<string> { "responseHeaders", "statusCode", "@odata.context" };
         private static readonly SemaphoreSlim SyncLock = new (1);
@@ -51,7 +52,10 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
         /// <summary>
         /// Gets a cache of the stored values, converted using the provided serializer.
         /// </summary>
-        public IDictionary<string, object> Cache { get; }
+        public IReadOnlyDictionary<string, object> Cache => _cache;
+
+        private readonly Dictionary<string, object> _cache;
+        private bool _cleared;
 
         /// <summary>
         /// Creates a new instance using the userId retrieved from a Graph "Me" request.
@@ -85,7 +89,7 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
         /// <returns>The value found for the provided key.</returns>
         public object this[string key]
         {
-            get => Read<object>(key);
+            get => ISettingsStorageHelperExtensions.Read<string, object>(this, key);
             set => Save(key, value);
         }
 
@@ -101,11 +105,49 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
             UserId = userId ?? throw new ArgumentNullException(nameof(userId));
             Serializer = objectSerializer ?? new SystemSerializer();
 
-            Cache = new Dictionary<string, object>();
+            _cache = new Dictionary<string, object>();
+            _cleared = false;
+        }
+
+        /// <inheritdoc />
+        public void Save<T>(string key, T value)
+        {
+            _cache[key] = SerializeValue(value);
+        }
+
+        /// <inheritdoc />
+        public bool TryRead<TValue>(string key, out TValue value)
+        {
+            if (_cache.TryGetValue(key, out object cachedValue))
+            {
+                value = DeserializeValue<TValue>(cachedValue);
+                return true;
+            }
+            else
+            {
+                value = default;
+                return false;
+            }
+        }
+
+        /// <inheritdoc />
+        public bool TryDelete(string key)
+        {
+            return _cache.Remove(key);
+        }
+
+        /// <inheritdoc />
+        public void Clear()
+        {
+            _cache.Clear();
+            _cleared = true;
         }
 
         /// <summary>
-        /// Update the remote extension to match the local cache and retrieve any new keys. Any existing remote values are replaced.
+        /// Synchronize the cache with the remote:
+        /// - If the cache has been cleared, the remote will be deleted and recreated.
+        /// - Any cached keys will be saved to the remote, overwriting existing values.
+        /// - Any new keys from the remote will be stored in the cache.
         /// </summary>
         /// <returns>The freshly synced user extension.</returns>
         public virtual async Task Sync()
@@ -116,30 +158,34 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
             {
                 IDictionary<string, object> remoteData = null;
 
-                try
+                // Check if the extension should be cleared.
+                if (_cleared)
                 {
-                    // Get the remote
+                    // Delete and re-create the remote extension.
+                    await UserExtensionDataSource.DeleteExtension(UserId, ExtensionId);
+                    Extension extension = await UserExtensionDataSource.CreateExtension(UserId, ExtensionId);
+                    remoteData = extension.AdditionalData;
+
+                    _cleared = false;
+                }
+                else
+                {
+                    // Get the remote extension.
                     Extension extension = await UserExtensionDataSource.GetExtension(UserId, ExtensionId);
                     remoteData = extension.AdditionalData;
                 }
-                catch
-                {
-                }
 
-                if (Cache != null)
+                // Send updates for all local values, overwriting the remote.
+                foreach (string key in _cache.Keys.ToList())
                 {
-                    // Send updates for all local values, overwriting the remote.
-                    foreach (string key in Cache.Keys.ToList())
+                    if (ReservedKeys.Contains(key))
                     {
-                        if (ReservedKeys.Contains(key))
-                        {
-                            continue;
-                        }
+                        continue;
+                    }
 
-                        if (remoteData == null || !remoteData.ContainsKey(key) || !EqualityComparer<object>.Default.Equals(remoteData[key], Cache[key]))
-                        {
-                            Save(key, Cache[key]);
-                        }
+                    if (!remoteData.ContainsKey(key) || !EqualityComparer<object>.Default.Equals(remoteData[key], Cache[key]))
+                    {
+                        Save(key, _cache[key]);
                     }
                 }
 
@@ -148,9 +194,14 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
                     // Update local cache with additions from remote
                     foreach (string key in remoteData.Keys.ToList())
                     {
-                        if (!Cache.ContainsKey(key))
+                        if (ReservedKeys.Contains(key))
                         {
-                            Cache.Add(key, remoteData[key]);
+                            continue;
+                        }
+
+                        if (!_cache.ContainsKey(key))
+                        {
+                            _cache.Add(key, remoteData[key]);
                         }
                     }
                 }
@@ -164,115 +215,6 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
             finally
             {
                 SyncLock.Release();
-            }
-        }
-
-        /// <inheritdoc />
-        public bool KeyExists(string key)
-        {
-            return Cache.ContainsKey(key);
-        }
-
-        /// <inheritdoc />
-        public bool KeyExists(string compositeKey, string key)
-        {
-            if (Cache.TryGetValue(compositeKey, out object compositeObj))
-            {
-                var composite = compositeObj as Composite;
-                return composite != default && composite.ContainsKey(key);
-            }
-
-            return false;
-        }
-
-        /// <inheritdoc />
-        public T Read<T>(string key, T @default = default)
-        {
-            return Cache.TryGetValue(key, out object value)
-                ? DeserializeValue<T>(value)
-                : @default;
-        }
-
-        /// <inheritdoc />
-        public T Read<T>(string compositeKey, string key, T @default = default)
-        {
-            if (Cache.TryGetValue(compositeKey, out object compositeObj))
-            {
-                var composite = compositeObj as Composite;
-                if (composite != default && composite.TryGetValue(key, out object valueObj))
-                {
-                    return DeserializeValue<T>(valueObj);
-                }
-            }
-
-            return @default;
-        }
-
-        /// <inheritdoc />
-        public void Save<T>(string key, T value)
-        {
-            Cache[key] = SerializeValue(value);
-        }
-
-        /// <inheritdoc />
-        public void Save<T>(string compositeKey, IDictionary<string, T> values)
-        {
-            if (Cache.TryGetValue(compositeKey, out object compositeObj))
-            {
-                var composite = compositeObj as Composite;
-
-                foreach (KeyValuePair<string, T> setting in values.ToList())
-                {
-                    string key = setting.Key;
-                    object value = SerializeValue(setting.Value);
-                    if (composite.ContainsKey(setting.Key))
-                    {
-                        composite[key] = value;
-                    }
-                    else
-                    {
-                        composite.Add(key, value);
-                    }
-                }
-
-                Cache[compositeKey] = composite;
-            }
-            else
-            {
-                var composite = new Composite();
-                foreach (KeyValuePair<string, T> setting in values.ToList())
-                {
-                    string key = setting.Key;
-                    object value = SerializeValue(setting.Value);
-                    composite.Add(key, value);
-                }
-
-                Cache[compositeKey] = composite;
-            }
-        }
-
-        /// <inheritdoc />
-        public void Delete(string key)
-        {
-            if (!Cache.Remove(key))
-            {
-                throw new KeyNotFoundException($"Key \"{key}\" was not found.");
-            }
-        }
-
-        /// <inheritdoc />
-        public void Delete(string compositeKey, string key)
-        {
-            if (!Cache.TryGetValue(compositeKey, out object compositeObj))
-            {
-                throw new KeyNotFoundException($"Composite key \"{compositeKey}\" was not found.");
-            }
-
-            var composite = compositeObj as Composite;
-
-            if (!composite.Remove(key))
-            {
-                throw new KeyNotFoundException($"Key \"{key}\" was not found in composite \"{compositeKey}\"");
             }
         }
 
@@ -317,11 +259,6 @@ namespace CommunityToolkit.Graph.Helpers.ObjectStorage
                 // Update the cache
                 return Serializer.Serialize(value);
             }
-        }
-
-        // A "Composite" is really just a dictionary.
-        private class Composite : Dictionary<string, object>
-        {
         }
     }
 }
