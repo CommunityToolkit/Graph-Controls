@@ -49,6 +49,9 @@
                     <Setter Property="Margin" Value="8,8,8,0" />
                 </Style>
             </Pivot.ItemContainerStyle>
+            <PivotItem Header="PersonView">
+                <samples:PersonViewSample />
+            </PivotItem>
             <PivotItem Header="PeoplePicker">
                 <StackPanel>
                     <TextBlock Margin="0,0,0,16"

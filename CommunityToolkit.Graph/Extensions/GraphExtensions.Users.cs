@@ -20,15 +20,7 @@ namespace CommunityToolkit.Graph.Extensions
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task<User> GetMeAsync(this GraphServiceClient graph)
         {
-            try
-            {
-                return await graph.Me.Request().GetAsync();
-            }
-            catch
-            {
-            }
-
-            return null;
+            return await graph.Me.Request().GetAsync();
         }
 
         /// <summary>
@@ -39,15 +31,7 @@ namespace CommunityToolkit.Graph.Extensions
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task<User> GetUserAsync(this GraphServiceClient graph, string userId)
         {
-            try
-            {
-                return await graph.Users[userId].Request().GetAsync();
-            }
-            catch
-            {
-            }
-
-            return null;
+            return await graph.Users[userId].Request().GetAsync();
         }
 
         /// <summary>
@@ -58,20 +42,12 @@ namespace CommunityToolkit.Graph.Extensions
         /// <returns><see cref="IGraphServiceUsersCollectionPage"/> collection of <see cref="User"/>.</returns>
         public static async Task<IGraphServiceUsersCollectionPage> FindUserAsync(this GraphServiceClient graph, string query)
         {
-            try
-            {
-                return await graph
-                    .Users
-                    .Request()
-                    .Filter($"startswith(displayName, '{query}') or startswith(givenName, '{query}') or startswith(surname, '{query}') or startswith(mail, '{query}') or startswith(userPrincipalName, '{query}')")
-                    ////.WithScopes(new string[] { "user.readbasic.all" })
-                    .GetAsync();
-            }
-            catch
-            {
-            }
-
-            return new GraphServiceUsersCollectionPage();
+            return await graph
+                .Users
+                .Request()
+                .Filter($"startswith(displayName, '{query}') or startswith(givenName, '{query}') or startswith(surname, '{query}') or startswith(mail, '{query}') or startswith(userPrincipalName, '{query}')")
+                ////.WithScopes(new string[] { "user.readbasic.all" })
+                .GetAsync();
         }
 
         /// <summary>
@@ -82,21 +58,13 @@ namespace CommunityToolkit.Graph.Extensions
         /// <returns>Stream with user photo or null.</returns>
         public static async Task<Stream> GetUserPhoto(this GraphServiceClient graph, string userId)
         {
-            try
-            {
-                return await graph
-                    .Users[userId]
-                    .Photo
-                    .Content
-                    .Request()
-                    ////.WithScopes(new string[] { "user.readbasic.all" })
-                    .GetAsync();
-            }
-            catch
-            {
-            }
-
-            return null;
+            return await graph
+                .Users[userId]
+                .Photo
+                .Content
+                .Request()
+                ////.WithScopes(new string[] { "user.readbasic.all" })
+                .GetAsync();
         }
 
         /// <summary>
@@ -106,21 +74,13 @@ namespace CommunityToolkit.Graph.Extensions
         /// <returns>Stream with user photo or null.</returns>
         public static async Task<Stream> GetMyPhotoAsync(this GraphServiceClient graph)
         {
-            try
-            {
-                return await graph
-                    .Me
-                    .Photo
-                    .Content
-                    .Request()
-                    ////.WithScopes(new string[] { "user.read" })
-                    .GetAsync();
-            }
-            catch
-            {
-            }
-
-            return null;
+            return await graph
+                .Me
+                .Photo
+                .Content
+                .Request()
+                ////.WithScopes(new string[] { "user.read" })
+                .GetAsync();
         }
     }
 }
