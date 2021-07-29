@@ -12,6 +12,7 @@ using Windows.Security.Authentication.Web;
 using Windows.Security.Authentication.Web.Core;
 using Windows.Security.Credentials;
 using Windows.Storage;
+using Windows.System;
 using Windows.UI.ApplicationSettings;
 
 namespace CommunityToolkit.Authentication
@@ -197,7 +198,21 @@ namespace CommunityToolkit.Authentication
                     }
 
                     // Attempt to authenticate interactively.
-                    authResult = await AuthenticateInteractiveAsync(_scopes);
+                    var tcs = new TaskCompletionSource<WebTokenRequestResult>();
+                    var taskQueued = DispatcherQueue.GetForCurrentThread().TryEnqueue(async () =>
+                        {
+                            var result = await AuthenticateInteractiveAsync(_scopes);
+                            tcs.SetResult(result);
+                        });
+
+                    if (taskQueued)
+                    {
+                        authResult = await tcs.Task;
+                    }
+                    else
+                    {
+                        tcs.SetCanceled();
+                    }
                 }
 
                 if (authResult?.ResponseStatus == WebTokenRequestStatus.Success)
@@ -241,74 +256,85 @@ namespace CommunityToolkit.Authentication
                 throw new InvalidOperationException("A logged in account is required to display the account management pane.");
             }
 
-            // Build the AccountSettingsPane and configure it with available account commands.
-            void OnAccountCommandsRequested(AccountsSettingsPane sender, AccountsSettingsPaneCommandsRequestedEventArgs e)
+            var tcs = new TaskCompletionSource<bool>();
+            _ = DispatcherQueue.GetForCurrentThread().TryEnqueue(async () =>
             {
-                AccountsSettingsPaneEventDeferral deferral = e.GetDeferral();
-
-                // Apply the configured header.
-                var headerText = _accountsSettingsPaneConfig?.ManageAccountHeaderText;
-                if (!string.IsNullOrWhiteSpace(headerText))
+                AccountsSettingsPane pane = null;
+                try
                 {
-                    e.HeaderText = headerText;
+                    // GetForCurrentView may throw an exception if the current view isn't ready yet.
+                    pane = AccountsSettingsPane.GetForCurrentView();
+                    pane.AccountCommandsRequested += OnAccountCommandsRequested;
+
+                    // Show the AccountSettingsPane and wait for the result.
+                    await AccountsSettingsPane.ShowManageAccountsAsync();
+
+                    tcs.SetResult(true);
                 }
-
-                // Generate any account commands.
-                if (_accountsSettingsPaneConfig?.AccountCommandParameter != null)
+                catch (Exception e)
                 {
-                    var commandParameter = _accountsSettingsPaneConfig.Value.AccountCommandParameter;
-                    var webAccountCommand = new WebAccountCommand(
-                        _webAccount,
-                        async (command, args) =>
-                        {
-                            // When the logout command is triggered, we also need to modify the state of the Provider.
-                            if (args.Action == WebAccountAction.Remove)
-                            {
-                                await SignOutAsync();
-                            }
-
-                            commandParameter.Invoked?.Invoke(command, args);
-                        },
-                        commandParameter.Actions);
-
-                    e.WebAccountCommands.Add(webAccountCommand);
+                    tcs.SetException(e);
                 }
-
-                // Apply any configured setting commands.
-                var commands = _accountsSettingsPaneConfig?.Commands;
-                if (commands != null)
+                finally
                 {
-                    foreach (var command in commands)
+                    if (pane != null)
                     {
-                        e.Commands.Add(command);
+                        pane.AccountCommandsRequested -= OnAccountCommandsRequested;
                     }
                 }
+            });
 
-                deferral.Complete();
+            await tcs.Task;
+        }
+
+        /// <summary>
+        /// Build the AccountSettingsPane and configure it with available account commands.
+        /// </summary>
+        /// <param name="sender">The pane that fired the event.</param>
+        /// <param name="e">Arguments for the AccountCommandsRequested event.</param>
+        private void OnAccountCommandsRequested(AccountsSettingsPane sender, AccountsSettingsPaneCommandsRequestedEventArgs e)
+        {
+            AccountsSettingsPaneEventDeferral deferral = e.GetDeferral();
+
+            // Apply the configured header.
+            var headerText = _accountsSettingsPaneConfig?.ManageAccountHeaderText;
+            if (!string.IsNullOrWhiteSpace(headerText))
+            {
+                e.HeaderText = headerText;
             }
 
-            AccountsSettingsPane pane = null;
-            try
+            // Generate any account commands.
+            if (_accountsSettingsPaneConfig?.AccountCommandParameter != null)
             {
-                // GetForCurrentView may throw an exception if the current view isn't ready yet.
-                pane = AccountsSettingsPane.GetForCurrentView();
-                pane.AccountCommandsRequested += OnAccountCommandsRequested;
+                var commandParameter = _accountsSettingsPaneConfig.Value.AccountCommandParameter;
+                var webAccountCommand = new WebAccountCommand(
+                    _webAccount,
+                    async (command, args) =>
+                    {
+                        // When the logout command is triggered, we also need to modify the state of the Provider.
+                        if (args.Action == WebAccountAction.Remove)
+                        {
+                            await SignOutAsync();
+                        }
 
-                // Show the AccountSettingsPane and wait for the result.
-                await AccountsSettingsPane.ShowManageAccountsAsync();
+                        commandParameter.Invoked?.Invoke(command, args);
+                    },
+                    commandParameter.Actions);
+
+                e.WebAccountCommands.Add(webAccountCommand);
             }
-            catch (Exception e)
+
+            // Apply any configured setting commands.
+            var commands = _accountsSettingsPaneConfig?.Commands;
+            if (commands != null)
             {
-                // TODO: Log exception
-                System.Diagnostics.Debug.WriteLine(e.Message);
-            }
-            finally
-            {
-                if (pane != null)
+                foreach (var command in commands)
                 {
-                    pane.AccountCommandsRequested -= OnAccountCommandsRequested;
+                    e.Commands.Add(command);
                 }
             }
+
+            deferral.Complete();
         }
 
         private async Task SetAccountAsync(WebAccount account)
