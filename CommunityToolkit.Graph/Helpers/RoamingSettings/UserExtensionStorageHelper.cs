@@ -14,7 +14,7 @@ using Microsoft.Graph;
 using Microsoft.Toolkit.Extensions;
 using Microsoft.Toolkit.Helpers;
 
-namespace CommunityToolkit.Graph.Helpers.ObjectStorage
+namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
     /// An IObjectStorageHelper implementation using open extensions on the Graph User for storing key/value pairs.

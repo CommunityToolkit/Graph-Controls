@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Authentication;
-using CommunityToolkit.Graph.Helpers.ObjectStorage;
+using CommunityToolkit.Graph.Helpers.RoamingSettings;
 using Microsoft.Toolkit.Helpers;
 using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.Helpers;
@@ -31,7 +31,7 @@ namespace UnitTests.UWP.Helpers
                 {
                     var userId = "TestUserId";
                     var storageHelper = new OneDriveStorageHelper(userId);
-
+                    
                     // Evaluate the default state is as expected
                     Assert.AreEqual(userId, storageHelper.UserId);
 

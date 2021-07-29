@@ -11,7 +11,7 @@ using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Extensions;
 using Microsoft.Toolkit.Helpers;
 
-namespace CommunityToolkit.Graph.Helpers.ObjectStorage
+namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
     /// A base class for easily building roaming settings helper implementations.

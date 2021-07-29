@@ -3,7 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Authentication;
-using CommunityToolkit.Graph.Helpers.ObjectStorage;
+using CommunityToolkit.Graph.Helpers.RoamingSettings;
 using Microsoft.Toolkit.Extensions;
 using Microsoft.Toolkit.Helpers;
 using Microsoft.Toolkit.Uwp;
@@ -19,7 +19,7 @@ namespace UnitTests.UWP.Helpers
         /// <summary>
         /// Test the dafault state of a new instance of the UserExtensionDataStore.
         /// </summary>
-        [TestCategory("ObjectStorage")]
+        [TestCategory("RoamingSettings")]
         [TestMethod]
         public async Task Test_Default()
         {
@@ -33,7 +33,7 @@ namespace UnitTests.UWP.Helpers
                     string extensionId = "RoamingData";
 
                     UserExtensionStorageHelper storageHelper = new UserExtensionStorageHelper(extensionId, userId);
-
+                    
                     Assert.AreEqual(extensionId, storageHelper.ExtensionId);
                     Assert.AreEqual(userId, storageHelper.UserId);
                     Assert.IsNotNull(storageHelper.Serializer);

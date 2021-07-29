@@ -12,7 +12,7 @@ using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Helpers;
 
-namespace CommunityToolkit.Graph.Helpers.ObjectStorage
+namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
     /// Helpers for interacting with files in the special OneDrive AppRoot folder.

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Helpers;
 
-namespace CommunityToolkit.Graph.Helpers.ObjectStorage
+namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
     /// Describes a remote settings storage location with basic sync support.

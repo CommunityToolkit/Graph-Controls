@@ -77,8 +77,7 @@ namespace CommunityToolkit.Graph.Uwp.Controls
                 var request = new BaseRequest(
                                         RequestBuilder.RequestUrl,
                                         RequestBuilder.Client); // TODO: Do we need separate Options here?
-                ////request.Method = HttpMethods.GET;
-                request.Method = "GET";
+                request.Method = HttpMethods.GET;
                 request.QueryOptions = QueryOptions?.Select(option => (Microsoft.Graph.QueryOption)option)?.ToList() ?? new List<Microsoft.Graph.QueryOption>();
 
                 // Handle Special QueryOptions
