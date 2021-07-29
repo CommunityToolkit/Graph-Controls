@@ -77,9 +77,20 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
         }
 
         /// <inheritdoc />
-        public Task CreateFolderAsync(string folderPath)
+        public Task CreateFolderAsync(string folderName)
         {
-            return OneDriveDataSource.CreateFolderAsync(UserId, folderPath);
+            return OneDriveDataSource.CreateFolderAsync(UserId, folderName);
+        }
+
+        /// <summary>
+        /// Ensure a folder exists at the path specified.
+        /// </summary>
+        /// <param name="folderName">The name of the new folder.</param>
+        /// <param name="folderPath">The path to create the new folder in.</param>
+        /// <returns>A task.</returns>
+        public Task CreateFolderAsync(string folderName, string folderPath)
+        {
+            return OneDriveDataSource.CreateFolderAsync(UserId, folderName, folderPath);
         }
 
         /// <inheritdoc />

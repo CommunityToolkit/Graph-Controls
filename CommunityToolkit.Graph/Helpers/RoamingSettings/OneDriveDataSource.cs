@@ -26,12 +26,12 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
         /// </summary>
         /// <typeparam name="T">The type of object to save.</typeparam>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public static async Task<DriveItem> SetFileAsync<T>(string userId, string fileWithExt, T fileContents, IObjectSerializer serializer)
+        public static async Task<DriveItem> SetFileAsync<T>(string userId, string itemPath, T fileContents, IObjectSerializer serializer)
         {
             var json = serializer.Serialize(fileContents) as string;
             using var stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
 
-            return await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(fileWithExt).Content.Request().PutAsync<DriveItem>(stream);
+            return await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(itemPath).Content.Request().PutAsync<DriveItem>(stream);
         }
 
         /// <summary>
@@ -39,9 +39,9 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
         /// </summary>
         /// <typeparam name="T">The type of object to return.</typeparam>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public static async Task<T> GetFileAsync<T>(string userId, string fileWithExt, IObjectSerializer serializer)
+        public static async Task<T> GetFileAsync<T>(string userId, string itemPath, IObjectSerializer serializer)
         {
-            Stream stream = await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(fileWithExt).Content.Request().GetAsync();
+            Stream stream = await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(itemPath).Content.Request().GetAsync();
 
             string streamContents = new StreamReader(stream).ReadToEnd();
 
@@ -52,20 +52,27 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
         /// Delete the file from the remote.
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public static async Task DeleteItemAsync(string userId, string fileWithExt)
+        public static async Task DeleteItemAsync(string userId, string itemPath)
         {
-            await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(fileWithExt).Request().DeleteAsync();
+            await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(itemPath).Request().DeleteAsync();
         }
 
-        public static async Task CreateFolderAsync(string userId, string folderPath)
+        public static async Task CreateFolderAsync(string userId, string folderName, string path = null)
         {
             var folderDriveItem = new DriveItem()
             {
-                Name = folderPath,
+                Name = folderName,
                 Folder = new Folder(),
             };
 
-            await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(folderPath).Request().CreateAsync(folderDriveItem);
+            if (path != null)
+            {
+                await Graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(path).Children.Request().AddAsync(folderDriveItem);
+            }
+            else
+            {
+                await Graph.Users[userId].Drive.Special.AppRoot.Children.Request().AddAsync(folderDriveItem);
+            }
         }
 
         public static async Task<IEnumerable<(DirectoryItemType, string)>> ReadFolderAsync(string userId, string folderPath)

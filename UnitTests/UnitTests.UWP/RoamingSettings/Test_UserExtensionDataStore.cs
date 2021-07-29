@@ -55,7 +55,7 @@ namespace UnitTests.UWP.Helpers
         /// <summary>
         /// Test the dafault state of a new instance of the UserExtensionDataStore.
         /// </summary>
-        [TestCategory("ObjectStorage")]
+        [TestCategory("RoamingSettings")]
         [TestMethod]
         public async Task Test_Sync()
         {
@@ -66,19 +66,18 @@ namespace UnitTests.UWP.Helpers
                 try
                 {
                     string extensionId = "RoamingData";
-                    string userId = "TestUserId";
 
                     string testKey = "foo";
                     string testValue = "bar";
 
-                    var dataStore = new UserExtensionStorageHelper(extensionId, userId);
+                    var dataStore = await UserExtensionStorageHelper.CreateForCurrentUserAsync(extensionId);
 
                     dataStore.SyncCompleted += async (s, e) =>
                     {
                         try
                         {
                             // Create a second instance to ensure that the Cache doesn't yield a false positive.
-                            var dataStore2 = new UserExtensionStorageHelper(extensionId, userId);
+                            var dataStore2 = await UserExtensionStorageHelper.CreateForCurrentUserAsync(extensionId);
                             await dataStore2.Sync();
 
                             Assert.IsTrue(dataStore.TryRead(testKey, out string storedValue));
@@ -104,6 +103,7 @@ namespace UnitTests.UWP.Helpers
                         }
                     };
 
+                    dataStore.Clear();
                     dataStore.Save(testKey, testValue);
                     await dataStore.Sync();
                 }
@@ -115,8 +115,7 @@ namespace UnitTests.UWP.Helpers
 
             PrepareProvider(test);
 
-            var result = await tcs.Task;
-            Assert.IsTrue(result);
+            await tcs.Task;
         }
 
         /// <summary>

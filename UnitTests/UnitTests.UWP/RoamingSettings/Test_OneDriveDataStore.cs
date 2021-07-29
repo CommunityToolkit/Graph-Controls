@@ -9,6 +9,7 @@ using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace UnitTests.UWP.Helpers
@@ -34,6 +35,104 @@ namespace UnitTests.UWP.Helpers
                     
                     // Evaluate the default state is as expected
                     Assert.AreEqual(userId, storageHelper.UserId);
+
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            };
+
+            PrepareProvider(test);
+
+            await tcs.Task;
+        }
+
+        [TestCategory("RoamingSettings")]
+        [TestMethod]
+        public async Task Test_FileCRUD()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            async void test()
+            {
+                try
+                {
+                    var filePath = "TestFile.txt";
+                    var fileContents = "this is a test";
+                    var fileContents2 = "this is also a test";
+                    var storageHelper = await OneDriveStorageHelper.CreateForCurrentUserAsync();
+
+                    // Create a file
+                    await storageHelper.CreateFileAsync(filePath, fileContents);
+
+                    // Read a file
+                    var readContents = await storageHelper.ReadFileAsync<string>(filePath);
+                    Assert.AreEqual(fileContents, readContents);
+
+                    // Update a file
+                    await storageHelper.CreateFileAsync(filePath, fileContents2);
+                    var readContents2 = await storageHelper.ReadFileAsync<string>(filePath);
+                    Assert.AreEqual(fileContents2, readContents2);
+
+                    // Delete a file
+                    await storageHelper.DeleteItemAsync(filePath);
+
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            };
+
+            PrepareProvider(test);
+
+            await tcs.Task;
+        }
+
+        [TestCategory("RoamingSettings")]
+        [TestMethod]
+        public async Task Test_FolderCRUD()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            async void test()
+            {
+                try
+                {
+                    var subfolderName = "TestSubFolder";
+                    var folderName = "TestFolder";
+                    var fileName = "TestFile.txt";
+                    var filePath = $"{folderName}/{fileName}";
+                    var fileContents = "this is a test";
+                    var storageHelper = await OneDriveStorageHelper.CreateForCurrentUserAsync();
+
+                    // Create a folder
+                    await storageHelper.CreateFolderAsync(folderName);
+                    
+                    // Create a subfolder
+                    await storageHelper.CreateFolderAsync(subfolderName, folderName);
+
+                    // Create a file in a folder
+                    await storageHelper.CreateFileAsync(filePath, fileContents);
+
+                    // Read a file from a folder
+                    var readContents = await storageHelper.ReadFileAsync<string>(filePath);
+                    Assert.AreEqual(fileContents, readContents);
+
+                    // List folder contents
+                    var folderItems = await storageHelper.ReadFolderAsync(folderName);
+                    var folderItemsList = folderItems.ToList();
+                    Assert.AreEqual(2, folderItemsList.Count());
+                    Assert.AreEqual(subfolderName, folderItemsList[0].Name);
+                    Assert.AreEqual(DirectoryItemType.Folder, folderItemsList[0].ItemType);
+                    Assert.AreEqual(fileName, folderItemsList[1].Name);
+                    Assert.AreEqual(DirectoryItemType.File, folderItemsList[1].ItemType);
+
+                    // Delete a folder
+                    await storageHelper.DeleteItemAsync(folderName);
 
                     tcs.SetResult(true);
                 }
