@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
@@ -68,49 +69,85 @@ namespace CommunityToolkit.Graph.Uwp.Controls
 
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
             {
-                var text = sender.Text;
-                var list = SuggestedItemsSource as IList;
-
-                if (list != null)
+                _typeTimer.Debounce(
+                async () =>
                 {
-                    _typeTimer.Debounce(
-                    async () =>
+                    var text = sender.Text;
+                    await UpdateResultsAsync(text);
+
+                    // TODO: If we don't have Graph connection and just list of Person should we auto-filter here?
+                }, TimeSpan.FromSeconds(0.3));
+            }
+        }
+
+        private async Task UpdateResultsAsync(string text)
+        {
+            var list = SuggestedItemsSource as IList;
+            if (list == null)
+            {
+                return;
+            }
+
+            var graph = ProviderManager.Instance.GlobalProvider.GetClient();
+            if (graph == null)
+            {
+                return;
+            }
+
+            // If empty, will clear out
+            list.Clear();
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+
+            IGraphServiceUsersCollectionPage usersCollection = null;
+            try
+            {
+                usersCollection = await graph.FindUserAsync(text);
+            }
+            catch
+            {
+                // No users found.
+            }
+
+            if (usersCollection != null)
+            {
+                foreach (var user in usersCollection.CurrentPage)
+                {
+                    // Exclude people in suggested list that we already have picked
+                    if (!Items.Any(person => (person as Person)?.Id == user.Id))
                     {
-                        var graph = ProviderManager.Instance.GlobalProvider.GetClient();
-                        if (graph != null)
-                        {
-                            // If empty, will clear out
-                            list.Clear();
+                        list.Add(user.ToPerson());
+                    }
+                }
+            }
 
-                            if (!string.IsNullOrWhiteSpace(text))
-                            {
-                                foreach (var user in (await graph.FindUserAsync(text)).CurrentPage)
-                                {
-                                    // Exclude people in suggested list that we already have picked
-                                    if (!Items.Any(person => (person as Person)?.Id == user.Id))
-                                    {
-                                        list.Add(user.ToPerson());
-                                    }
-                                }
+            IUserPeopleCollectionPage peopleCollection = null;
+            try
+            {
+                peopleCollection = await graph.FindPersonAsync(text);
+            }
+            catch
+            {
+                // No people found.
+            }
 
-                                // Grab ids of current suggestions
-                                var ids = list.Cast<object>().Select(person => (person as Person).Id);
+            if (peopleCollection != null)
+            {
+                // Grab ids of current suggestions
+                var ids = list.Cast<object>().Select(person => (person as Person).Id);
 
-                                foreach (var contact in (await graph.FindPersonAsync(text)).CurrentPage)
-                                {
-                                    // Exclude people in suggested list that we already have picked
-                                    // Or already suggested
-                                    if (!Items.Any(person => (person as Person)?.Id == contact.Id) &&
-                                        !ids.Any(id => id == contact.Id))
-                                    {
-                                        list.Add(contact);
-                                    }
-                                }
-                            }
-                        }
-
-                        // TODO: If we don't have Graph connection and just list of Person should we auto-filter here?
-                    }, TimeSpan.FromSeconds(0.3));
+                foreach (var contact in peopleCollection.CurrentPage)
+                {
+                    // Exclude people in suggested list that we already have picked
+                    // Or already suggested
+                    if (!Items.Any(person => (person as Person)?.Id == contact.Id) &&
+                        !ids.Any(id => id == contact.Id))
+                    {
+                        list.Add(contact);
+                    }
                 }
             }
         }

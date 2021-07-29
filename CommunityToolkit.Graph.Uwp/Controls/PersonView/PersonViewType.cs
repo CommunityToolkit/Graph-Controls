@@ -9,19 +9,24 @@ namespace CommunityToolkit.Graph.Uwp.Controls
     /// </summary>
     public enum PersonViewType
     {
-        /**
-         * Render only the avatar
-         */
+        /// <summary>
+        /// Render only the avatar.
+        /// </summary>
         Avatar = 0,
 
-        /**
-         * Render the avatar and one line of text
-         */
+        /// <summary>
+        /// Render the avatar and one line of text.
+        /// </summary>
         OneLine = 1,
 
-        /**
-         * Render the avatar and two lines of text
-         */
+        /// <summary>
+        /// Render the avatar and two lines of text.
+        /// </summary>
         TwoLines = 2,
+
+        /// <summary>
+        /// Render the avatar and three lines of text.
+        /// </summary>
+        ThreeLines = 3,
     }
 }

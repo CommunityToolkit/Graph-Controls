@@ -135,5 +135,20 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         /// </summary>
         public static readonly DependencyProperty PersonViewTypeProperty =
             DependencyProperty.Register(nameof(PersonViewType), typeof(PersonViewType), typeof(PersonView), new PropertyMetadata(PersonViewType.TwoLines, PersonViewTypePropertiesChanged));
+
+        /// <summary>
+        /// Gets or sets the type of visual to display in the image part of the template.
+        /// </summary>
+        public PersonAvatarType PersonAvatarType
+        {
+            get => (PersonAvatarType)GetValue(PersonAvatarTypeProperty);
+            set => SetValue(PersonAvatarTypeProperty, value);
+        }
+
+        /// <summary>
+        /// Identifies the <see cref="PersonAvatarType"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty PersonAvatarTypeProperty =
+            DependencyProperty.Register(nameof(PersonAvatarType), typeof(PersonAvatarType), typeof(PersonView), new PropertyMetadata(PersonAvatarType.Photo, PersonAvatarTypePropertiesChanged));
     }
 }
