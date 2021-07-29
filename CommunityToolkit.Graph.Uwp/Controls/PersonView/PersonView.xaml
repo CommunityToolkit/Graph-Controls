@@ -64,56 +64,52 @@
                             </Grid>
                         </Grid>
 
-                        <Grid Grid.Column="1">
-                            <Grid Name="LoadingContent" Visibility="Collapsed"></Grid>
+                        <Grid Grid.Column="1" Name="LoadingContent" Visibility="Collapsed"></Grid>
 
-                            <Grid Name="SignedInContent" Visibility="Collapsed">
-                                <controls:SwitchPresenter
-                                    Value="{Binding PersonViewType, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ObjectToStringConverter}}"
-                                    VerticalAlignment="Center">
-                                    <!-- Avatar -->
-                                    <controls:Case Value="Avatar" IsDefault="True" />
+                        <Grid Grid.Column="1" Name="SignedInContent" Visibility="Collapsed">
+                            <controls:SwitchPresenter
+                                Value="{Binding PersonViewType, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource ObjectToStringConverter}}"
+                                VerticalAlignment="Center">
+                                <!-- Avatar -->
+                                <controls:Case Value="Avatar" IsDefault="True" />
 
-                                    <!-- One line -->
-                                    <controls:Case Value="OneLine">
-                                        <TextBlock Margin="6,-2,2,0"
+                                <!-- One line -->
+                                <controls:Case Value="OneLine">
+                                    <TextBlock Margin="6,-2,2,0"
+                                        FontWeight="SemiBold"
+                                        Text="{Binding PersonDetails.DisplayName, RelativeSource={RelativeSource TemplatedParent}}" />
+                                </controls:Case>
+
+                                <!-- Two lines -->
+                                <controls:Case Value="TwoLines">
+                                    <StackPanel Margin="6,-2,2,0" Spacing="2">
+                                        <TextBlock
                                             FontWeight="SemiBold"
-                                            Text="{Binding PersonDetails.DisplayName, RelativeSource={RelativeSource TemplatedParent}}" />
-                                    </controls:Case>
+                                            Text="{Binding PersonDetails.DisplayName, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        <TextBlock
+                                            FontSize="12"
+                                            Text="{Binding PersonDetails.ScoredEmailAddresses[0].Address, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    </StackPanel>
+                                </controls:Case>
 
-                                    <!-- Two lines -->
-                                    <controls:Case Value="TwoLines">
-                                        <StackPanel Margin="6,-2,2,0" Spacing="2">
-                                            <TextBlock
-                                                FontWeight="SemiBold"
-                                                Text="{Binding PersonDetails.DisplayName, RelativeSource={RelativeSource TemplatedParent}}"/>
-                                            <TextBlock
-                                                FontSize="12"
-                                                Text="{Binding PersonDetails.ScoredEmailAddresses[0].Address, RelativeSource={RelativeSource TemplatedParent}}" />
-                                        </StackPanel>
-                                    </controls:Case>
-
-                                    <!-- Three lines-->
-                                    <controls:Case Value="ThreeLines">
-                                        <StackPanel Margin="6,-2,2,0" Spacing="2" VerticalAlignment="Center">
-                                            <TextBlock
-                                                FontWeight="SemiBold"
-                                                Text="{Binding PersonDetails.DisplayName, RelativeSource={RelativeSource TemplatedParent}}"/>
-                                            <TextBlock
-                                                FontSize="12"
-                                                Text="{Binding PersonDetails.ScoredEmailAddresses[0].Address, RelativeSource={RelativeSource TemplatedParent}}" />
-                                            <TextBlock
-                                                FontSize="12"
-                                                Text="{Binding PersonDetails.JobTitle, RelativeSource={RelativeSource TemplatedParent}}" />
-                                        </StackPanel>
-                                    </controls:Case>
-                                </controls:SwitchPresenter>
-                            </Grid>
-
-                            <Grid Name="SignedOutContent" Visibility="Collapsed">
-                                <TextBlock>foobar</TextBlock>
-                            </Grid>
+                                <!-- Three lines-->
+                                <controls:Case Value="ThreeLines">
+                                    <StackPanel Margin="6,-2,2,0" Spacing="2" VerticalAlignment="Center">
+                                        <TextBlock
+                                            FontWeight="SemiBold"
+                                            Text="{Binding PersonDetails.DisplayName, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        <TextBlock
+                                            FontSize="12"
+                                            Text="{Binding PersonDetails.ScoredEmailAddresses[0].Address, RelativeSource={RelativeSource TemplatedParent}}" />
+                                        <TextBlock
+                                            FontSize="12"
+                                            Text="{Binding PersonDetails.JobTitle, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    </StackPanel>
+                                </controls:Case>
+                            </controls:SwitchPresenter>
                         </Grid>
+
+                        <Grid Grid.Column="1" Name="SignedOutContent" Visibility="Collapsed"></Grid>
 
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="ProviderStates">
