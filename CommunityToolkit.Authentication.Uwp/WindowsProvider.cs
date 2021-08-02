@@ -64,6 +64,11 @@ namespace CommunityToolkit.Authentication
         public WebAccountProviderConfig WebAccountProviderConfig => _webAccountProviderConfig;
 
         /// <summary>
+        /// Gets or sets which DispatcherQueue is used to dispatch UI updates.
+        /// </summary>
+        public DispatcherQueue DispatcherQueue { get; set; }
+
+        /// <summary>
         /// Gets a cache of important values for the signed in user.
         /// </summary>
         protected IDictionary<string, object> Settings => ApplicationData.Current.LocalSettings.Values;
@@ -71,7 +76,7 @@ namespace CommunityToolkit.Authentication
         private readonly string[] _scopes;
         private readonly AccountsSettingsPaneConfig? _accountsSettingsPaneConfig;
         private readonly WebAccountProviderConfig _webAccountProviderConfig;
-        private WebAccount _webAccount;
+        private WebAccount _webAccount = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WindowsProvider"/> class.
@@ -80,7 +85,8 @@ namespace CommunityToolkit.Authentication
         /// <param name="accountsSettingsPaneConfig">Configuration values for the AccountsSettingsPane.</param>
         /// <param name="webAccountProviderConfig">Configuration value for determining the available web account providers.</param>
         /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon construction.</param>
-        public WindowsProvider(string[] scopes = null, WebAccountProviderConfig? webAccountProviderConfig = null, AccountsSettingsPaneConfig? accountsSettingsPaneConfig = null, bool autoSignIn = true)
+        /// <param name="dispatcherQueue">The DispatcherQueue that should be used to dispatch UI updates, or null if this is being called from the UI thread.</param>
+        public WindowsProvider(string[] scopes = null, WebAccountProviderConfig? webAccountProviderConfig = null, AccountsSettingsPaneConfig? accountsSettingsPaneConfig = null, bool autoSignIn = true, DispatcherQueue dispatcherQueue = null)
         {
             _scopes = scopes ?? DefaultScopes;
             _webAccountProviderConfig = webAccountProviderConfig ?? new WebAccountProviderConfig()
@@ -89,7 +95,7 @@ namespace CommunityToolkit.Authentication
             };
             _accountsSettingsPaneConfig = accountsSettingsPaneConfig;
 
-            _webAccount = null;
+            DispatcherQueue = dispatcherQueue ?? DispatcherQueue.GetForCurrentThread();
 
             State = ProviderState.SignedOut;
 
@@ -198,21 +204,7 @@ namespace CommunityToolkit.Authentication
                     }
 
                     // Attempt to authenticate interactively.
-                    var tcs = new TaskCompletionSource<WebTokenRequestResult>();
-                    var taskQueued = DispatcherQueue.GetForCurrentThread().TryEnqueue(async () =>
-                        {
-                            var result = await AuthenticateInteractiveAsync(_scopes);
-                            tcs.SetResult(result);
-                        });
-
-                    if (taskQueued)
-                    {
-                        authResult = await tcs.Task;
-                    }
-                    else
-                    {
-                        tcs.SetCanceled();
-                    }
+                    authResult = await AuthenticateInteractiveAsync(_scopes);
                 }
 
                 if (authResult?.ResponseStatus == WebTokenRequestStatus.Success)
@@ -249,7 +241,7 @@ namespace CommunityToolkit.Authentication
         /// Display AccountSettingsPane for the management of logged-in users.
         /// </summary>
         /// <returns><see cref="Task"/>.</returns>
-        public async Task ShowAccountManagementPaneAsync()
+        public Task ShowAccountManagementPaneAsync()
         {
             if (_webAccount == null)
             {
@@ -257,7 +249,7 @@ namespace CommunityToolkit.Authentication
             }
 
             var tcs = new TaskCompletionSource<bool>();
-            _ = DispatcherQueue.GetForCurrentThread().TryEnqueue(async () =>
+            var taskQueued = DispatcherQueue.TryEnqueue(async () =>
             {
                 AccountsSettingsPane pane = null;
                 try
@@ -284,7 +276,12 @@ namespace CommunityToolkit.Authentication
                 }
             });
 
-            await tcs.Task;
+            if (!taskQueued)
+            {
+                tcs.SetException(new InvalidOperationException("Failed to enqueue the operation."));
+            }
+
+            return tcs.Task;
         }
 
         /// <summary>
@@ -392,34 +389,45 @@ namespace CommunityToolkit.Authentication
             }
         }
 
-        private async Task<WebTokenRequestResult> AuthenticateInteractiveAsync(string[] scopes)
+        private Task<WebTokenRequestResult> AuthenticateInteractiveAsync(string[] scopes)
         {
-            try
+            var tcs = new TaskCompletionSource<WebTokenRequestResult>();
+            var taskQueued = DispatcherQueue.TryEnqueue(async () =>
             {
-                WebTokenRequestResult authResult = null;
-
-                var account = _webAccount;
-                if (account != null)
+                try
                 {
-                    // We already have the account.
-                    var webAccountProvider = account.WebAccountProvider;
-                    var webTokenRequest = GetWebTokenRequest(webAccountProvider, _webAccountProviderConfig.ClientId, scopes);
-                    authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest, account);
-                }
-                else
-                {
-                    // We don't have an account. Prompt the user to provide one.
-                    var webAccountProvider = await ShowAccountSettingsPaneAndGetProviderAsync();
-                    var webTokenRequest = GetWebTokenRequest(webAccountProvider, _webAccountProviderConfig.ClientId, scopes);
-                    authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest);
-                }
+                    WebTokenRequestResult authResult = null;
 
-                return authResult;
-            }
-            catch (HttpRequestException)
+                    var account = _webAccount;
+                    if (account != null)
+                    {
+                        // We already have the account.
+                        var webAccountProvider = account.WebAccountProvider;
+                        var webTokenRequest = GetWebTokenRequest(webAccountProvider, _webAccountProviderConfig.ClientId, scopes);
+                        authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest, account);
+                    }
+                    else
+                    {
+                        // We don't have an account. Prompt the user to provide one.
+                        var webAccountProvider = await ShowAccountSettingsPaneAndGetProviderAsync();
+                        var webTokenRequest = GetWebTokenRequest(webAccountProvider, _webAccountProviderConfig.ClientId, scopes);
+                        authResult = await WebAuthenticationCoreManager.RequestTokenAsync(webTokenRequest);
+                    }
+
+                    tcs.SetResult(authResult);
+                }
+                catch (Exception e)
+                {
+                    tcs.SetException(e);
+                }
+            });
+
+            if (!taskQueued)
             {
-                throw; /* probably offline, no point continuing to interactive auth */
+                tcs.SetException(new InvalidOperationException("Failed to enqueue the operation."));
             }
+
+            return tcs.Task;
         }
 
         /// <summary>

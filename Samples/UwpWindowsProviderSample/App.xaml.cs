@@ -29,15 +29,12 @@ namespace UwpWindowsProviderSample
         /// </summary>
         void ConfigureGlobalProvider()
         {
-            DispatcherQueue.GetForCurrentThread().TryEnqueue(DispatcherQueuePriority.Normal, () =>
+            if (ProviderManager.Instance.GlobalProvider == null)
             {
-                if (ProviderManager.Instance.GlobalProvider == null)
-                {
-                    string[] scopes = new string[] { "User.Read" };
-                    var paneConfig = GetAccountsSettingsPaneConfig();
-                    ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes, accountsSettingsPaneConfig: paneConfig);
-                }
-            });
+                string[] scopes = new string[] { "User.Read" };
+                var paneConfig = GetAccountsSettingsPaneConfig();
+                ProviderManager.Instance.GlobalProvider = new WindowsProvider(scopes, accountsSettingsPaneConfig: paneConfig);
+            }
         }
 
         AccountsSettingsPaneConfig GetAccountsSettingsPaneConfig()
