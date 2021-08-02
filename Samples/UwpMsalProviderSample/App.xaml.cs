@@ -22,15 +22,12 @@ namespace UwpMsalProviderSample
         /// </summary>
         void ConfigureGlobalProvider()
         {
-            DispatcherQueue.GetForCurrentThread().TryEnqueue(DispatcherQueuePriority.Normal, () =>
+            if (ProviderManager.Instance.GlobalProvider == null)
             {
-                if (ProviderManager.Instance.GlobalProvider == null)
-                {
-                    string clientId = "YOUR-CLIENT-ID-HERE";
-                    string[] scopes = new string[] { "User.Read" };
-                    ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, scopes);
-                }
-            });
+                string clientId = "YOUR-CLIENT-ID-HERE";
+                string[] scopes = new string[] { "User.Read" };
+                ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, scopes);
+            }
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs e)
@@ -48,6 +45,7 @@ namespace UwpMsalProviderSample
                 {
                     rootFrame.Navigate(typeof(MainPage), e.Arguments);
                 }
+
                 Window.Current.Activate();
 
                 ConfigureGlobalProvider();
