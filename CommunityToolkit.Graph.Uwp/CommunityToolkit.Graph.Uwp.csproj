@@ -22,7 +22,7 @@
   </ItemGroup>
     
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Graph" Version="3.31.0" />
+    <PackageReference Include="Microsoft.Graph" Version="4.0.0" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI" Version="7.0.1" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.Input" Version="7.0.1" />
   </ItemGroup>

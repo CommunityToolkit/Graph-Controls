@@ -31,6 +31,7 @@ namespace ManualGraphRequestSample
                 {
                     rootFrame.Navigate(typeof(MainPage), e.Arguments);
                 }
+
                 Window.Current.Activate();
             }
         }
