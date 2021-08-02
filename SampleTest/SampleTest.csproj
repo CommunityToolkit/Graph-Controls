@@ -126,10 +126,6 @@
     <Compile Include="Samples\PersonView\PersonViewSample.xaml.cs">
       <DependentUpon>PersonViewSample.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Samples\RoamingSettings\RoamingSettingsView.xaml.cs">
-      <DependentUpon>RoamingSettingsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Samples\RoamingSettings\RoamingSettingsViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -160,10 +156,6 @@
     <Page Include="Samples\PersonView\PersonViewSample.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Samples\RoamingSettings\RoamingSettingsView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>

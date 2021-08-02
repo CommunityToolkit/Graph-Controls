@@ -3,11 +3,13 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Authentication;
-using CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings;
+using CommunityToolkit.Graph.Helpers.RoamingSettings;
+using Microsoft.Toolkit.Helpers;
 using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace UnitTests.UWP.Helpers
@@ -28,17 +30,11 @@ namespace UnitTests.UWP.Helpers
             {
                 try
                 {
-                    string userId = "TestUserId";
-                    string dataStoreId = "RoamingData.json";
-                    IObjectSerializer serializer = new SystemSerializer();
-
-                    IRoamingSettingsDataStore dataStore = new OneDriveDataStore(userId, dataStoreId, serializer, false);
-
+                    var userId = "TestUserId";
+                    var storageHelper = new OneDriveStorageHelper(userId);
+                    
                     // Evaluate the default state is as expected
-                    Assert.IsFalse(dataStore.AutoSync);
-                    Assert.IsNotNull(dataStore.Cache);
-                    Assert.AreEqual(dataStoreId, dataStore.Id);
-                    Assert.AreEqual(userId, dataStore.UserId);
+                    Assert.AreEqual(userId, storageHelper.UserId);
 
                     tcs.SetResult(true);
                 }
@@ -53,12 +49,9 @@ namespace UnitTests.UWP.Helpers
             await tcs.Task;
         }
 
-        /// <summary>
-        /// Test the dafault state of a new instance of the OneDriveDataStore.
-        /// </summary>
         [TestCategory("RoamingSettings")]
         [TestMethod]
-        public async Task Test_Sync()
+        public async Task Test_FileCRUD()
         {
             var tcs = new TaskCompletionSource<bool>();
 
@@ -66,65 +59,92 @@ namespace UnitTests.UWP.Helpers
             {
                 try
                 {
-                    string userId = "TestUserId";
-                    string dataStoreId = "RoamingData.json";
-                    IObjectSerializer serializer = new SystemSerializer();
+                    var filePath = "TestFile.txt";
+                    var fileContents = "this is a test";
+                    var fileContents2 = "this is also a test";
+                    var storageHelper = await OneDriveStorageHelper.CreateForCurrentUserAsync();
 
-                    IRoamingSettingsDataStore dataStore = new OneDriveDataStore(userId, dataStoreId, serializer, false);
+                    // Create a file
+                    await storageHelper.CreateFileAsync(filePath, fileContents);
 
-                    try
-                    {
-                        // Attempt to delete the remote first.
-                        await dataStore.Delete();
-                    }
-                    catch
-                    {
-                    }
+                    // Read a file
+                    var readContents = await storageHelper.ReadFileAsync<string>(filePath);
+                    Assert.AreEqual(fileContents, readContents);
 
-                    dataStore.SyncCompleted += async (s, e) =>
-                    {
-                        try
-                        {
-                            // Create a second instance to ensure that the Cache doesn't yield a false positive.
-                            IRoamingSettingsDataStore dataStore2 = new OneDriveDataStore(userId, dataStoreId, serializer, false);
-                            await dataStore2.Sync();
+                    // Update a file
+                    await storageHelper.CreateFileAsync(filePath, fileContents2);
+                    var readContents2 = await storageHelper.ReadFileAsync<string>(filePath);
+                    Assert.AreEqual(fileContents2, readContents2);
 
-                            var foo = dataStore.Read<string>("foo");
-                            Assert.AreEqual("bar", foo);
+                    // Delete a file
+                    await storageHelper.DeleteItemAsync(filePath);
 
-                            tcs.SetResult(true);
-                        }
-                        catch (Exception ex)
-                        {
-                            tcs.SetException(ex);
-                        }
-                    };
-
-                    dataStore.SyncFailed = (s, e) =>
-                    {
-                        try
-                        {
-                            Assert.Fail("Sync Failed");
-                        }
-                        catch (Exception ex)
-                        {
-                            tcs.SetException(ex);
-                        }
-                    };
-
-                    dataStore.Save("foo", "bar");
-                    await dataStore.Sync();
+                    tcs.SetResult(true);
                 }
                 catch (Exception ex)
                 {
                     tcs.SetException(ex);
                 }
-            }
+            };
 
             PrepareProvider(test);
 
-            var result = await tcs.Task;
-            Assert.IsTrue(result);
+            await tcs.Task;
+        }
+
+        [TestCategory("RoamingSettings")]
+        [TestMethod]
+        public async Task Test_FolderCRUD()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            async void test()
+            {
+                try
+                {
+                    var subfolderName = "TestSubFolder";
+                    var folderName = "TestFolder";
+                    var fileName = "TestFile.txt";
+                    var filePath = $"{folderName}/{fileName}";
+                    var fileContents = "this is a test";
+                    var storageHelper = await OneDriveStorageHelper.CreateForCurrentUserAsync();
+
+                    // Create a folder
+                    await storageHelper.CreateFolderAsync(folderName);
+                    
+                    // Create a subfolder
+                    await storageHelper.CreateFolderAsync(subfolderName, folderName);
+
+                    // Create a file in a folder
+                    await storageHelper.CreateFileAsync(filePath, fileContents);
+
+                    // Read a file from a folder
+                    var readContents = await storageHelper.ReadFileAsync<string>(filePath);
+                    Assert.AreEqual(fileContents, readContents);
+
+                    // List folder contents
+                    var folderItems = await storageHelper.ReadFolderAsync(folderName);
+                    var folderItemsList = folderItems.ToList();
+                    Assert.AreEqual(2, folderItemsList.Count());
+                    Assert.AreEqual(subfolderName, folderItemsList[0].Name);
+                    Assert.AreEqual(DirectoryItemType.Folder, folderItemsList[0].ItemType);
+                    Assert.AreEqual(fileName, folderItemsList[1].Name);
+                    Assert.AreEqual(DirectoryItemType.File, folderItemsList[1].ItemType);
+
+                    // Delete a folder
+                    await storageHelper.DeleteItemAsync(folderName);
+
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            };
+
+            PrepareProvider(test);
+
+            await tcs.Task;
         }
 
         /// <summary>

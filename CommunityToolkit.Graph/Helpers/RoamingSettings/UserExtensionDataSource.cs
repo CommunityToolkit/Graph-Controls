@@ -10,12 +10,12 @@ using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
 
-namespace CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings
+namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
     /// Manages Graph interaction with open extensions on the user.
     /// </summary>
-    internal static class UserExtensionsDataSource
+    internal static class UserExtensionDataSource
     {
         private static GraphServiceClient Graph => ProviderManager.Instance.GlobalProvider?.GetClient();
 
@@ -91,7 +91,7 @@ namespace CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings
                     "\"extensionName\": \"" + extensionId + "\"," +
                 "}";
 
-            HttpRequestMessage hrm = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+            HttpRequestMessage hrm = new (HttpMethod.Post, requestUrl);
             hrm.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             await Graph.AuthenticationProvider.AuthenticateRequestAsync(hrm);
             HttpResponseMessage response = await Graph.HttpProvider.SendAsync(hrm);

@@ -3,9 +3,10 @@
 // See the LICENSE file in the project root for more information.
 
 using CommunityToolkit.Authentication;
-using CommunityToolkit.Graph.Uwp.Helpers.RoamingSettings;
+using CommunityToolkit.Graph.Helpers.RoamingSettings;
+using Microsoft.Toolkit.Extensions;
+using Microsoft.Toolkit.Helpers;
 using Microsoft.Toolkit.Uwp;
-using Microsoft.Toolkit.Uwp.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading.Tasks;
@@ -29,16 +30,14 @@ namespace UnitTests.UWP.Helpers
                 try
                 {
                     string userId = "TestUserId";
-                    string dataStoreId = "RoamingData";
-                    IObjectSerializer serializer = new SystemSerializer();
+                    string extensionId = "RoamingData";
 
-                    IRoamingSettingsDataStore dataStore = new UserExtensionDataStore(userId, dataStoreId, serializer, false);
-
-                    // Evaluate the default state is as expected
-                    Assert.IsFalse(dataStore.AutoSync);
-                    Assert.IsNotNull(dataStore.Cache);
-                    Assert.AreEqual(dataStoreId, dataStore.Id);
-                    Assert.AreEqual(userId, dataStore.UserId);
+                    UserExtensionStorageHelper storageHelper = new UserExtensionStorageHelper(extensionId, userId);
+                    
+                    Assert.AreEqual(extensionId, storageHelper.ExtensionId);
+                    Assert.AreEqual(userId, storageHelper.UserId);
+                    Assert.IsNotNull(storageHelper.Serializer);
+                    Assert.IsInstanceOfType(storageHelper.Serializer, typeof(SystemSerializer));
 
                     tcs.SetResult(true);
                 }
@@ -66,31 +65,23 @@ namespace UnitTests.UWP.Helpers
             {
                 try
                 {
-                    string userId = "TestUserId";
-                    string dataStoreId = "RoamingData";
-                    IObjectSerializer serializer = new SystemSerializer();
+                    string extensionId = "RoamingData";
 
-                    IRoamingSettingsDataStore dataStore = new UserExtensionDataStore(userId, dataStoreId, serializer, false);
+                    string testKey = "foo";
+                    string testValue = "bar";
 
-                    try
-                    {
-                        // Attempt to delete the remote first.
-                        await dataStore.Delete();
-                    }
-                    catch
-                    {
-                    }
+                    var dataStore = await UserExtensionStorageHelper.CreateForCurrentUserAsync(extensionId);
 
                     dataStore.SyncCompleted += async (s, e) =>
                     {
                         try
                         {
                             // Create a second instance to ensure that the Cache doesn't yield a false positive.
-                            IRoamingSettingsDataStore dataStore2 = new OneDriveDataStore(userId, dataStoreId, serializer, false);
+                            var dataStore2 = await UserExtensionStorageHelper.CreateForCurrentUserAsync(extensionId);
                             await dataStore2.Sync();
 
-                            var foo = dataStore.Read<string>("foo");
-                            Assert.AreEqual("bar", foo);
+                            Assert.IsTrue(dataStore.TryRead(testKey, out string storedValue));
+                            Assert.AreEqual(testValue, storedValue);
 
                             tcs.SetResult(true);
                         }
@@ -112,7 +103,8 @@ namespace UnitTests.UWP.Helpers
                         }
                     };
 
-                    dataStore.Save("foo", "bar");
+                    dataStore.Clear();
+                    dataStore.Save(testKey, testValue);
                     await dataStore.Sync();
                 }
                 catch (Exception ex)
@@ -123,8 +115,7 @@ namespace UnitTests.UWP.Helpers
 
             PrepareProvider(test);
 
-            var result = await tcs.Task;
-            Assert.IsTrue(result);
+            await tcs.Task;
         }
 
         /// <summary>
