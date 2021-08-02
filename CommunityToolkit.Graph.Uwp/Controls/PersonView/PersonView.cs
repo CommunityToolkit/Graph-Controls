@@ -270,8 +270,9 @@ namespace CommunityToolkit.Graph.Uwp.Controls
                 var graph = ProviderManager.Instance.GlobalProvider?.GetBetaClient();
                 photoStream = await graph.GetUserPhoto(person.Id);
             }
-            catch (Exception e)
+            catch
             {
+                // TODO: Log exception
             }
 
             if (photoStream != null)
