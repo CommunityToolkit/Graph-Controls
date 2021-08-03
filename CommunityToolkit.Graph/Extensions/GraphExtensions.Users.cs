@@ -20,7 +20,11 @@ namespace CommunityToolkit.Graph.Extensions
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task<User> GetMeAsync(this GraphServiceClient graph)
         {
-            return await graph.Me.Request().GetAsync();
+            return await graph
+                .Me
+                .Request()
+                .WithScopes(new string[] { "user.read" })
+                .GetAsync();
         }
 
         /// <summary>
@@ -31,7 +35,11 @@ namespace CommunityToolkit.Graph.Extensions
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task<User> GetUserAsync(this GraphServiceClient graph, string userId)
         {
-            return await graph.Users[userId].Request().GetAsync();
+            return await graph
+                .Users[userId]
+                .Request()
+                .WithScopes(new string[] { "user.read" })
+                .GetAsync();
         }
 
         /// <summary>
@@ -46,7 +54,7 @@ namespace CommunityToolkit.Graph.Extensions
                 .Users
                 .Request()
                 .Filter($"startswith(displayName, '{query}') or startswith(givenName, '{query}') or startswith(surname, '{query}') or startswith(mail, '{query}') or startswith(userPrincipalName, '{query}')")
-                ////.WithScopes(new string[] { "user.readbasic.all" })
+                .WithScopes(new string[] { "user.readbasic.all" })
                 .GetAsync();
         }
 
@@ -63,7 +71,7 @@ namespace CommunityToolkit.Graph.Extensions
                 .Photo
                 .Content
                 .Request()
-                ////.WithScopes(new string[] { "user.readbasic.all" })
+                .WithScopes(new string[] { "user.readbasic.all" })
                 .GetAsync();
         }
 
@@ -79,7 +87,7 @@ namespace CommunityToolkit.Graph.Extensions
                 .Photo
                 .Content
                 .Request()
-                ////.WithScopes(new string[] { "user.read" })
+                .WithScopes(new string[] { "user.read" })
                 .GetAsync();
         }
     }

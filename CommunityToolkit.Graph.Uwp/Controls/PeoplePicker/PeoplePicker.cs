@@ -22,7 +22,7 @@ namespace CommunityToolkit.Graph.Uwp.Controls
     /// </summary>
     public partial class PeoplePicker : TokenizingTextBox
     {
-        private DispatcherQueueTimer _typeTimer = null;
+        private readonly DispatcherQueueTimer _typeTimer = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PeoplePicker"/> class.

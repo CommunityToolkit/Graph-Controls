@@ -5,12 +5,11 @@
     <Title>Windows Community Toolkit .NET Standard Auth Services</Title>
     <Description>
         This package includes .NET Standard authentication helpers such as:
-        - BaseProvider:
-        - IProvider:
-        - MockProvider:
-        - ProviderManager:
-        - ProviderState:
-        - ProviderStateChangedEventArgs:
+        
+        - BaseProvider: A base construct for building Graph Providers on top of.
+        - IProvider: Authentication provider interface to expose more states around the authentication process for Graph controls and helpers.
+        - ProviderManager: Shared provider manager used by controls and helpers to authenticate and call the Microsoft Graph.
+        - ProviderState: Represents the current authentication state of the session for a given IProvider.
     </Description>
     <PackageTags>Community Toolkit Provider Authentication Auth</PackageTags>
   </PropertyGroup>

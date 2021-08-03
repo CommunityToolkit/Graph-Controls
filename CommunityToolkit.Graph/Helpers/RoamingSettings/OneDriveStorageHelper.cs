@@ -9,12 +9,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Extensions;
+using Microsoft.Graph;
 using Microsoft.Toolkit.Helpers;
 
 namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
-    /// A base class for easily building roaming settings helper implementations.
+    /// An IFileStorageHelper implementation for interacting with data stored via files and folders in OneDrive.
     /// </summary>
     public class OneDriveStorageHelper : IFileStorageHelper
     {
@@ -35,13 +36,8 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
         /// <returns>A new instance of the <see cref="OneDriveStorageHelper"/> configured for the current Graph user.</returns>
         public static async Task<OneDriveStorageHelper> CreateForCurrentUserAsync(IObjectSerializer objectSerializer = null)
         {
-            var provider = ProviderManager.Instance.GlobalProvider;
-            if (provider == null || provider.State != ProviderState.SignedIn)
-            {
-                throw new InvalidOperationException($"The {nameof(ProviderManager.GlobalProvider)} must be set and signed in to create a new {nameof(OneDriveStorageHelper)} for the current user.");
-            }
-
-            var me = await provider.GetClient().Me.Request().GetAsync();
+            var graph = GetGraphClient();
+            var me = await graph.GetMeAsync();
             var userId = me.Id;
 
             return new OneDriveStorageHelper(userId, objectSerializer);
@@ -61,25 +57,29 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
         /// <inheritdoc />
         public async Task<T> ReadFileAsync<T>(string filePath, T @default = default)
         {
-            return await OneDriveDataSource.GetFileAsync<T>(UserId, filePath, Serializer) ?? @default;
+            var graph = ProviderManager.Instance.GlobalProvider.GetClient();
+            return await graph.GetFileAsync<T>(UserId, filePath, Serializer) ?? @default;
         }
 
         /// <inheritdoc />
         public Task<IEnumerable<(DirectoryItemType ItemType, string Name)>> ReadFolderAsync(string folderPath)
         {
-            return OneDriveDataSource.ReadFolderAsync(UserId, folderPath);
+            var graph = GetGraphClient();
+            return graph.ReadFolderAsync(UserId, folderPath);
         }
 
         /// <inheritdoc />
         public async Task CreateFileAsync<T>(string filePath, T value)
         {
-            await OneDriveDataSource.SetFileAsync<T>(UserId, filePath, value, Serializer);
+            var graph = GetGraphClient();
+            await graph.SetFileAsync<T>(UserId, filePath, value, Serializer);
         }
 
         /// <inheritdoc />
         public Task CreateFolderAsync(string folderName)
         {
-            return OneDriveDataSource.CreateFolderAsync(UserId, folderName);
+            var graph = GetGraphClient();
+            return graph.CreateFolderAsync(UserId, folderName);
         }
 
         /// <summary>
@@ -90,13 +90,26 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
         /// <returns>A task.</returns>
         public Task CreateFolderAsync(string folderName, string folderPath)
         {
-            return OneDriveDataSource.CreateFolderAsync(UserId, folderName, folderPath);
+            var graph = GetGraphClient();
+            return graph.CreateFolderAsync(UserId, folderName, folderPath);
         }
 
         /// <inheritdoc />
         public Task DeleteItemAsync(string itemPath)
         {
-            return OneDriveDataSource.DeleteItemAsync(UserId, itemPath);
+            var graph = GetGraphClient();
+            return graph.DeleteItemAsync(UserId, itemPath);
+        }
+
+        private static GraphServiceClient GetGraphClient()
+        {
+            var provider = ProviderManager.Instance.GlobalProvider;
+            if (provider == null || provider.State != ProviderState.SignedIn)
+            {
+                throw new InvalidOperationException($"The {nameof(ProviderManager.GlobalProvider)} must be set and signed in to perform this action.");
+            }
+
+            return provider.GetClient();
         }
     }
 }

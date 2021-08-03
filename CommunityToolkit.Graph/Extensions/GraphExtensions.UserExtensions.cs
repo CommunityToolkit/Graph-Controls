@@ -4,28 +4,28 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
-using CommunityToolkit.Authentication;
-using CommunityToolkit.Graph.Extensions;
 using Microsoft.Graph;
+using Microsoft.Toolkit.Helpers;
 
-namespace CommunityToolkit.Graph.Helpers.RoamingSettings
+namespace CommunityToolkit.Graph.Extensions
 {
     /// <summary>
-    /// Manages Graph interaction with open extensions on the user.
+    /// UserExtensions focused extension methods to the Graph SDK used by the controls and helpers.
     /// </summary>
-    internal static class UserExtensionDataSource
+    public static partial class GraphExtensions
     {
-        private static GraphServiceClient Graph => ProviderManager.Instance.GlobalProvider?.GetClient();
-
         /// <summary>
         /// Retrieve an extension object for a user.
         /// </summary>
+        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
         /// <param name="userId">The user to access.</param>
         /// <param name="extensionId">The extension to retrieve.</param>
         /// <returns>The extension result.</returns>
-        public static async Task<Extension> GetExtension(string userId, string extensionId)
+        public static async Task<Extension> GetExtension(this GraphServiceClient graph, string userId, string extensionId)
         {
             if (string.IsNullOrWhiteSpace(extensionId))
             {
@@ -37,33 +37,35 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
                 throw new ArgumentNullException(nameof(userId));
             }
 
-            var extension = await Graph.Users[userId].Extensions[extensionId].Request().GetAsync();
+            var extension = await graph.Users[userId].Extensions[extensionId].Request().GetAsync();
             return extension;
         }
 
         /// <summary>
         /// Get all extension objects for a user.
         /// </summary>
+        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
         /// <param name="userId">The user to access.</param>
         /// <returns>All extension results.</returns>
-        public static async Task<IList<Extension>> GetAllExtensions(string userId)
+        public static async Task<IList<Extension>> GetAllExtensions(this GraphServiceClient graph, string userId)
         {
             if (string.IsNullOrWhiteSpace(userId))
             {
                 throw new ArgumentNullException(nameof(userId));
             }
 
-            var extensions = await Graph.Users[userId].Extensions.Request().GetAsync();
+            var extensions = await graph.Users[userId].Extensions.Request().GetAsync();
             return extensions;
         }
 
         /// <summary>
         /// Create a new extension object on a user.
         /// </summary>
+        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
         /// <param name="userId">The user to access.</param>
         /// <param name="extensionId">The id of the new extension.</param>
         /// <returns>The newly created extension.</returns>
-        public static async Task<Extension> CreateExtension(string userId, string extensionId)
+        public static async Task<Extension> CreateExtension(this GraphServiceClient graph, string userId, string extensionId)
         {
             if (string.IsNullOrWhiteSpace(extensionId))
             {
@@ -78,13 +80,13 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
             try
             {
                 // Try to see if the extension already exists.
-               return await GetExtension(userId, extensionId);
+                return await graph.GetExtension(userId, extensionId);
             }
             catch
             {
             }
 
-            string requestUrl = Graph.Users[userId].Extensions.Request().RequestUrl;
+            string requestUrl = graph.Users[userId].Extensions.Request().RequestUrl;
 
             string json = "{" +
                     "\"@odata.type\": \"microsoft.graph.openTypeExtension\"," +
@@ -93,13 +95,13 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 
             HttpRequestMessage hrm = new (HttpMethod.Post, requestUrl);
             hrm.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-            await Graph.AuthenticationProvider.AuthenticateRequestAsync(hrm);
-            HttpResponseMessage response = await Graph.HttpProvider.SendAsync(hrm);
+            await graph.AuthenticationProvider.AuthenticateRequestAsync(hrm);
+            HttpResponseMessage response = await graph.HttpProvider.SendAsync(hrm);
             if (response.IsSuccessStatusCode)
             {
                 // Deserialize into Extension object.
                 var content = await response.Content.ReadAsStringAsync();
-                var extension = Graph.HttpProvider.Serializer.DeserializeObject<Extension>(content);
+                var extension = graph.HttpProvider.Serializer.DeserializeObject<Extension>(content);
                 return extension;
             }
 
@@ -109,10 +111,11 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
         /// <summary>
         /// Delete a user extension by id.
         /// </summary>
+        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
         /// <param name="userId">The user to access.</param>
         /// <param name="extensionId">The id of the extension to delete.</param>
         /// <returns>A task.</returns>
-        public static async Task DeleteExtension(string userId, string extensionId)
+        public static async Task DeleteExtension(this GraphServiceClient graph, string userId, string extensionId)
         {
             if (string.IsNullOrWhiteSpace(extensionId))
             {
@@ -126,7 +129,7 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 
             try
             {
-                await GetExtension(userId, extensionId);
+                await graph.GetExtension(userId, extensionId);
             }
             catch
             {
@@ -134,51 +137,19 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
                 return;
             }
 
-            await Graph.Users[userId].Extensions[extensionId].Request().DeleteAsync();
-        }
-
-        /// <summary>
-        /// Get a value from an extension by key.
-        /// </summary>
-        /// <typeparam name="T">The type of object to return.</typeparam>
-        /// <param name="extension">The target extension.</param>
-        /// <param name="key">The key for the desired value.</param>
-        /// <returns>The value for the provided key.</returns>
-        public static T GetValue<T>(this Extension extension, string key)
-        {
-            return (T)GetValue(extension, key);
-        }
-
-        /// <summary>
-        /// Get a value from a user extension by key.
-        /// </summary>
-        /// <param name="extension">The target extension.</param>
-        /// <param name="key">The key for the desired value.</param>
-        /// <returns>The value for the provided key.</returns>
-        public static object GetValue(this Extension extension, string key)
-        {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-
-            if (extension.AdditionalData.ContainsKey(key))
-            {
-                return extension.AdditionalData[key];
-            }
-
-            return null;
+            await graph.Users[userId].Extensions[extensionId].Request().DeleteAsync();
         }
 
         /// <summary>
         /// Sets a user extension value at the specified key.
         /// </summary>
+        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
         /// <param name="userId">The user to access.</param>
         /// <param name="extensionId">The id of the target extension.</param>
         /// <param name="key">The key.</param>
         /// <param name="value">The value to set.</param>
         /// <returns>A task.</returns>
-        public static async Task SetValue(string userId, string extensionId, string key, object value)
+        public static async Task SetValue(this GraphServiceClient graph, string userId, string extensionId, string key, object value)
         {
             if (string.IsNullOrWhiteSpace(userId))
             {
@@ -198,7 +169,7 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
             var extensionToUpdate = (Extension)Activator.CreateInstance(typeof(Extension), true);
             extensionToUpdate.AdditionalData = new Dictionary<string, object>() { { key, value } };
 
-            await Graph.Users[userId].Extensions[extensionId].Request().UpdateAsync(extensionToUpdate);
+            await graph.Users[userId].Extensions[extensionId].Request().UpdateAsync(extensionToUpdate);
         }
     }
 }

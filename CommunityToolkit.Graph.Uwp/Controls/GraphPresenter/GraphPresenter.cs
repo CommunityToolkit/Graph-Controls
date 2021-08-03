@@ -74,11 +74,11 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             // Note: some interfaces from the Graph SDK don't implement IBaseRequestBuilder properly, see https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/722
             if (RequestBuilder != null)
             {
-                var request = new BaseRequest(
-                                        RequestBuilder.RequestUrl,
-                                        RequestBuilder.Client); // TODO: Do we need separate Options here?
-                request.Method = HttpMethods.GET;
-                request.QueryOptions = QueryOptions?.Select(option => (Microsoft.Graph.QueryOption)option)?.ToList() ?? new List<Microsoft.Graph.QueryOption>();
+                var request = new BaseRequest(RequestBuilder.RequestUrl, RequestBuilder.Client) // TODO: Do we need separate Options here?
+                {
+                    Method = HttpMethods.GET,
+                    QueryOptions = QueryOptions?.Select(option => (Microsoft.Graph.QueryOption)option)?.ToList() ?? new List<Microsoft.Graph.QueryOption>(),
+                };
 
                 // Handle Special QueryOptions
                 if (!string.IsNullOrWhiteSpace(OrderBy))
