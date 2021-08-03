@@ -4,12 +4,12 @@
     <TargetFramework>uap10.0.17134</TargetFramework>
     <Title>Windows Community Toolkit Graph Uwp Authentication Provider</Title>
     <Description>
-      This library provides an authentication provider based on the native Windows dialogues. It is part of the Windows Community Toolkit.
+      This library provides an authentication provider based on the native Windows dialogues.
 
       Classes:
-      - WindowsProvider: 
+      - WindowsProvider: An authentication provider based on the native AccountsSettingsPane in Windows.
     </Description>
-    <PackageTags>UWP Toolkit Windows Microsoft Graph AadLogin Authentication Login</PackageTags>
+    <PackageTags>UWP Community Toolkit Provider Authentication Auth Windows</PackageTags>
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 

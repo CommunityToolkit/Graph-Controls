@@ -4,8 +4,10 @@
     
     <Title>Windows Community Toolkit .NET Standard Auth Services</Title>
     <Description>
-        This package includes .NET Standard authentication helpers such as:
-        - MsalProvider:
+        This library provides an authentication provider based on the native Windows dialogues. It is part of the Windows Community Toolkit.
+        
+        Classes:
+        - MsalProvider: An authentication provider based on MSAL for .NET.
     </Description>
     <PackageTags>Community Toolkit Provider Authentication Auth Msal</PackageTags>
   </PropertyGroup>
@@ -18,7 +20,4 @@
     <ProjectReference Include="..\CommunityToolkit.Authentication\CommunityToolkit.Authentication.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Update="Nerdbank.GitVersioning" Version="3.4.194" />
-  </ItemGroup>
 </Project>

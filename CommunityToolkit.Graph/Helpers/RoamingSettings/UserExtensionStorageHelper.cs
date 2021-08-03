@@ -17,9 +17,9 @@ using Microsoft.Toolkit.Helpers;
 namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 {
     /// <summary>
-    /// An IObjectStorageHelper implementation using open extensions on the Graph User for storing key/value pairs.
+    /// An ISettingsStorageHelper implementation using open extensions on the Graph User for storing key/value pairs.
     /// </summary>
-    public class UserExtensionStorageHelper : IRemoteSettingsStorageHelper<string>
+    public class UserExtensionStorageHelper : ISettingsStorageHelper<string>
     {
         private static readonly IList<string> ReservedKeys = new List<string> { "responseHeaders", "statusCode", "@odata.context" };
         private static readonly SemaphoreSlim SyncLock = new (1);
@@ -30,7 +30,7 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
         public EventHandler SyncCompleted { get; set; }
 
         /// <summary>
-        /// gets or sets an event that fires whenever a remote sync request has failed.
+        /// Gets or sets an event that fires whenever a remote sync request has failed.
         /// </summary>
         public EventHandler SyncFailed { get; set; }
 
@@ -80,6 +80,21 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
             var userId = me.Id;
 
             return new UserExtensionStorageHelper(extensionId, userId, objectSerializer);
+        }
+
+        /// <summary>
+        /// Retrieve an instance of the GraphServiceClient, or throws an exception if not signed in.
+        /// </summary>
+        /// <returns>A <see cref="GraphServiceClient"/> instance.</returns>
+        protected static GraphServiceClient GetGraphClient()
+        {
+            var provider = ProviderManager.Instance.GlobalProvider;
+            if (provider == null || provider.State != ProviderState.SignedIn)
+            {
+                throw new InvalidOperationException($"The {nameof(ProviderManager.GlobalProvider)} must be set and signed in to perform this action.");
+            }
+
+            return provider.GetClient();
         }
 
         /// <summary>
@@ -156,14 +171,16 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 
             try
             {
+                var graph = GetGraphClient();
+
                 IDictionary<string, object> remoteData = null;
 
                 // Check if the extension should be cleared.
                 if (_cleared)
                 {
                     // Delete and re-create the remote extension.
-                    await UserExtensionDataSource.DeleteExtension(UserId, ExtensionId);
-                    Extension extension = await UserExtensionDataSource.CreateExtension(UserId, ExtensionId);
+                    await graph.DeleteExtension(UserId, ExtensionId);
+                    Extension extension = await graph.CreateExtension(UserId, ExtensionId);
                     remoteData = extension.AdditionalData;
 
                     _cleared = false;
@@ -171,7 +188,7 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
                 else
                 {
                     // Get the remote extension.
-                    Extension extension = await UserExtensionDataSource.GetExtension(UserId, ExtensionId);
+                    Extension extension = await graph.GetExtension(UserId, ExtensionId);
                     remoteData = extension.AdditionalData;
                 }
 
@@ -208,9 +225,10 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
 
                 SyncCompleted?.Invoke(this, new EventArgs());
             }
-            catch
+            catch (Exception e)
             {
                 SyncFailed?.Invoke(this, new EventArgs());
+                throw e;
             }
             finally
             {
