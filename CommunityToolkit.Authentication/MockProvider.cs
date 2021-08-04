@@ -4,6 +4,7 @@
 
 using System;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Authentication.Extensions;
 
@@ -15,7 +16,12 @@ namespace CommunityToolkit.Authentication
     [Obsolete("MockProvider is meant for prototyping and demonstration purposes only. Not for use in production applications.")]
     public class MockProvider : BaseProvider
     {
-        private const string GRAPH_PROXY_URL = "https://proxy.apisandbox.msdn.microsoft.com/svc?url=";
+        private const string GRAPH_PROXY_URL_REQUEST_ENDPOINT = "https://cdn.graph.office.net/en-us/graph/api/proxy/endpoint";
+        private const string FALLBACK_GRAPH_PROXY_URL = "https://proxy.apisandbox.msdn.microsoft.com/svc?url=";
+
+        private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+
+        private string _baseUrl = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MockProvider"/> class.
@@ -30,7 +36,7 @@ namespace CommunityToolkit.Authentication
         public override string CurrentAccountId => State == ProviderState.SignedIn ? "mock-account-id" : null;
 
         /// <inheritdoc/>
-        public override Task AuthenticateRequestAsync(HttpRequestMessage request)
+        public override async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
             // Append the SDK version header
             AddSdkVersion(request);
@@ -38,11 +44,11 @@ namespace CommunityToolkit.Authentication
             // Append the token auth header
             request.AddMockProviderToken();
 
+            var baseUrl = await GetBaseUrlAsync();
+
             // Prepend Proxy Service URI
             var requestUri = request.RequestUri.ToString();
-            request.RequestUri = new Uri(GRAPH_PROXY_URL + Uri.EscapeDataString(requestUri));
-
-            return Task.FromResult(0);
+            request.RequestUri = new Uri(baseUrl + Uri.EscapeDataString(requestUri));
         }
 
         /// <inheritdoc/>
@@ -87,6 +93,33 @@ namespace CommunityToolkit.Authentication
 
             await SignInAsync();
             return true;
+        }
+
+        private async Task<string> GetBaseUrlAsync()
+        {
+            await _semaphore.WaitAsync();
+
+            if (_baseUrl == null)
+            {
+                var httpClient = new HttpClient();
+                var response = await httpClient.GetAsync(GRAPH_PROXY_URL_REQUEST_ENDPOINT);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    responseContent = responseContent.Replace("\"", string.Empty);
+
+                    _baseUrl = $"{responseContent}?url=";
+                }
+                else
+                {
+                    _baseUrl = FALLBACK_GRAPH_PROXY_URL;
+                }
+            }
+
+            _semaphore.Release();
+
+            return _baseUrl;
         }
     }
 }
