@@ -107,7 +107,11 @@ namespace CommunityToolkit.Authentication
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
-                    responseContent = responseContent.Replace("\"", string.Empty);
+
+                    if (responseContent.StartsWith("\"") && responseContent.EndsWith("\""))
+                    {
+                        responseContent = responseContent.Substring(1, responseContent.Length - 2);
+                    }
 
                     _baseUrl = $"{responseContent}?url=";
                 }
