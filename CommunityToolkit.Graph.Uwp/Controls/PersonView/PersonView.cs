@@ -121,7 +121,11 @@ namespace CommunityToolkit.Graph.Uwp.Controls
 
             if (provider?.State == ProviderState.SignedIn)
             {
-                await TryLoadPersonDetailsAsync();
+                if (!await TryLoadPersonDetailsAsync())
+                {
+                    // TODO: Handle failure to load the PersonDetails.
+                }
+
                 UpdateVisual();
             }
             else
@@ -132,6 +136,12 @@ namespace CommunityToolkit.Graph.Uwp.Controls
 
         private async void UpdateVisual()
         {
+            if (PersonDetails == null)
+            {
+                LoadDefaultImage();
+                return;
+            }
+
             if (PersonAvatarType is PersonAvatarType.Initials)
             {
                 var initialsLoaded = TryLoadInitials();
@@ -144,30 +154,23 @@ namespace CommunityToolkit.Graph.Uwp.Controls
                     LoadDefaultImage();
                 }
             }
-            else if (PersonDetails != null)
+            else if (PersonDetails.Id != _photoId)
             {
-                if (PersonDetails.Id != _photoId)
+                var photoLoaded = await TryLoadUserPhotoAsync();
+                if (photoLoaded)
                 {
-                    LoadDefaultImage();
+                    UpdateImageSize();
+                }
+                else
+                {
+                    ClearUserPhoto();
 
-                    var photoLoaded = await TryLoadUserPhotoAsync();
-                    if (photoLoaded)
+                    var initialsLoaded = TryLoadInitials();
+                    if (!initialsLoaded)
                     {
-                        UpdateImageSize();
-                    }
-                    else
-                    {
-                        var initialsLoaded = TryLoadInitials();
-                        if (initialsLoaded)
-                        {
-                            ClearUserPhoto();
-                        }
+                        LoadDefaultImage();
                     }
                 }
-            }
-            else
-            {
-                LoadDefaultImage();
             }
         }
 
@@ -200,6 +203,7 @@ namespace CommunityToolkit.Graph.Uwp.Controls
 
         private async Task<bool> TryLoadPersonDetailsAsync()
         {
+            // TODO: Better guarding.
             if (PersonDetails != null)
             {
                 return true;
@@ -208,50 +212,61 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             var provider = ProviderManager.Instance.GlobalProvider;
             if (provider?.State != ProviderState.SignedIn)
             {
+                PersonDetails = null;
                 return false;
             }
+
+            var graph = provider.GetClient();
 
             try
             {
                 if (!string.IsNullOrWhiteSpace(UserId))
                 {
-                    var user = await provider.GetClient().GetUserAsync(UserId);
+                    var user = await graph.GetUserAsync(UserId);
                     PersonDetails = user.ToPerson();
                 }
                 else if (PersonQuery?.ToLowerInvariant() == PersonQueryMe)
                 {
-                    var user = await provider.GetClient().GetMeAsync();
+                    var user = await graph.GetMeAsync();
                     PersonDetails = user.ToPerson();
                 }
                 else if (!string.IsNullOrWhiteSpace(PersonQuery))
                 {
-                    var people = await provider.GetClient().FindPersonAsync(PersonQuery);
+                    var people = await graph.FindPersonAsync(PersonQuery);
                     if (people != null && people.Count > 0)
                     {
-                        var person = people.FirstOrDefault();
-                        PersonDetails = person;
+                        PersonDetails = people.FirstOrDefault();
                     }
                 }
-
-                return PersonDetails != null;
             }
-            catch
+            catch (Microsoft.Graph.ServiceException e)
             {
-                // TODO: Log exception
+                if (e.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    // Insufficient privileges.
+                    // Incremental consent must not be supported by the current provider.
+                    // TODO: Log or handle the lack of sufficient privileges.
+                }
+                else
+                {
+                    // Something unexpected happened.
+                    throw;
+                }
             }
 
-            return false;
+            return PersonDetails != null;
         }
 
         private async Task<bool> TryLoadUserPhotoAsync()
         {
+            // TODO: Better guarding.
             var person = PersonDetails;
             if (person == null)
             {
                 return false;
             }
 
-            if (PersonDetails.Id == _photoId && UserPhoto != null && UserPhoto != _defaultImage)
+            if (person.Id == _photoId && UserPhoto != null && UserPhoto != _defaultImage)
             {
                 return true;
             }
@@ -264,27 +279,51 @@ namespace CommunityToolkit.Graph.Uwp.Controls
 
             Stream photoStream = null;
 
-            // TODO: Better guarding
             try
             {
                 var graph = ProviderManager.Instance.GlobalProvider?.GetBetaClient();
                 photoStream = await graph.GetUserPhoto(person.Id);
             }
-            catch
+            catch (Microsoft.Graph.ServiceException e)
             {
-                // TODO: Log exception
+                if (e.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    // Insufficient privileges.
+                    // Incremental consent must not be supported by the current provider.
+                    // TODO: Log or handle the lack of sufficient privileges.
+                }
+                else if (e.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                {
+                    // This entity does not support profile photos.
+                }
+                else if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    // Image not found.
+                }
+                else if ((int)e.StatusCode == 422)
+                {
+                    // IncorrectRecipientTypeDetected:
+                    // Incorrect recipient type detected in request url. Retry with Groups as the object type.
+                }
+                else
+                {
+                    // Something unexpected happened.
+                    throw;
+                }
             }
 
-            if (photoStream != null)
+            if (photoStream == null)
             {
-                var decodeResults = await TryDecodeStreamAsync(photoStream);
-                if (decodeResults.Success)
-                {
-                    UserPhoto = decodeResults.Image;
-                    _photoId = person.Id;
+                return false;
+            }
 
-                    return true;
-                }
+            var decodeResults = await TryDecodeStreamAsync(photoStream);
+            if (decodeResults.Success)
+            {
+                UserPhoto = decodeResults.Image;
+                _photoId = person.Id;
+
+                return true;
             }
 
             return false;
