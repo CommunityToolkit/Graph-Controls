@@ -105,14 +105,25 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             IGraphServiceUsersCollectionPage usersCollection = null;
             try
             {
+                // Returns an empty collection if no results found.
                 usersCollection = await graph.FindUserAsync(text);
             }
-            catch
+            catch (Microsoft.Graph.ServiceException e)
             {
-                // No users found.
+                if (e.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    // Insufficient privileges.
+                    // Incremental consent must not be supported by the current provider.
+                    // TODO: Log or handle the lack of sufficient privileges.
+                }
+                else
+                {
+                    // Something unexpected happened.
+                    throw;
+                }
             }
 
-            if (usersCollection != null)
+            if (usersCollection != null && usersCollection.Count > 0)
             {
                 foreach (var user in usersCollection.CurrentPage)
                 {
@@ -127,14 +138,25 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             IUserPeopleCollectionPage peopleCollection = null;
             try
             {
+                // Returns an empty collection if no results found.
                 peopleCollection = await graph.FindPersonAsync(text);
             }
-            catch
+            catch (Microsoft.Graph.ServiceException e)
             {
-                // No people found.
+                if (e.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    // Insufficient privileges.
+                    // Incremental consent must not be supported by the current provider.
+                    // TODO: Log or handle the lack of sufficient privileges.
+                }
+                else
+                {
+                    // Something unexpected happened.
+                    throw;
+                }
             }
 
-            if (peopleCollection != null)
+            if (peopleCollection != null && peopleCollection.Count > 0)
             {
                 // Grab ids of current suggestions
                 var ids = list.Cast<object>().Select(person => (person as Person).Id);
