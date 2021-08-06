@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Extensions;
+using Microsoft.Graph;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -212,7 +213,13 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             {
                 case ProviderState.SignedIn:
                     IsLoading = true;
-                    await SetUserDetails();
+                    if (!await TrySetUserDetailsAsync())
+                    {
+                        // Failed to retrieve user details, force signout.
+                        await SignOutAsync();
+                        return;
+                    }
+
                     IsLoading = false;
                     LoginCompleted?.Invoke(this, new EventArgs());
                     break;
@@ -284,20 +291,36 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             }
         }
 
-        private async Task SetUserDetails()
+        private async Task<bool> TrySetUserDetailsAsync()
         {
+            User userDetails = null;
+
             var provider = ProviderManager.Instance.GlobalProvider;
             if (provider != null)
             {
                 try
                 {
-                    UserDetails = await provider.GetClient().GetMeAsync();
+                    userDetails = await provider.GetClient().GetMeAsync();
                 }
-                catch
+                catch (Microsoft.Graph.ServiceException e)
                 {
-                    // TODO: Handle if UserDetails is null.
+                    if (e.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                    {
+                        // Insufficient privileges.
+                        // Incremental consent must not be supported by the current provider.
+                        // TODO: Log or handle the lack of sufficient privileges.
+                    }
+                    else
+                    {
+                        // Something unexpected happened.
+                        throw;
+                    }
                 }
             }
+
+            UserDetails = userDetails;
+
+            return UserDetails != null;
         }
 
         private void ClearUserDetails()

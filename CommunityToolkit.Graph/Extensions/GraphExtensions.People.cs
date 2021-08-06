@@ -20,21 +20,13 @@ namespace CommunityToolkit.Graph.Extensions
         /// <returns><see cref="IUserPeopleCollectionPage"/> collection of <see cref="Person"/>.</returns>
         public static async Task<IUserPeopleCollectionPage> FindPersonAsync(this GraphServiceClient graph, string query)
         {
-            try
-            {
-                return await graph
-                    .Me
-                    .People
-                    .Request()
-                    .Search(query)
-                    ////.WithScopes(new string[] { "people.read" })
-                    .GetAsync();
-            }
-            catch
-            {
-            }
-
-            return new UserPeopleCollectionPage();
+            return await graph
+                .Me
+                .People
+                .Request()
+                .Search(query)
+                .WithScopes(new string[] { "people.read" })
+                .GetAsync();
         }
     }
 }
