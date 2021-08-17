@@ -21,16 +21,16 @@
     <PackageTags>UWP Community Toolkit Windows Controls Microsoft Graph Login Person PeoplePicker Presenter</PackageTags>
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
+    
+	<ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Graph" Version="4.2.0" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.Input" Version="7.0.2" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CommunityToolkit.Authentication\CommunityToolkit.Authentication.csproj" />
     <ProjectReference Include="..\CommunityToolkit.Graph\CommunityToolkit.Graph.csproj" />
-  </ItemGroup>
-    
-	<ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Graph" Version="4.0.0" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.Input" Version="7.0.2" />
   </ItemGroup>
       
   <ItemGroup>
@@ -50,4 +50,5 @@
     <Message Text="CSFiles: @(GeneratedCSFiles->'&quot;%(Identity)&quot;')" />
     <Exec Command="for %%f in (@(GeneratedCSFiles->'&quot;%(Identity)&quot;')) do echo #pragma warning disable &gt; %%f.temp &amp;&amp; type %%f &gt;&gt; %%f.temp &amp;&amp; move /y %%f.temp %%f &gt; NUL" />
   </Target>
+
 </Project>

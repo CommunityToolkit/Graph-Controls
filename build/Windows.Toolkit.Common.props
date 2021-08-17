@@ -1,0 +1,45 @@
+<Project>
+
+  <PropertyGroup>
+    <Company>.NET Foundation</Company>
+    <Authors>Microsoft.Toolkit</Authors>
+    <Product>Windows Community Toolkit</Product>
+    <CommonTags>Windows;Community;Toolkit;WCT;Graph;Authentication;</CommonTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Copyright>(c) .NET Foundation and Contributors.  All rights reserved.</Copyright>
+    <PackageProjectUrl>https://github.com/CommunityToolkit/Graph-Controls</PackageProjectUrl>
+    <PackageReleaseNotes>https://github.com/CommunityToolkit/Graph-Controls/releases</PackageReleaseNotes>
+    <PackageIcon>Icon.png</PackageIcon>
+    <PackageIconUrl>https://raw.githubusercontent.com/CommunityToolkit/Graph-Controls/main/build/nuget.png</PackageIconUrl>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Features>Strict</Features>
+    <Nullable>Disable</Nullable>
+    <LangVersion>Latest</LangVersion>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetPlatformBaseVersion>10.0</TargetPlatformBaseVersion>
+    <TargetPlatformRevision>19041</TargetPlatformRevision>
+    <TargetPlatformMinRevision>17763</TargetPlatformMinRevision>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsSampleProject>$(MSBuildProjectName.Contains('.Sample'))</IsSampleProject>
+    <IsTestProject>$(MSBuildProjectName.Contains('Test'))</IsTestProject>
+    <IsUwpProject>$(MSBuildProjectName.Contains('.Uwp'))</IsUwpProject>
+    <IsCoreProject Condition="'$(IsCoreProject)' == ''">True</IsCoreProject>
+    <IsCoreProject Condition="$(IsSampleProject) or $(IsTestProject)">False</IsCoreProject>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <IsPublishable>true</IsPublishable>
+    <ContinuousIntegrationBuild>$(TF_BUILD)</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+</Project>

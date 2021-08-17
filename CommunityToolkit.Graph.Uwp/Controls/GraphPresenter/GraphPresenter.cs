@@ -5,10 +5,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp;
-using Newtonsoft.Json.Linq;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -20,14 +20,6 @@ namespace CommunityToolkit.Graph.Uwp.Controls
     /// </summary>
     public class GraphPresenter : ContentPresenter
     {
-        /// <summary>
-        /// Gets or sets a <see cref="IBaseRequestBuilder"/> to be used to make a request to the graph. The results will be automatically populated to the <see cref="ContentPresenter.Content"/> property. Use a <see cref="ContentPresenter.ContentTemplate"/> to change the presentation of the data.
-        /// </summary>
-        public IBaseRequestBuilder RequestBuilder
-        {
-            get { return (IBaseRequestBuilder)GetValue(RequestBuilderProperty); }
-            set { SetValue(RequestBuilderProperty, value); }
-        }
 
         /// <summary>
         /// Identifies the <see cref="RequestBuilder"/> dependency property.
@@ -37,6 +29,23 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         /// </returns>
         public static readonly DependencyProperty RequestBuilderProperty =
             DependencyProperty.Register(nameof(RequestBuilder), typeof(IBaseRequestBuilder), typeof(GraphPresenter), new PropertyMetadata(null));
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GraphPresenter"/> class.
+        /// </summary>
+        public GraphPresenter()
+        {
+            this.Loaded += this.GraphPresenter_Loaded;
+        }
+
+        /// <summary>
+        /// Gets or sets a <see cref="IBaseRequestBuilder"/> to be used to make a request to the graph. The results will be automatically populated to the <see cref="ContentPresenter.Content"/> property. Use a <see cref="ContentPresenter.ContentTemplate"/> to change the presentation of the data.
+        /// </summary>
+        public IBaseRequestBuilder RequestBuilder
+        {
+            get { return (IBaseRequestBuilder)this.GetValue(RequestBuilderProperty); }
+            set { this.SetValue(RequestBuilderProperty, value); }
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="Type"/> of item returned by the <see cref="RequestBuilder"/>.
@@ -59,52 +68,47 @@ namespace CommunityToolkit.Graph.Uwp.Controls
         /// </summary>
         public string OrderBy { get; set; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GraphPresenter"/> class.
-        /// </summary>
-        public GraphPresenter()
-        {
-            Loaded += GraphPresenter_Loaded;
-        }
-
         private async void GraphPresenter_Loaded(object sender, RoutedEventArgs e)
         {
             var dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
             // Note: some interfaces from the Graph SDK don't implement IBaseRequestBuilder properly, see https://github.com/microsoftgraph/msgraph-sdk-dotnet/issues/722
-            if (RequestBuilder != null)
+            if (this.RequestBuilder != null)
             {
-                var request = new BaseRequest(RequestBuilder.RequestUrl, RequestBuilder.Client) // TODO: Do we need separate Options here?
+                var request = new BaseRequest(this.RequestBuilder.RequestUrl, this.RequestBuilder.Client) // TODO: Do we need separate Options here?
                 {
                     Method = HttpMethods.GET,
-                    QueryOptions = QueryOptions?.Select(option => (Microsoft.Graph.QueryOption)option)?.ToList() ?? new List<Microsoft.Graph.QueryOption>(),
+                    QueryOptions = this.QueryOptions?.Select(option => (Microsoft.Graph.QueryOption)option)?.ToList() ?? new List<Microsoft.Graph.QueryOption>(),
                 };
 
                 // Handle Special QueryOptions
-                if (!string.IsNullOrWhiteSpace(OrderBy))
+                if (!string.IsNullOrWhiteSpace(this.OrderBy))
                 {
-                    request.QueryOptions.Add(new Microsoft.Graph.QueryOption("$orderby", OrderBy));
+                    request.QueryOptions.Add(new Microsoft.Graph.QueryOption("$orderby", this.OrderBy));
                 }
 
                 try
                 {
-                    var response = await request.SendAsync<object>(null, CancellationToken.None).ConfigureAwait(false) as JObject;
+                    var responseObj = await request.SendAsync<object>(null, CancellationToken.None).ConfigureAwait(false);
 
-                    //// TODO: Deal with paging?
-
-                    var values = response["value"];
-                    object data = null;
-
-                    if (IsCollection)
+                    if (responseObj is JsonElement responseElement)
                     {
-                        data = values.ToObject(Array.CreateInstance(ResponseType, 0).GetType());
-                    }
-                    else
-                    {
-                        data = values.ToObject(ResponseType);
-                    }
+                        //// TODO: Deal with paging?
 
-                    _ = dispatcherQueue.EnqueueAsync(() => Content = data);
+                        var value = responseElement.GetProperty("value");
+                        object data = null;
+
+                        if (this.IsCollection)
+                        {
+                            data = value.EnumerateArray().ToList().Select(elem => System.Text.Json.JsonSerializer.Deserialize(elem.GetRawText(), this.ResponseType));
+                        }
+                        else
+                        {
+                            data = System.Text.Json.JsonSerializer.Deserialize(value.GetRawText(), this.ResponseType);
+                        }
+
+                        _ = dispatcherQueue.EnqueueAsync(() => this.Content = data);
+                    }
                 }
                 catch
                 {
