@@ -24,7 +24,7 @@
     
 	<ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Graph" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Graph" Version="4.2.0" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.Input" Version="7.0.2" />
   </ItemGroup>
 
