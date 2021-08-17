@@ -35,25 +35,11 @@
       </PropertyGroup>
     </When>
   </Choose>
-
-  <Choose>
-    <When Condition="!$(IsDesignProject)">
-      <!--
-          Debug builds have this turned on by default, but it breaks our Xaml Islands Scenarios.
-          ARM64 builds for managed apps use .NET Native. We can't use the Reflection Provider for that.
-      -->
-      <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-        <EnableXBindDiagnostics>false</EnableXBindDiagnostics>
-        <EnableTypeInfoReflection>false</EnableTypeInfoReflection>
-      </PropertyGroup>
-      <ItemGroup>
-        <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="All" />
-      </ItemGroup>
-    </When>
-  </Choose>
-
-  <Import Project="$(BuildToolsDirectory)Windows.Toolkit.VisualStudio.Design.props" Condition="$(IsDesignProject)" />
-
+    
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="All" />
+  </ItemGroup>
+    
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37" PrivateAssets="All" />
   </ItemGroup>

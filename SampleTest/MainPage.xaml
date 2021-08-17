@@ -13,15 +13,6 @@
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
       mc:Ignorable="d">
 
-    <Page.Resources>
-        <!-- These references are required for the GraphPresenter to properly pass the ResponseType parameter using one of the below types.
-             For example, the <graph:Event x:Key="GraphEvent" /> tag must be pre-referenced to render messages using ResponseType="graph:Event". -->
-        <graph:Event x:Key="GraphEvent" />
-        <graph:Message x:Key="GraphMessage" />
-        <graph:PlannerTask x:Key="GraphPlannerTask" />
-        <graph:ChatMessage x:Key="GraphChatMessage" />
-    </Page.Resources>
-    
     <Grid>
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup>
