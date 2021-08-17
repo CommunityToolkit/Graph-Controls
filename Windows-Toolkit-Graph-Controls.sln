@@ -21,6 +21,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build Config", "Build Confi
 		settings.xamlstyler = settings.xamlstyler
 		stylecop.json = stylecop.json
 		version.json = version.json
+		build\Windows.Toolkit.Common.props = build\Windows.Toolkit.Common.props
+		build\Windows.Toolkit.Common.targets = build\Windows.Toolkit.Common.targets
+		build\Windows.Toolkit.UWP.Build.targets = build\Windows.Toolkit.UWP.Build.targets
+		build\Windows.Toolkit.Workarounds.Xaml.targets = build\Windows.Toolkit.Workarounds.Xaml.targets
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleTest", "SampleTest\SampleTest.csproj", "{26F5807A-25B5-4E09-8C72-1749C4C59591}"
