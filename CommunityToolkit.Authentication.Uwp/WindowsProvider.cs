@@ -179,7 +179,7 @@ namespace CommunityToolkit.Authentication
         }
 
         /// <inheritdoc />
-        public override async Task<string> GetTokenAsync(bool silentOnly = false)
+        public override async Task<string> GetTokenAsync(bool silentOnly = false, string[] withScopes = null)
         {
             var internetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
             if (internetConnectionProfile == null)
@@ -189,10 +189,14 @@ namespace CommunityToolkit.Authentication
                 return null;
             }
 
+            // WebAuthenticationCoreManager does not support incremental consent so we ignore the withScopes param.
+            // var scopes = withScopes ?? _scopes;
+            var scopes = _scopes;
+
             try
             {
                 // Attempt to authenticate silently.
-                var authResult = await AuthenticateSilentAsync(_scopes);
+                var authResult = await AuthenticateSilentAsync(scopes);
 
                 // Authenticate with user interaction as appropriate.
                 if (authResult?.ResponseStatus != WebTokenRequestStatus.Success)
@@ -204,7 +208,7 @@ namespace CommunityToolkit.Authentication
                     }
 
                     // Attempt to authenticate interactively.
-                    authResult = await AuthenticateInteractiveAsync(_scopes);
+                    authResult = await AuthenticateInteractiveAsync(scopes);
                 }
 
                 if (authResult?.ResponseStatus == WebTokenRequestStatus.Success)

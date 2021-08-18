@@ -52,7 +52,7 @@ namespace CommunityToolkit.Authentication
         }
 
         /// <inheritdoc/>
-        public override Task<string> GetTokenAsync(bool silentOnly = false)
+        public override Task<string> GetTokenAsync(bool silentOnly = false, string[] withScopes = null)
         {
             return Task.FromResult("<mock-provider-token>");
         }

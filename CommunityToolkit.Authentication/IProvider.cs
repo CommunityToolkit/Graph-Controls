@@ -39,8 +39,9 @@ namespace CommunityToolkit.Authentication
         /// Retrieve a token for the authenticated user.
         /// </summary>
         /// <param name="silentOnly">Determines if the acquisition should be done without prompts to the user.</param>
+        /// <param name="withScopes">Additional scopes to request access for. Only for use with auth providers that support incremental consent.</param>
         /// <returns>A token string for the authenticated user.</returns>
-        Task<string> GetTokenAsync(bool silentOnly = false);
+        Task<string> GetTokenAsync(bool silentOnly = false, string[] withScopes = null);
 
         /// <summary>
         /// Sign in the user.
