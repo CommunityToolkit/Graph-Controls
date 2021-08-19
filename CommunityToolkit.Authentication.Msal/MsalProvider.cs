@@ -6,7 +6,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Graph;
 using Microsoft.Identity.Client;
 
 namespace CommunityToolkit.Authentication
@@ -16,6 +18,8 @@ namespace CommunityToolkit.Authentication
     /// </summary>
     public class MsalProvider : BaseProvider
     {
+        private static readonly SemaphoreSlim SemaphoreSlim = new (1);
+
         /// <inheritdoc />
         public override string CurrentAccountId => _account?.HomeAccountId?.Identifier;
 
@@ -47,7 +51,7 @@ namespace CommunityToolkit.Authentication
                 .WithClientVersion(Assembly.GetExecutingAssembly().GetName().Version.ToString())
                 .Build();
 
-            Scopes = scopes ?? new string[] { string.Empty };
+            Scopes = scopes.Select(s => s.ToLower()).ToArray() ?? new string[] { string.Empty };
 
             Client = client;
 
@@ -60,7 +64,23 @@ namespace CommunityToolkit.Authentication
         /// <inheritdoc/>
         public override async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
-            string token = await GetTokenAsync();
+            string token;
+
+            // Check if any specific scopes are being requested.
+            if (request.Properties.TryGetValue(nameof(GraphRequestContext), out object requestContextObj) &&
+                requestContextObj is GraphRequestContext requestContext &&
+                requestContext.MiddlewareOptions.TryGetValue(nameof(AuthenticationHandlerOption), out IMiddlewareOption optionsMiddleware) &&
+                optionsMiddleware is AuthenticationHandlerOption options &&
+                options.AuthenticationProviderOption?.Scopes != null && options.AuthenticationProviderOption.Scopes.Length > 0)
+            {
+                var withScopes = options.AuthenticationProviderOption.Scopes;
+                token = await this.GetTokenWithScopesAsync(withScopes);
+            }
+            else
+            {
+                token = await this.GetTokenAsync();
+            }
+
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         }
 
@@ -119,42 +139,63 @@ namespace CommunityToolkit.Authentication
         }
 
         /// <inheritdoc/>
-        public override async Task<string> GetTokenAsync(bool silentOnly = false)
+        public override Task<string> GetTokenAsync(bool silentOnly = false)
         {
-            AuthenticationResult authResult = null;
+            return this.GetTokenWithScopesAsync(Scopes, silentOnly);
+        }
+
+        private async Task<string> GetTokenWithScopesAsync(string[] scopes, bool silentOnly = false)
+        {
+            await SemaphoreSlim.WaitAsync();
+
             try
             {
-                var account = _account ?? (await Client.GetAccountsAsync()).FirstOrDefault();
-                if (account != null)
-                {
-                    authResult = await Client.AcquireTokenSilent(Scopes, account).ExecuteAsync();
-                }
-            }
-            catch (MsalUiRequiredException)
-            {
-            }
-            catch
-            {
-                // Unexpected exception
-                // TODO: Send exception to a logger.
-            }
-
-            if (authResult == null && !silentOnly)
-            {
+                AuthenticationResult authResult = null;
                 try
                 {
-                    authResult = await Client.AcquireTokenInteractive(Scopes).WithPrompt(Prompt.SelectAccount).ExecuteAsync();
+                    var account = _account ?? (await Client.GetAccountsAsync()).FirstOrDefault();
+                    if (account != null)
+                    {
+                        authResult = await Client.AcquireTokenSilent(scopes, account).ExecuteAsync();
+                    }
+                }
+                catch (MsalUiRequiredException)
+                {
                 }
                 catch
                 {
                     // Unexpected exception
                     // TODO: Send exception to a logger.
                 }
+
+                if (authResult == null && !silentOnly)
+                {
+                    try
+                    {
+                        if (_account != null)
+                        {
+                            authResult = await Client.AcquireTokenInteractive(scopes).WithPrompt(Prompt.NoPrompt).WithAccount(_account).ExecuteAsync();
+                        }
+                        else
+                        {
+                            authResult = await Client.AcquireTokenInteractive(scopes).WithPrompt(Prompt.NoPrompt).ExecuteAsync();
+                        }
+                    }
+                    catch
+                    {
+                        // Unexpected exception
+                        // TODO: Send exception to a logger.
+                    }
+                }
+
+                _account = authResult?.Account;
+
+                return authResult?.AccessToken;
             }
-
-            _account = authResult?.Account;
-
-            return authResult?.AccessToken;
+            finally
+            {
+                SemaphoreSlim.Release();
+            }
         }
     }
 }
