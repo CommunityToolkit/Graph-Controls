@@ -131,6 +131,11 @@ namespace CommunityToolkit.Graph.Uwp.Controls
             else
             {
                 LoadDefaultImage();
+
+                if (!string.IsNullOrWhiteSpace(UserId) || !string.IsNullOrWhiteSpace(PersonQuery))
+                {
+                    PersonDetails = null;
+                }
             }
         }
 

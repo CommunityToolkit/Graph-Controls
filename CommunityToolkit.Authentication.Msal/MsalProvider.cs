@@ -69,8 +69,9 @@ namespace CommunityToolkit.Authentication
             // Check if any specific scopes are being requested.
             if (request.Properties.TryGetValue(nameof(GraphRequestContext), out object requestContextObj) &&
                 requestContextObj is GraphRequestContext requestContext &&
-                requestContext.MiddlewareOptions.TryGetValue(nameof(AuthenticationHandlerOption), out IMiddlewareOption optionsMiddleware) && 
-                optionsMiddleware is AuthenticationHandlerOption options)
+                requestContext.MiddlewareOptions.TryGetValue(nameof(AuthenticationHandlerOption), out IMiddlewareOption optionsMiddleware) &&
+                optionsMiddleware is AuthenticationHandlerOption options &&
+                options.AuthenticationProviderOption?.Scopes != null && options.AuthenticationProviderOption.Scopes.Length > 0)
             {
                 var withScopes = options.AuthenticationProviderOption.Scopes;
                 token = await this.GetTokenWithScopesAsync(withScopes);
@@ -140,7 +141,7 @@ namespace CommunityToolkit.Authentication
         /// <inheritdoc/>
         public override Task<string> GetTokenAsync(bool silentOnly = false)
         {
-            return GetTokenWithScopesAsync(Scopes, silentOnly);
+            return this.GetTokenWithScopesAsync(Scopes, silentOnly);
         }
 
         private async Task<string> GetTokenWithScopesAsync(string[] scopes, bool silentOnly = false)
