@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Networking.Connectivity;
 using Windows.Security.Authentication.Web;
@@ -27,6 +28,8 @@ namespace CommunityToolkit.Authentication
         /// Used for configuring the Azure app registration.
         /// </summary>
         public static string RedirectUri => string.Format("ms-appx-web://Microsoft.AAD.BrokerPlugIn/{0}", WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper());
+
+        private static readonly SemaphoreSlim SemaphoreSlim = new(1);
 
         private const string AuthenticationHeaderScheme = "Bearer";
         private const string GraphResourcePropertyKey = "resource";
@@ -181,18 +184,20 @@ namespace CommunityToolkit.Authentication
         /// <inheritdoc />
         public override async Task<string> GetTokenAsync(bool silentOnly = false)
         {
-            var internetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
-            if (internetConnectionProfile == null)
-            {
-                // We are not online, no token for you.
-                // TODO: Is there anything special to do when we go offline?
-                return null;
-            }
-
-            var scopes = _scopes;
+            await SemaphoreSlim.WaitAsync();
 
             try
             {
+                var internetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
+                if (internetConnectionProfile == null)
+                {
+                    // We are not online, no token for you.
+                    // TODO: Is there anything special to do when we go offline?
+                    return null;
+                }
+
+                var scopes = _scopes;
+
                 // Attempt to authenticate silently.
                 var authResult = await AuthenticateSilentAsync(scopes);
 
@@ -234,8 +239,11 @@ namespace CommunityToolkit.Authentication
             catch (Exception e)
             {
                 // TODO: Log failure
-                System.Diagnostics.Debug.WriteLine(e.Message);
                 throw e;
+            }
+            finally
+            {
+                SemaphoreSlim.Release();
             }
         }
 
