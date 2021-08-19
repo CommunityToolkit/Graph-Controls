@@ -73,7 +73,7 @@ namespace CommunityToolkit.Authentication
                 optionsMiddleware is AuthenticationHandlerOption options)
             {
                 var withScopes = options.AuthenticationProviderOption.Scopes;
-                token = await this.GetTokenAsync(false, withScopes);
+                token = await this.GetTokenWithScopesAsync(withScopes);
             }
             else
             {
@@ -138,14 +138,17 @@ namespace CommunityToolkit.Authentication
         }
 
         /// <inheritdoc/>
-        public override async Task<string> GetTokenAsync(bool silentOnly = false, string[] withScopes = null)
+        public override Task<string> GetTokenAsync(bool silentOnly = false)
+        {
+            return GetTokenWithScopesAsync(Scopes, silentOnly);
+        }
+
+        private async Task<string> GetTokenWithScopesAsync(string[] scopes, bool silentOnly = false)
         {
             await SemaphoreSlim.WaitAsync();
 
             try
             {
-                var scopes = withScopes ?? Scopes;
-
                 AuthenticationResult authResult = null;
                 try
                 {

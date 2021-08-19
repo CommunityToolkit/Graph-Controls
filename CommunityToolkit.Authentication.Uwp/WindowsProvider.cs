@@ -179,7 +179,7 @@ namespace CommunityToolkit.Authentication
         }
 
         /// <inheritdoc />
-        public override async Task<string> GetTokenAsync(bool silentOnly = false, string[] withScopes = null)
+        public override async Task<string> GetTokenAsync(bool silentOnly = false)
         {
             var internetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
             if (internetConnectionProfile == null)
@@ -189,8 +189,6 @@ namespace CommunityToolkit.Authentication
                 return null;
             }
 
-            // WebAuthenticationCoreManager does not support incremental consent so we ignore the withScopes param.
-            // var scopes = withScopes ?? _scopes;
             var scopes = _scopes;
 
             try
