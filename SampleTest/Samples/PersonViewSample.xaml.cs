@@ -10,7 +10,7 @@ namespace SampleTest.Samples
     {
         public PersonViewSample()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
     }
 }

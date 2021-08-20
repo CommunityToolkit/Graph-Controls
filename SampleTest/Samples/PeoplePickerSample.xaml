@@ -1,0 +1,35 @@
+﻿<Page
+    x:Class="SampleTest.Samples.PeoplePickerSample"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SampleTest.Samples"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:controls="using:CommunityToolkit.Graph.Uwp.Controls"
+    xmlns:graph="using:Microsoft.Graph"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <graph:Person x:Key="GraphPerson" />
+    </Page.Resources>
+    
+    <Grid>
+        <StackPanel>
+            <TextBlock Margin="0,0,0,16" TextWrapping="WrapWholeWords">
+                The `PeoplePicker` lets a logged in user easily search for familiar people they interact with or contacts. Great for emails or messages.
+            </TextBlock>
+            <controls:PeoplePicker x:Name="PeopleChooser" />
+            <TextBlock Margin="0,8,0,0" FontWeight="Bold">
+                Picked People:
+            </TextBlock>
+            <ItemsControl Margin="8,0,0,0" ItemsSource="{x:Bind PeopleChooser.ItemsSource}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="graph:Person">
+                        <TextBlock Text="{x:Bind DisplayName}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Grid>
+</Page>
