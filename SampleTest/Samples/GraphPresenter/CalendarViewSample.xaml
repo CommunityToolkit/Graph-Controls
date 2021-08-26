@@ -1,0 +1,72 @@
+﻿<Page
+    x:Class="SampleTest.Samples.GraphPresenter.CalendarViewSample"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SampleTest.Samples.GraphPresenter"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.Graph.Uwp.Controls"
+    xmlns:global="using:System.Globalization"
+    xmlns:graph="using:Microsoft.Graph"
+    xmlns:samples="using:SampleTest.Samples"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock>
+                The following example shows the `Me.CalendarView` API.
+            </TextBlock>
+            <TextBlock Margin="0,8,0,0" FontWeight="Bold">
+                My Upcoming Calendar Events:
+            </TextBlock>
+        </StackPanel>
+        <controls:GraphPresenter
+            Grid.Row="1"
+            IsCollection="True"
+            OrderBy="start/dateTime"
+            RequestBuilder="{x:Bind CalendarViewRequestBuilder, Mode=OneWay}"
+            ResponseType="graph:Event">
+            <controls:GraphPresenter.QueryOptions>
+                <!--  Need to create separate Properties as multiple functions not supported in x:Bind see https://github.com/microsoft/microsoft-ui-xaml/issues/2407  -->
+                <controls:QueryOption Name="startDateTime" Value="{x:Bind Today.ToString('o', global:CultureInfo.InvariantCulture)}" />
+                <controls:QueryOption Name="endDateTime" Value="{x:Bind ThreeDaysFromNow.ToString('o', global:CultureInfo.InvariantCulture)}" />
+            </controls:GraphPresenter.QueryOptions>
+            <controls:GraphPresenter.ContentTemplate>
+                <DataTemplate>
+                    <!--  Return result is a collection of Event's as we used 'IsCollection', so bind that first.  -->
+                    <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="graph:Event">
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="{Binding Subject}" />
+                                        <TextBlock FontWeight="Bold">
+                                            <Run Text="{x:Bind samples:GraphPresenterSample.ToLocalTime(Start), Mode=OneWay}" />
+                                            <Run>-</Run>
+                                            <Run Text="{x:Bind samples:GraphPresenterSample.ToLocalTime(End), Mode=OneWay}" />
+                                        </TextBlock>
+                                        <TextBlock>
+                                            <Run FontFamily="Segoe MDL2 Assets" Text="&#xE707;" />
+                                            <Run />
+                                            <Run Text="{x:Bind Location.DisplayName, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Margin" Value="0,8,0,8" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DataTemplate>
+            </controls:GraphPresenter.ContentTemplate>
+        </controls:GraphPresenter>
+    </Grid>
+</Page>
