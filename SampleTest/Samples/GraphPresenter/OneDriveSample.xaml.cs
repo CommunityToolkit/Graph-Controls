@@ -40,87 +40,62 @@ namespace SampleTest.Samples.GraphPresenter
                     break;
             }
         }
-    }
 
-    internal sealed class AsyncResult<TResult> : ObservableObject
-    {
-        private TaskNotifier<TResult> taskNotifier;
-
-        public Task<TResult> Task
-        {
-            get => taskNotifier;
-            private set
-            {
-                SetPropertyAndNotifyOnCompletion(ref taskNotifier, value, nameof(ResultOrDefault));
-            }
-        }
-
-        public AsyncResult(Task<TResult> task)
-        {
-            Task = task;
-        }
-
-        public TResult ResultOrDefault => this.Task.GetResultOrDefault();
-    }
-
-    public class OneDriveThumbnailConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            if (value is RemoteItem ri)
-            {
-                // drives/${file.remoteItem.parentReference.driveId}/items/${file.remoteItem.id}/thumbnails/0/medium
-                var provider = ProviderManager.Instance.GlobalProvider;
-                if (provider?.State == ProviderState.SignedIn)
-                {
-                    var graph = provider.GetClient();
-                    return new AsyncResult<ThumbnailSet>(graph.Drives[ri.ParentReference.DriveId].Items[ri.Id].Thumbnails["0"].Request().GetAsync());
-                }
-            }
-
-            return null;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class FileSizeConverter : IValueConverter
-    {
         private static readonly string[] Suffixes = { "B", "KB", "MB", "GB", "TB" };
 
-        public object Convert(object value, Type targetType, object parameter, string language)
+        public static string FormatFileSize(Int64? size)
         {
-            if (value is long size)
+            float number = size ?? throw new ArgumentNullException(nameof(size));
+
+            var suffixIndex = 0;
+            string Output() => $"{Math.Round(number)}{Suffixes[suffixIndex]}";
+
+            do
             {
-                float number = size;
-
-                var suffixIndex = 0;
-                string Output() => $"{Math.Round(number)}{Suffixes[suffixIndex]}";
-
-                do
+                if (number < 1024f)
                 {
-                    if (number < 1024f)
-                    {
-                        return Output();
-                    }
-
-                    number = number / 1024f;
+                    return Output();
                 }
-                while (++suffixIndex < Suffixes.Length - 1);
 
-                return Output();
+                number = number / 1024f;
+            }
+            while (++suffixIndex < Suffixes.Length - 1);
+
+            return Output();
+        }
+
+        public static AsyncResult<ThumbnailSet> GetThumbnail(RemoteItem ri)
+        {
+            // drives/${file.remoteItem.parentReference.driveId}/items/${file.remoteItem.id}/thumbnails/0/medium
+            var provider = ProviderManager.Instance.GlobalProvider;
+            if (provider?.State == ProviderState.SignedIn)
+            {
+                var graph = provider.GetClient();
+                return new AsyncResult<ThumbnailSet>(graph.Drives[ri.ParentReference.DriveId].Items[ri.Id].Thumbnails["0"].Request().GetAsync());
             }
 
             return null;
-
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        public sealed class AsyncResult<TResult> : ObservableObject
         {
-            throw new NotImplementedException();
+            private TaskNotifier<TResult> taskNotifier;
+
+            public Task<TResult> Task
+            {
+                get => taskNotifier;
+                private set
+                {
+                    SetPropertyAndNotifyOnCompletion(ref taskNotifier, value, nameof(ResultOrDefault));
+                }
+            }
+
+            public AsyncResult(Task<TResult> task)
+            {
+                Task = task;
+            }
+
+            public TResult ResultOrDefault => this.Task.GetResultOrDefault();
         }
     }
 }

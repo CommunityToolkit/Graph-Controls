@@ -11,11 +11,6 @@
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
-    <Page.Resources>
-        <local:OneDriveThumbnailConverter x:Key="OneDriveThumbnailConverter" />
-        <local:FileSizeConverter x:Key="FileSizeConverter" />
-    </Page.Resources>
     
     <Grid>
         <wgt:GraphPresenter 
@@ -40,7 +35,7 @@
                                         </Grid.ColumnDefinitions>
                                         <controls:ImageEx 
                                             Grid.RowSpan="2"
-                                            DataContext="{x:Bind RemoteItem, Converter={StaticResource OneDriveThumbnailConverter}}"
+                                            DataContext="{x:Bind local:OneDriveSample.GetThumbnail(RemoteItem)}"
                                             PlaceholderSource="/Assets/FileIcon.png"
                                             Source="{Binding ResultOrDefault.Medium.Url}"
                                             Width="48"
@@ -51,7 +46,7 @@
                                         <TextBlock 
                                             Grid.Column="1"
                                             Grid.Row="1"
-                                            Text="{Binding Size, Converter={StaticResource FileSizeConverter}}"/>
+                                            Text="{x:Bind local:OneDriveSample.FormatFileSize(Size)}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
