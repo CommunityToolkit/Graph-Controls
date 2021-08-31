@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Foundation.Metadata;
 using Windows.UI.Xaml;
 
 namespace CommunityToolkit.Graph.Uwp.Controls
@@ -14,6 +15,7 @@ namespace CommunityToolkit.Graph.Uwp.Controls
     /// <summary>
     /// XAML Proxy for <see cref="Microsoft.Graph.QueryOption"/>.
     /// </summary>
+    [Experimental]
     public sealed class QueryOption
     {
         /// <inheritdoc cref="Microsoft.Graph.Option.Name"/>

@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Threading;
 using Microsoft.Graph;
 using Microsoft.Toolkit.Uwp;
+using Windows.Foundation.Metadata;
 using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -18,6 +19,7 @@ namespace CommunityToolkit.Graph.Uwp.Controls
     /// <summary>
     /// Specialized <see cref="ContentPresenter"/> to fetch and display data from the Microsoft Graph.
     /// </summary>
+    [Experimental]
     public class GraphPresenter : ContentPresenter
     {
         /// <summary>
