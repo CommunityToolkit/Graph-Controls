@@ -20,7 +20,6 @@ namespace CommunityToolkit.Graph.Uwp.Controls
     /// </summary>
     public class GraphPresenter : ContentPresenter
     {
-
         /// <summary>
         /// Identifies the <see cref="RequestBuilder"/> dependency property.
         /// </summary>

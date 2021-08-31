@@ -95,10 +95,35 @@ namespace CommunityToolkit.Graph.Helpers.RoamingSettings
         }
 
         /// <inheritdoc />
-        public Task DeleteItemAsync(string itemPath)
+        public async Task<bool> TryDeleteItemAsync(string itemPath)
         {
-            var graph = GetGraphClient();
-            return graph.DeleteItemAsync(UserId, itemPath);
+            try
+            {
+                var graph = GetGraphClient();
+                await graph.DeleteItemAsync(UserId, itemPath);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> TryRenameItemAsync(string itemPath, string newName)
+        {
+            try
+            {
+                var graph = GetGraphClient();
+                await graph.RenameItemAsync(UserId, itemPath, newName);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private static GraphServiceClient GetGraphClient()

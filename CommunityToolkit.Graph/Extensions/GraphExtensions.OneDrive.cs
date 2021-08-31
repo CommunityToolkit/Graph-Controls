@@ -20,6 +20,11 @@ namespace CommunityToolkit.Graph.Extensions
         /// <summary>
         /// Updates or create a new file on the remote with the provided content.
         /// </summary>
+        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
+        /// <param name="userId">The id of the target Graph user.</param>
+        /// <param name="itemPath">The path of the target item.</param>
+        /// <param name="fileContents">The contents to put in the file.</param>
+        /// <param name="serializer">A serializer for converting stored values.</param>
         /// <typeparam name="T">The type of object to save.</typeparam>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task<DriveItem> SetFileAsync<T>(this GraphServiceClient graph, string userId, string itemPath, T fileContents, IObjectSerializer serializer)
@@ -33,6 +38,10 @@ namespace CommunityToolkit.Graph.Extensions
         /// <summary>
         /// Get a file from the remote.
         /// </summary>
+        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
+        /// <param name="userId">The id of the target Graph user.</param>
+        /// <param name="itemPath">The path of the target item.</param>
+        /// <param name="serializer">A serializer for converting stored values.</param>
         /// <typeparam name="T">The type of object to return.</typeparam>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task<T> GetFileAsync<T>(this GraphServiceClient graph, string userId, string itemPath, IObjectSerializer serializer)
@@ -47,10 +56,31 @@ namespace CommunityToolkit.Graph.Extensions
         /// <summary>
         /// Delete the file from the remote.
         /// </summary>
+        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
+        /// <param name="userId">The id of the target Graph user.</param>
+        /// <param name="itemPath">The path of the target item.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public static async Task DeleteItemAsync(this GraphServiceClient graph, string userId, string itemPath)
         {
             await graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(itemPath).Request().DeleteAsync();
+        }
+
+        /// <summary>
+        /// Rename an item.
+        /// </summary>
+        /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
+        /// <param name="userId">The id of the target Graph user.</param>
+        /// <param name="itemPath">The path of the target item.</param>
+        /// <param name="newName">The new name for the item.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task RenameItemAsync(this GraphServiceClient graph, string userId, string itemPath, string newName)
+        {
+            var driveItem = new DriveItem
+            {
+                Name = newName,
+            };
+
+            await graph.Users[userId].Drive.Special.AppRoot.ItemWithPath(itemPath).Request().UpdateAsync(driveItem);
         }
 
         /// <summary>
