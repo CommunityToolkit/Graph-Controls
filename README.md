@@ -96,7 +96,7 @@ ProviderManager.Instance.ProviderStateChanged += OnProviderStateChanged;
 
 void OnProviderStateChanged(object sender, ProviderStateChangedEventArgs args)
 {
-    var provider = ProviderMananager.Instance.GlobalProvider;
+    var provider = ProviderManager.Instance.GlobalProvider;
     if (provider?.State == ProviderState.SignedIn)
     {
         var graphClient = provider.GetClient();
