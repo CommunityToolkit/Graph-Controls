@@ -2,15 +2,15 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Helpers.RoamingSettings;
 using Microsoft.Toolkit.Helpers;
 using Microsoft.Toolkit.Uwp;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace UnitTests.UWP.Helpers
 {
@@ -77,7 +77,8 @@ namespace UnitTests.UWP.Helpers
                     Assert.AreEqual(fileContents2, readContents2);
 
                     // Delete a file
-                    await storageHelper.DeleteItemAsync(filePath);
+                    var itemDeleted = await storageHelper.TryDeleteItemAsync(filePath);
+                    Assert.IsTrue(itemDeleted);
 
                     tcs.SetResult(true);
                 }
@@ -111,7 +112,7 @@ namespace UnitTests.UWP.Helpers
 
                     // Create a folder
                     await storageHelper.CreateFolderAsync(folderName);
-                    
+
                     // Create a subfolder
                     await storageHelper.CreateFolderAsync(subfolderName, folderName);
 
@@ -132,7 +133,8 @@ namespace UnitTests.UWP.Helpers
                     Assert.AreEqual(DirectoryItemType.File, folderItemsList[1].ItemType);
 
                     // Delete a folder
-                    await storageHelper.DeleteItemAsync(folderName);
+                    var itemDeleted = await storageHelper.TryDeleteItemAsync(folderName);
+                    Assert.IsTrue(itemDeleted);
 
                     tcs.SetResult(true);
                 }

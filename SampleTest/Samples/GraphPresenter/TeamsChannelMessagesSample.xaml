@@ -1,0 +1,64 @@
+﻿<Page
+    x:Class="SampleTest.Samples.GraphPresenter.TeamsChannelMessagesSample"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SampleTest.Samples.GraphPresenter"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.Graph.Uwp.Controls"
+    xmlns:graph="using:Microsoft.Graph"
+    xmlns:toolkit="using:Microsoft.Toolkit"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock>
+                The following example shows the beta `Teams/id/Channels/id/messages` API for getting a list of messages (without replies) from a Channel in Teams.
+            </TextBlock>
+            <TextBlock Margin="0,8,0,0" FontWeight="Bold">
+                My Chat Messages:
+            </TextBlock>
+        </StackPanel>
+        <controls:GraphPresenter
+            Grid.Row="1"
+            IsCollection="True"
+            RequestBuilder="{x:Bind TeamsChannelMessagesRequestBuilder, Mode=OneWay}"
+            ResponseType="graph:ChatMessage">
+            <controls:GraphPresenter.ContentTemplate>
+                <DataTemplate>
+                    <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="graph:ChatMessage">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <controls:PersonView 
+                                            Margin="-4,-4,8,-4" 
+                                            UserId="{x:Bind From.User.Id, Mode=OneWay}" />
+                                        <TextBlock 
+                                            Grid.Column="1"
+                                            Text="{x:Bind toolkit:StringExtensions.DecodeHtml(Body.Content), Mode=OneWay}"
+                                            TextWrapping="WrapWholeWords" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Margin" Value="0,8,0,8" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DataTemplate>
+            </controls:GraphPresenter.ContentTemplate>
+        </controls:GraphPresenter>
+    </Grid>
+</Page>

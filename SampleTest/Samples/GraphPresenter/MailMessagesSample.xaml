@@ -1,0 +1,63 @@
+﻿<Page
+    x:Class="SampleTest.Samples.GraphPresenter.MailMessagesSample"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SampleTest.Samples.GraphPresenter"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.Graph.Uwp.Controls"
+    xmlns:graph="using:Microsoft.Graph"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock>
+                The following example shows the `Me.Messages` API for getting a user's inbox mail messages.
+            </TextBlock>
+            <TextBlock Margin="0,8,0,0" FontWeight="Bold">
+                My Messages:
+            </TextBlock>
+        </StackPanel>
+        <controls:GraphPresenter
+            Grid.Row="1"
+            IsCollection="True"
+            RequestBuilder="{x:Bind MessagesRequestBuilder, Mode=OneWay}"
+            ResponseType="graph:Message">
+            <controls:GraphPresenter.ContentTemplate>
+                <DataTemplate>
+                    <ScrollViewer HorizontalScrollMode="Disabled" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="graph:Message">
+                                    <StackPanel>
+                                        <controls:PersonView
+                                            Margin="-4"
+                                            PersonQuery="{x:Bind Sender.EmailAddress.Address}"
+                                            PersonViewType="OneLine" />
+                                        <TextBlock
+                                            Padding="0"
+                                            Style="{StaticResource BaseTextBlockStyle}"
+                                            Text="{x:Bind Subject}" />
+                                        <TextBlock 
+                                            Text="{x:Bind local:MailMessagesSample.RemoveWhitespace(BodyPreview)}"
+                                            TextWrapping="WrapWholeWords" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Margin" Value="0,8,0,8" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DataTemplate>
+            </controls:GraphPresenter.ContentTemplate>
+        </controls:GraphPresenter>
+    </Grid>
+</Page>
