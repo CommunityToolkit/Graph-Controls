@@ -8,7 +8,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Networking.Connectivity;
 using Windows.Security.Authentication.Web;
 using Windows.Security.Authentication.Web.Core;
 using Windows.Security.Credentials;
@@ -23,14 +22,6 @@ namespace CommunityToolkit.Authentication
     /// </summary>
     public class WindowsProvider : BaseProvider
     {
-        /// <summary>
-        /// Gets the redirect uri value based on the current app callback uri.
-        /// Used for configuring the Azure app registration.
-        /// </summary>
-        public static string RedirectUri => string.Format("ms-appx-web://Microsoft.AAD.BrokerPlugIn/{0}", WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper());
-
-        private static readonly SemaphoreSlim SemaphoreSlim = new(1);
-
         private const string AuthenticationHeaderScheme = "Bearer";
         private const string GraphResourcePropertyKey = "resource";
         private const string GraphResourcePropertyValue = "https://graph.microsoft.com";
@@ -41,12 +32,20 @@ namespace CommunityToolkit.Authentication
         private const string SettingsKeyAccountId = "WindowsProvider_AccountId";
         private const string SettingsKeyProviderId = "WindowsProvider_ProviderId";
 
+        private static readonly SemaphoreSlim SemaphoreSlim = new (1);
+
         // Default/minimal scopes for authentication, if none are provided.
         private static readonly string[] DefaultScopes = { "User.Read" };
 
         // The default account providers available in the AccountsSettingsPane.
         // Default is Msa because it does not require any additional configuration
         private static readonly WebAccountProviderType DefaultWebAccountsProviderType = WebAccountProviderType.Msa;
+
+        /// <summary>
+        /// Gets the redirect uri value based on the current app callback uri.
+        /// Used for configuring the Azure app registration.
+        /// </summary>
+        public static string RedirectUri => string.Format("ms-appx-web://Microsoft.AAD.BrokerPlugIn/{0}", WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper());
 
         /// <inheritdoc />
         public override string CurrentAccountId => _webAccount?.Id;
@@ -188,14 +187,6 @@ namespace CommunityToolkit.Authentication
 
             try
             {
-                var internetConnectionProfile = NetworkInformation.GetInternetConnectionProfile();
-                if (internetConnectionProfile == null)
-                {
-                    // We are not online, no token for you.
-                    // TODO: Is there anything special to do when we go offline?
-                    return null;
-                }
-
                 var scopes = _scopes;
 
                 // Attempt to authenticate silently.
