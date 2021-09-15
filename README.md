@@ -36,6 +36,10 @@ Check out our samples for getting started with authentication providers and maki
 - [WpfMsalProviderSample](./Samples/WpfMsalProviderSample)
 - [ManualGraphRequestSample](./Samples/ManualGraphRequestSample)
 
+### Contoso Notes Sample
+
+[Contoso Notes](https://github.com/CommunityToolkit/Sample-Graph-ContosoNotes) is a premier sample note-taking app infused with Graph powered features and controls from the Windows Community Toolkit, demonstrated in practical application scenarios.
+
 ## <a name="documentation"></a> Getting Started
 
 To get started using Graph data in your application, you'll first need to enable authentication.
