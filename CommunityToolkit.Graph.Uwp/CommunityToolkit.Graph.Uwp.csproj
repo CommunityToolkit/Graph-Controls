@@ -23,8 +23,8 @@
   </PropertyGroup>
     
 	<ItemGroup>
-    <PackageReference Include="Microsoft.Graph" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.Input" Version="7.1.0-rc1" />
+    <PackageReference Include="Microsoft.Graph" Version="4.5.0" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.Input" Version="7.1.0-rc2" />
   </ItemGroup>
 
   <ItemGroup>
