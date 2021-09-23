@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Graph" Version="4.5.0" />
-    <PackageReference Include="Microsoft.Toolkit" Version="7.1.0-rc2" />
+    <PackageReference Include="Microsoft.Toolkit" Version="7.1.0" />
   </ItemGroup>
 
   <ItemGroup>
