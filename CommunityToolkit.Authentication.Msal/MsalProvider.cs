@@ -2,14 +2,21 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
+
+#if WINDOWS_UWP
+using Windows.Security.Authentication.Web;
+#else
+using System.Diagnostics;
+using Microsoft.Identity.Client.Extensions.Msal;
+#endif
 
 namespace CommunityToolkit.Authentication
 {
@@ -18,10 +25,19 @@ namespace CommunityToolkit.Authentication
     /// </summary>
     public class MsalProvider : BaseProvider
     {
+        public static readonly string RedirectUriPrefix = "ms-appx-web://microsoft.aad.brokerplugin/";
+
         private static readonly SemaphoreSlim SemaphoreSlim = new (1);
+
+        private IAccount _account;
 
         /// <inheritdoc />
         public override string CurrentAccountId => _account?.HomeAccountId?.Identifier;
+
+        /// <summary>
+        /// Gets the configuration values for creating the <see cref="PublicClientApplication"/> instance.
+        /// </summary>
+        protected PublicClientApplicationConfig Config { get; private set; }
 
         /// <summary>
         /// Gets the MSAL.NET Client used to authenticate the user.
@@ -31,34 +47,40 @@ namespace CommunityToolkit.Authentication
         /// <summary>
         /// Gets an array of scopes to use for accessing Graph resources.
         /// </summary>
-        protected string[] Scopes { get; private set; }
-
-        private IAccount _account;
+        protected string[] Scopes => Config.Scopes;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MsalProvider"/> class.
+        /// Initializes a new instance of the <see cref="MsalProvider"/> class using a configuration object.
+        /// </summary>
+        /// <param name="config">Configuration values for building the <see cref="PublicClientApplication"/> instance.</param>
+        /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon creation.</param>
+        public MsalProvider(PublicClientApplicationConfig config, bool autoSignIn = true)
+        {
+            Config = config;
+            Client = CreatePublicClientApplication(config);
+
+            InitTokenCacheAsync(autoSignIn);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MsalProvider"/> class with default configuration values.
         /// </summary>
         /// <param name="clientId">Registered ClientId.</param>
         /// <param name="redirectUri">RedirectUri for auth response.</param>
         /// <param name="scopes">List of Scopes to initially request.</param>
-        /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon instantionation.</param>
-        public MsalProvider(string clientId, string[] scopes = null, string redirectUri = "https://login.microsoftonline.com/common/oauth2/nativeclient", bool autoSignIn = true)
+        /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon creation.</param>
+        public MsalProvider(string clientId, string[] scopes = null, string redirectUri = null, bool autoSignIn = true)
         {
-            var client = PublicClientApplicationBuilder.Create(clientId)
-                .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
-                .WithRedirectUri(redirectUri)
-                .WithClientName(ProviderManager.ClientName)
-                .WithClientVersion(Assembly.GetExecutingAssembly().GetName().Version.ToString())
-                .Build();
-
-            Scopes = scopes.Select(s => s.ToLower()).ToArray() ?? new string[] { string.Empty };
-
-            Client = client;
-
-            if (autoSignIn)
+            Config = new PublicClientApplicationConfig()
             {
-                _ = TrySilentSignInAsync();
-            }
+                ClientId = clientId,
+                Scopes = scopes.Select(s => s.ToLower()).ToArray() ?? new string[] { string.Empty },
+                RedirectUri = redirectUri,
+            };
+
+            Client = CreatePublicClientApplication(Config);
+
+            InitTokenCacheAsync(autoSignIn);
         }
 
         /// <inheritdoc/>
@@ -144,6 +166,62 @@ namespace CommunityToolkit.Authentication
             return this.GetTokenWithScopesAsync(Scopes, silentOnly);
         }
 
+        private static IPublicClientApplication CreatePublicClientApplication(PublicClientApplicationConfig config)
+        {
+            var clientBuilder = PublicClientApplicationBuilder.Create(config.ClientId)
+                .WithAuthority(AzureCloudInstance.AzurePublic, config.Authority)
+                .WithClientName(config.ClientName)
+                .WithClientVersion(config.ClientVersion);
+
+#if WINDOWS_UWP
+            clientBuilder = clientBuilder
+                .WithBroker()
+                .WithWindowsBrokerOptions(new WindowsBrokerOptions()
+                {
+                    ListWindowsWorkAndSchoolAccounts = true,
+                });
+#endif
+
+            if (config.RedirectUri == null)
+            {
+#if WINDOWS_UWP
+                string sid = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper();
+                config.RedirectUri = $"{RedirectUriPrefix}{sid}";
+#else
+                config.RedirectUri = "http://localhost";
+                // config.RedirectUri = $"{RedirectUriPrefix}{config.ClientId}";
+#endif
+            }
+
+            return clientBuilder.WithRedirectUri(config.RedirectUri).Build();
+        }
+
+        private async Task InitTokenCacheAsync(bool trySignIn)
+        {
+#if !WINDOWS_UWP
+            // Token cache persistence (not required on UWP as MSAL does it for you)
+            var storageProperties = new StorageCreationPropertiesBuilder(Config.CacheFileName, Config.CacheDir)
+                .WithLinuxKeyring(
+                    Config.LinuxKeyRingSchema,
+                    Config.LinuxKeyRingCollection,
+                    Config.LinuxKeyRingLabel,
+                    Config.LinuxKeyRingAttr1,
+                    Config.LinuxKeyRingAttr2)
+                .WithMacKeyChain(
+                    Config.KeyChainServiceName,
+                    Config.KeyChainAccountName)
+                .Build();
+
+            var cacheHelper = await MsalCacheHelper.CreateAsync(storageProperties);
+            cacheHelper.RegisterCache(Client.UserTokenCache);
+#endif
+
+            if (trySignIn)
+            {
+                _ = TrySilentSignInAsync();
+            }
+        }
+
         private async Task<string> GetTokenWithScopesAsync(string[] scopes, bool silentOnly = false)
         {
             await SemaphoreSlim.WaitAsync();
@@ -172,14 +250,26 @@ namespace CommunityToolkit.Authentication
                 {
                     try
                     {
+                        var paramBuilder = Client.AcquireTokenInteractive(scopes);
+
                         if (_account != null)
                         {
-                            authResult = await Client.AcquireTokenInteractive(scopes).WithPrompt(Prompt.NoPrompt).WithAccount(_account).ExecuteAsync();
+                            paramBuilder = paramBuilder.WithAccount(_account);
                         }
-                        else
-                        {
-                            authResult = await Client.AcquireTokenInteractive(scopes).WithPrompt(Prompt.NoPrompt).ExecuteAsync();
-                        }
+
+#if WINDOWS_UWP
+                        // For UWP, specify NoPrompt for the least intrusive user experience.
+                        paramBuilder = paramBuilder.WithPrompt(Prompt.NoPrompt);
+#else
+                        // Otherwise, get the process by FriendlyName from Application Domain
+                        var friendlyName = AppDomain.CurrentDomain.FriendlyName;
+                        var proc = Process.GetProcessesByName(friendlyName).First();
+
+                        var windowHandle = proc.MainWindowHandle;
+                        paramBuilder = paramBuilder.WithParentActivityOrWindow(windowHandle);
+#endif
+
+                        authResult = await paramBuilder.ExecuteAsync();
                     }
                     catch
                     {
