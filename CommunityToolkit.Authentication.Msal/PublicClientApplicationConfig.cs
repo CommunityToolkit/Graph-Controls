@@ -93,8 +93,9 @@ namespace CommunityToolkit.Authentication
         /// </summary>
         public KeyValuePair<string, string> LinuxKeyRingAttr2 { get; set; } = new KeyValuePair<string, string>("ProductGroup", "MyApps");
 
-        // For Username / Password flow - to be used only for testing!
-        // public const string Username = "";
-        // public const string Password = "";
+        /// <summary>
+        /// Gets or sets a value indicating whether the user should be able to login with organizational accounts or not.
+        /// </summary>
+        public bool ListWindowsWorkAndSchoolAccounts { get; set; } = true;
     }
 }

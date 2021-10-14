@@ -25,14 +25,20 @@ namespace CommunityToolkit.Authentication
     /// </summary>
     public class MsalProvider : BaseProvider
     {
-        public static readonly string RedirectUriPrefix = "ms-appx-web://microsoft.aad.brokerplugin/";
+        /// <summary>
+        /// A prefix value used to create the redirect URI value for use in AAD.
+        /// </summary>
+        public static readonly string MSAccountBrokerRedirectUriPrefix = "ms-appx-web://microsoft.aad.brokerplugin/";
 
         private static readonly SemaphoreSlim SemaphoreSlim = new (1);
 
-        private IAccount _account;
+        /// <summary>
+        /// Gets or sets the currently authenticated user account.
+        /// </summary>
+        public IAccount Account { get; protected set; }
 
         /// <inheritdoc />
-        public override string CurrentAccountId => _account?.HomeAccountId?.Identifier;
+        public override string CurrentAccountId => Account?.HomeAccountId?.Identifier;
 
         /// <summary>
         /// Gets the configuration values for creating the <see cref="PublicClientApplication"/> instance.
@@ -109,7 +115,7 @@ namespace CommunityToolkit.Authentication
         /// <inheritdoc/>
         public override async Task<bool> TrySilentSignInAsync()
         {
-            if (_account != null && State == ProviderState.SignedIn)
+            if (Account != null && State == ProviderState.SignedIn)
             {
                 return true;
             }
@@ -130,7 +136,7 @@ namespace CommunityToolkit.Authentication
         /// <inheritdoc/>
         public override async Task SignInAsync()
         {
-            if (_account != null || State != ProviderState.SignedOut)
+            if (Account != null || State != ProviderState.SignedOut)
             {
                 return;
             }
@@ -151,10 +157,10 @@ namespace CommunityToolkit.Authentication
         /// <inheritdoc />
         public override async Task SignOutAsync()
         {
-            if (_account != null)
+            if (Account != null)
             {
-                await Client.RemoveAsync(_account);
-                _account = null;
+                await Client.RemoveAsync(Account);
+                Account = null;
             }
 
             State = ProviderState.SignedOut;
@@ -166,7 +172,12 @@ namespace CommunityToolkit.Authentication
             return this.GetTokenWithScopesAsync(Scopes, silentOnly);
         }
 
-        private static IPublicClientApplication CreatePublicClientApplication(PublicClientApplicationConfig config)
+        /// <summary>
+        /// Create an instance of <see cref="PublicClientApplication"/> using the provided config.
+        /// </summary>
+        /// <param name="config">An set of properties used to configure the <see cref="PublicClientApplication"/> creation.</param>
+        /// <returns>A new instance of <see cref="PublicClientApplication"/>.</returns>
+        protected IPublicClientApplication CreatePublicClientApplication(PublicClientApplicationConfig config)
         {
             var clientBuilder = PublicClientApplicationBuilder.Create(config.ClientId)
                 .WithAuthority(AzureCloudInstance.AzurePublic, config.Authority)
@@ -178,7 +189,7 @@ namespace CommunityToolkit.Authentication
                 .WithBroker()
                 .WithWindowsBrokerOptions(new WindowsBrokerOptions()
                 {
-                    ListWindowsWorkAndSchoolAccounts = true,
+                    ListWindowsWorkAndSchoolAccounts = config.ListWindowsWorkAndSchoolAccounts,
                 });
 #endif
 
@@ -186,17 +197,22 @@ namespace CommunityToolkit.Authentication
             {
 #if WINDOWS_UWP
                 string sid = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper();
-                config.RedirectUri = $"{RedirectUriPrefix}{sid}";
+                config.RedirectUri = $"{MSAccountBrokerRedirectUriPrefix}{sid}";
 #else
                 config.RedirectUri = "http://localhost";
-                // config.RedirectUri = $"{RedirectUriPrefix}{config.ClientId}";
+                // config.RedirectUri = $"{MSAccountBrokerRedirectUriPrefix}{config.ClientId}";
 #endif
             }
 
             return clientBuilder.WithRedirectUri(config.RedirectUri).Build();
         }
 
-        private async Task InitTokenCacheAsync(bool trySignIn)
+        /// <summary>
+        /// Initialize the token cache and if requested, attempt to sign in silently.
+        /// </summary>
+        /// <param name="trySignIn">A value indicating whether to attempt silent login after the cache configuration.</param>
+        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+        protected async Task InitTokenCacheAsync(bool trySignIn)
         {
 #if !WINDOWS_UWP
             // Token cache persistence (not required on UWP as MSAL does it for you)
@@ -222,7 +238,13 @@ namespace CommunityToolkit.Authentication
             }
         }
 
-        private async Task<string> GetTokenWithScopesAsync(string[] scopes, bool silentOnly = false)
+        /// <summary>
+        /// Retrieve an authorization token using the provided scopes.
+        /// </summary>
+        /// <param name="scopes">An array of scopes to pass along with the Graph request.</param>
+        /// <param name="silentOnly">A value to determine whether account broker UI should be shown, if required by MSAL.</param>
+        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
+        protected async Task<string> GetTokenWithScopesAsync(string[] scopes, bool silentOnly = false)
         {
             await SemaphoreSlim.WaitAsync();
 
@@ -231,7 +253,7 @@ namespace CommunityToolkit.Authentication
                 AuthenticationResult authResult = null;
                 try
                 {
-                    var account = _account ?? (await Client.GetAccountsAsync()).FirstOrDefault();
+                    var account = Account ?? (await Client.GetAccountsAsync()).FirstOrDefault();
                     if (account != null)
                     {
                         authResult = await Client.AcquireTokenSilent(scopes, account).ExecuteAsync();
@@ -252,9 +274,9 @@ namespace CommunityToolkit.Authentication
                     {
                         var paramBuilder = Client.AcquireTokenInteractive(scopes);
 
-                        if (_account != null)
+                        if (Account != null)
                         {
-                            paramBuilder = paramBuilder.WithAccount(_account);
+                            paramBuilder = paramBuilder.WithAccount(Account);
                         }
 
 #if WINDOWS_UWP
@@ -278,7 +300,7 @@ namespace CommunityToolkit.Authentication
                     }
                 }
 
-                _account = authResult?.Account;
+                Account = authResult?.Account;
 
                 return authResult?.AccessToken;
             }
