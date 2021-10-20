@@ -92,6 +92,8 @@ namespace CommunityToolkit.Authentication
         /// <inheritdoc/>
         public override async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
+            AddSdkVersion(request);
+
             string token;
 
             // Check if any specific scopes are being requested.
@@ -200,7 +202,6 @@ namespace CommunityToolkit.Authentication
                 config.RedirectUri = $"{MSAccountBrokerRedirectUriPrefix}{sid}";
 #else
                 config.RedirectUri = "http://localhost";
-                // config.RedirectUri = $"{MSAccountBrokerRedirectUriPrefix}{config.ClientId}";
 #endif
             }
 

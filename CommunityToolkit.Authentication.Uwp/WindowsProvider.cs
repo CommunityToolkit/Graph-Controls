@@ -110,6 +110,8 @@ namespace CommunityToolkit.Authentication
         /// <inheritdoc />
         public override async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
+            AddSdkVersion(request);
+
             string token = await GetTokenAsync();
             request.Headers.Authorization = new AuthenticationHeaderValue(AuthenticationHeaderScheme, token);
         }

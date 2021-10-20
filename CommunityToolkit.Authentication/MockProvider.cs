@@ -38,6 +38,9 @@ namespace CommunityToolkit.Authentication
         /// <inheritdoc/>
         public override async Task AuthenticateRequestAsync(HttpRequestMessage request)
         {
+            // Append the SDK version header
+            AddSdkVersion(request);
+
             // Append the token auth header
             request.AddMockProviderToken();
 

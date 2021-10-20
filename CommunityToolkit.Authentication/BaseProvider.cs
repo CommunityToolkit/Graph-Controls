@@ -5,6 +5,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CommunityToolkit.Authentication.Extensions;
 
 namespace CommunityToolkit.Authentication
 {
@@ -61,5 +62,16 @@ namespace CommunityToolkit.Authentication
 
         /// <inheritdoc />
         public abstract Task<bool> TrySilentSignInAsync();
+
+        /// <summary>
+        /// Append the Sdk version to the request headers.
+        /// </summary>
+        /// <param name="request">
+        /// The request to append the header to.
+        /// </param>
+        protected void AddSdkVersion(HttpRequestMessage request)
+        {
+            request.AddSdkVersion();
+        }
     }
 }
