@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Graph;
@@ -15,7 +16,6 @@ using Microsoft.Identity.Client;
 using Windows.Security.Authentication.Web;
 #else
 using System.Diagnostics;
-using Microsoft.Identity.Client.Extensions.Msal;
 #endif
 
 namespace CommunityToolkit.Authentication
@@ -41,52 +41,50 @@ namespace CommunityToolkit.Authentication
         public override string CurrentAccountId => Account?.HomeAccountId?.Identifier;
 
         /// <summary>
-        /// Gets the configuration values for creating the <see cref="PublicClientApplication"/> instance.
+        /// Gets or sets the MSAL.NET Client used to authenticate the user.
         /// </summary>
-        protected PublicClientApplicationConfig Config { get; private set; }
-
-        /// <summary>
-        /// Gets the MSAL.NET Client used to authenticate the user.
-        /// </summary>
-        protected IPublicClientApplication Client { get; private set; }
+        public IPublicClientApplication Client { get; protected set; }
 
         /// <summary>
         /// Gets an array of scopes to use for accessing Graph resources.
         /// </summary>
-        protected string[] Scopes => Config.Scopes;
+        protected string[] Scopes { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MsalProvider"/> class using a configuration object.
         /// </summary>
-        /// <param name="config">Configuration values for building the <see cref="PublicClientApplication"/> instance.</param>
+        /// <param name="client">Registered ClientId in Azure Acitve Directory.</param>
+        /// <param name="scopes">List of Scopes to initially request.</param>
         /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon creation.</param>
-        public MsalProvider(PublicClientApplicationConfig config, bool autoSignIn = true)
+        public MsalProvider(IPublicClientApplication client, string[] scopes = null, bool autoSignIn = true)
         {
-            Config = config;
-            Client = CreatePublicClientApplication(config);
+            Client = client;
+            Scopes = scopes.Select(s => s.ToLower()).ToArray() ?? new string[] { string.Empty };
 
-            InitTokenCacheAsync(autoSignIn);
+            if (autoSignIn)
+            {
+                TrySilentSignInAsync();
+            }
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MsalProvider"/> class with default configuration values.
         /// </summary>
-        /// <param name="clientId">Registered ClientId.</param>
+        /// <param name="clientId">Registered client id in Azure Acitve Directory.</param>
         /// <param name="redirectUri">RedirectUri for auth response.</param>
         /// <param name="scopes">List of Scopes to initially request.</param>
         /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon creation.</param>
-        public MsalProvider(string clientId, string[] scopes = null, string redirectUri = null, bool autoSignIn = true)
+        /// <param name="listWindowsWorkAndSchoolAccounts">Determines if organizational accounts should be enabled/disabled.</param>
+        /// <param name="tenantId">Registered tenant id in Azure Active Directory.</param>
+        public MsalProvider(string clientId, string[] scopes = null, string redirectUri = null, bool autoSignIn = true, bool listWindowsWorkAndSchoolAccounts = true, string tenantId = null)
         {
-            Config = new PublicClientApplicationConfig()
+            Client = CreatePublicClientApplication(clientId, tenantId, redirectUri, listWindowsWorkAndSchoolAccounts);
+            Scopes = scopes.Select(s => s.ToLower()).ToArray() ?? new string[] { string.Empty };
+
+            if (autoSignIn)
             {
-                ClientId = clientId,
-                Scopes = scopes.Select(s => s.ToLower()).ToArray() ?? new string[] { string.Empty },
-                RedirectUri = redirectUri,
-            };
-
-            Client = CreatePublicClientApplication(Config);
-
-            InitTokenCacheAsync(autoSignIn);
+                TrySilentSignInAsync();
+            }
         }
 
         /// <inheritdoc/>
@@ -175,68 +173,36 @@ namespace CommunityToolkit.Authentication
         }
 
         /// <summary>
-        /// Create an instance of <see cref="PublicClientApplication"/> using the provided config.
+        /// Create an instance of <see cref="PublicClientApplication"/> using the provided config and some default values.
         /// </summary>
-        /// <param name="config">An set of properties used to configure the <see cref="PublicClientApplication"/> creation.</param>
+        /// <param name="clientId">Registered ClientId.</param>
+        /// <param name="tenantId">An optional tenant id.</param>
+        /// <param name="redirectUri">Redirect uri for auth response.</param>
+        /// <param name="listWindowsWorkAndSchoolAccounts">Determines if organizational accounts should be supported.</param>
         /// <returns>A new instance of <see cref="PublicClientApplication"/>.</returns>
-        protected IPublicClientApplication CreatePublicClientApplication(PublicClientApplicationConfig config)
+        protected IPublicClientApplication CreatePublicClientApplication(string clientId, string tenantId, string redirectUri, bool listWindowsWorkAndSchoolAccounts)
         {
-            var clientBuilder = PublicClientApplicationBuilder.Create(config.ClientId)
-                .WithAuthority(AzureCloudInstance.AzurePublic, config.Authority)
-                .WithClientName(config.ClientName)
-                .WithClientVersion(config.ClientVersion);
+            var authority = listWindowsWorkAndSchoolAccounts ? AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount : AadAuthorityAudience.PersonalMicrosoftAccount;
 
-#if WINDOWS_UWP
-            clientBuilder = clientBuilder
-                .WithBroker()
-                .WithWindowsBrokerOptions(new WindowsBrokerOptions()
-                {
-                    ListWindowsWorkAndSchoolAccounts = config.ListWindowsWorkAndSchoolAccounts,
-                });
-#endif
+            var clientBuilder = PublicClientApplicationBuilder.Create(clientId)
+                .WithAuthority(AzureCloudInstance.AzurePublic, authority)
+                .WithClientName(ProviderManager.ClientName)
+                .WithClientVersion(Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
-            if (config.RedirectUri == null)
+            if (tenantId != null)
             {
-#if WINDOWS_UWP
-                string sid = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper();
-                config.RedirectUri = $"{MSAccountBrokerRedirectUriPrefix}{sid}";
-#else
-                config.RedirectUri = "http://localhost";
-#endif
+                clientBuilder = clientBuilder.WithTenantId(tenantId);
             }
 
-            return clientBuilder.WithRedirectUri(config.RedirectUri).Build();
-        }
-
-        /// <summary>
-        /// Initialize the token cache and if requested, attempt to sign in silently.
-        /// </summary>
-        /// <param name="trySignIn">A value indicating whether to attempt silent login after the cache configuration.</param>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        protected async Task InitTokenCacheAsync(bool trySignIn)
-        {
-#if !WINDOWS_UWP
-            // Token cache persistence (not required on UWP as MSAL does it for you)
-            var storageProperties = new StorageCreationPropertiesBuilder(Config.CacheFileName, Config.CacheDir)
-                .WithLinuxKeyring(
-                    Config.LinuxKeyRingSchema,
-                    Config.LinuxKeyRingCollection,
-                    Config.LinuxKeyRingLabel,
-                    Config.LinuxKeyRingAttr1,
-                    Config.LinuxKeyRingAttr2)
-                .WithMacKeyChain(
-                    Config.KeyChainServiceName,
-                    Config.KeyChainAccountName)
-                .Build();
-
-            var cacheHelper = await MsalCacheHelper.CreateAsync(storageProperties);
-            cacheHelper.RegisterCache(Client.UserTokenCache);
+#if WINDOWS_UWP
+            clientBuilder = clientBuilder.WithBroker();
 #endif
 
-            if (trySignIn)
-            {
-                _ = TrySilentSignInAsync();
-            }
+            clientBuilder = (redirectUri != null)
+                ? clientBuilder.WithRedirectUri(redirectUri)
+                : clientBuilder.WithDefaultRedirectUri();
+
+            return clientBuilder.Build();
         }
 
         /// <summary>
