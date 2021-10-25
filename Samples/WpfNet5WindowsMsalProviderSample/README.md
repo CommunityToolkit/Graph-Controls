@@ -1,12 +1,33 @@
-# MsalProvider Authentication Sample for WPF
+# MsalProvider Authentication Sample for .NET 5.0 WPF apps
 
 This sample demonstrates how to configure the MsalProvider to authenticate consumer MSA and organizational AAD accounts in your apps.
 
 ```
 string clientId = "YOUR-CLIENT-ID-HERE";
 string[] scopes = new string[] { "User.Read" };
-string redirectUri = "http://localhost";
-ProviderManager.Instance.GlobalProvider = new MsalProvider(clientId, scopes, redirectUri);
+
+if (ProviderManager.Instance.GlobalProvider == null)
+{
+    var provider = new MsalProvider(ClientId, Scopes, null, false, true);
+
+    // Configure the token cache storage for non-UWP applications.
+    var storageProperties = new StorageCreationPropertiesBuilder(CacheConfig.CacheFileName, CacheConfig.CacheDir)
+        .WithLinuxKeyring(
+            CacheConfig.LinuxKeyRingSchema,
+            CacheConfig.LinuxKeyRingCollection,
+            CacheConfig.LinuxKeyRingLabel,
+            CacheConfig.LinuxKeyRingAttr1,
+            CacheConfig.LinuxKeyRingAttr2)
+        .WithMacKeyChain(
+            CacheConfig.KeyChainServiceName,
+            CacheConfig.KeyChainAccountName)
+        .Build();
+    await provider.InitTokenCacheAsync(storageProperties);
+
+    ProviderManager.Instance.GlobalProvider = provider;
+
+    await provider.TrySilentSignInAsync();
+}
 ```
 
 It uses an IProvider implementation called MsalProvider, which leverages the official Microsoft Authentication Library (MSAL)
