@@ -18,6 +18,10 @@ using Windows.Security.Authentication.Web;
 using System.Diagnostics;
 #endif
 
+#if NETCOREAPP3_1
+using Microsoft.Identity.Client.Desktop;
+#endif
+
 namespace CommunityToolkit.Authentication
 {
     /// <summary>
@@ -196,6 +200,8 @@ namespace CommunityToolkit.Authentication
 
 #if WINDOWS_UWP || NET5_0_WINDOWS10_0_17763_0
             clientBuilder = clientBuilder.WithBroker();
+#elif NETCOREAPP3_1
+            clientBuilder = clientBuilder.WithWindowsBroker();
 #endif
 
             clientBuilder = (redirectUri != null)
