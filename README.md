@@ -6,26 +6,15 @@ Note: This new library replaces the `Microsoft.Toolkit.Uwp.UI.Controls.Graph` pa
 
 If you need similar controls for the Web, please use the [Microsoft Graph Toolkit](https://aka.ms/mgt).
 
-## What's new?
-
-We've overhauled our approach and introduced some big improvements:
-
-- The new WindowsProvivder enables basic consumer login without AAD configuration 🎊
-- Authentication packages are now split per provider 🎉
-- Access to the GraphServiceClient now lives in a separate package. This means no dependency on the Graph SDK for simple auth scenarios and apps that perform Graph requests manually (sans SDK) 🥳
-- Removed Beta Graph SDK, but enabled access with V1 SDK types. This is so our controls and helpers can be based on the stable Graph endpoint, while also allowing for requests to the beta endpoint in some circumstances (Such as retrieving a user's photo) 🎈
-
-For more info on our roadmap, check out the current [Release Plan](https://github.com/CommunityToolkit/Graph-Controls/issues/81)
-
 ## <a name="supported"></a> Supported SDKs
 
 | Package | Min Supported |
 |--|--|
 | `CommunityToolkit.Authentication` | NetStandard 2.0 |
-| `CommunityToolkit.Authentication.Msal` | NetStandard 2.0 |
-| `CommunityToolkit.Authentication.Uwp` | UWP Windows 10 17134 |
+| `CommunityToolkit.Authentication.Msal` | NetStandard 2.0, UWP, .NET 5, .NET 5 Windows 10.0.17763.0, .NET Core 3.1 |
+| `CommunityToolkit.Authentication.Uwp` | UWP Windows 10.0.17134.0 |
 | `CommunityTookit.Graph` | NetStandard 2.0 |
-| `CommunityToolkit.Graph.Uwp` | UWP Windows 10 17763 |
+| `CommunityToolkit.Graph.Uwp` | UWP Windows 10.0.17763.0 |
 
 ## Samples
 
@@ -33,7 +22,8 @@ Check out our samples for getting started with authentication providers and maki
 
 - [UwpWindowsProviderSample](./Samples/UwpWindowsProviderSample)
 - [UwpMsalProviderSample](./Samples/UwpMsalProviderSample)
-- [WpfMsalProviderSample](./Samples/WpfMsalProviderSample)
+- [WpfNetCoreMsalProviderSample](./Samples/WpfNetCoreMsalProviderSample)
+- [WpfNetMsalProviderSample](./Samples/WpfNet5WindowsMsalProviderSample)
 - [ManualGraphRequestSample](./Samples/ManualGraphRequestSample)
 
 ### Contoso Notes Sample
@@ -43,8 +33,6 @@ Check out our samples for getting started with authentication providers and maki
 ## <a name="documentation"></a> Getting Started
 
 To get started using Graph data in your application, you'll first need to enable authentication.
-
-> Note: The nuget packages metioned are not yet released, and can be accessed from using our dedicated Nuget feed: [WindowsCommunityToolkit-MainLatest](https://pkgs.dev.azure.com/dotnet/CommunityToolkit/_packaging/WindowsCommunityToolkit-MainLatest/nuget/v3/index.json)
 
 ### 1A. Setup authentication with MSAL
 
