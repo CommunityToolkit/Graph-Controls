@@ -3,31 +3,28 @@
 This sample demonstrates how to configure the MsalProvider to authenticate consumer MSA and organizational AAD accounts in your apps.
 
 ```
-string clientId = "YOUR-CLIENT-ID-HERE";
-string[] scopes = new string[] { "User.Read" };
+string ClientId = "YOUR-CLIENT-ID-HERE";
+string[] Scopes = new string[] { "User.Read" };
 
-if (ProviderManager.Instance.GlobalProvider == null)
-{
-    var provider = new MsalProvider(ClientId, Scopes, null, false, true);
+var provider = new MsalProvider(ClientId, Scopes, null, false, true);
 
-    // Configure the token cache storage for non-UWP applications.
-    var storageProperties = new StorageCreationPropertiesBuilder(CacheConfig.CacheFileName, CacheConfig.CacheDir)
-        .WithLinuxKeyring(
-            CacheConfig.LinuxKeyRingSchema,
-            CacheConfig.LinuxKeyRingCollection,
-            CacheConfig.LinuxKeyRingLabel,
-            CacheConfig.LinuxKeyRingAttr1,
-            CacheConfig.LinuxKeyRingAttr2)
-        .WithMacKeyChain(
-            CacheConfig.KeyChainServiceName,
-            CacheConfig.KeyChainAccountName)
-        .Build();
-    await provider.InitTokenCacheAsync(storageProperties);
+// Configure the token cache storage for non-UWP applications.
+var storageProperties = new StorageCreationPropertiesBuilder(CacheConfig.CacheFileName, CacheConfig.CacheDir)
+    .WithLinuxKeyring(
+        CacheConfig.LinuxKeyRingSchema,
+        CacheConfig.LinuxKeyRingCollection,
+        CacheConfig.LinuxKeyRingLabel,
+        CacheConfig.LinuxKeyRingAttr1,
+        CacheConfig.LinuxKeyRingAttr2)
+    .WithMacKeyChain(
+        CacheConfig.KeyChainServiceName,
+        CacheConfig.KeyChainAccountName)
+    .Build();
+await provider.InitTokenCacheAsync(storageProperties);
 
-    ProviderManager.Instance.GlobalProvider = provider;
+ProviderManager.Instance.GlobalProvider = provider;
 
-    await provider.TrySilentSignInAsync();
-}
+await provider.TrySilentSignInAsync();
 ```
 
 It uses an IProvider implementation called MsalProvider, which leverages the official Microsoft Authentication Library (MSAL)
