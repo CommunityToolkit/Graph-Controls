@@ -194,7 +194,7 @@ namespace CommunityToolkit.Authentication
                 clientBuilder = clientBuilder.WithTenantId(tenantId);
             }
 
-#if WINDOWS_UWP
+#if WINDOWS_UWP || NET5_0_WINDOWS10_0_17763_0
             clientBuilder = clientBuilder.WithBroker();
 #endif
 

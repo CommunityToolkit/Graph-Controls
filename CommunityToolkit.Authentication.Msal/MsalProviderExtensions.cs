@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Identity.Client.Extensions.Msal;
 
-namespace CommunityToolkit.Authentication.Msal
+namespace CommunityToolkit.Authentication.Extensions
 {
     /// <summary>
     /// Helpers for working with the MsalProvider.
@@ -26,9 +26,9 @@ namespace CommunityToolkit.Authentication.Msal
             TraceSource logger = null)
         {
 #if !WINDOWS_UWP
-                // Token cache persistence (not required on UWP as MSAL does it for you)
-                var cacheHelper = await MsalCacheHelper.CreateAsync(storageProperties, logger);
-                cacheHelper.RegisterCache(provider.Client.UserTokenCache);
+            // Token cache persistence (not required on UWP as MSAL does it for you)
+            var cacheHelper = await MsalCacheHelper.CreateAsync(storageProperties, logger);
+            cacheHelper.RegisterCache(provider.Client.UserTokenCache);
 #endif
         }
     }
