@@ -71,7 +71,7 @@ namespace CommunityToolkit.Graph.Extensions
                 .Photo
                 .Content
                 .Request()
-                .WithScopes(new string[] { "user.readbasic.all" })
+                .WithScopes(new string[] { "user.read" })
                 .GetAsync();
         }
 
