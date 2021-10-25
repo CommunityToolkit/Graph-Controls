@@ -1,6 +1,6 @@
 # Windows Community Toolkit - Graph Helpers and Controls
 
-Welcome! This is a sub-repo for the [Windows Community Toolkit](https://aka.ms/wct) focused on [Microsoft Graph](https://developer.microsoft.com/en-us/graph/) providing a set of Helpers and Controls for netstandard and UWP apps.
+Welcome! This is a sub-repo for the [Windows Community Toolkit](https://aka.ms/wct) focused on [Microsoft Graph](https://developer.microsoft.com/en-us/graph/) providing a set of Authentication and Graph helpers for Windows applications.
 
 Note: This new library replaces the `Microsoft.Toolkit.Uwp.UI.Controls.Graph` package; however, it is not backwards compatible nor does it provide all the same features at this time.
 
@@ -170,11 +170,6 @@ public ImageSource GetMyPhoto()
     return null;
 }
 ```
-
-## Build Status
-| Target | Branch | Status | Recommended package version |
-| ------ | ------ | ------ | ------ |
-| Pre-release beta testing | main | [![Build Status](https://dev.azure.com/dotnet/CommunityToolkit/_apis/build/status/CommunityToolkit.Graph-Controls?branchName=main)](https://dev.azure.com/dotnet/WindowsCommunityToolkit/_build/latest?definitionId=102&branchName=main) | [![MyGet](https://img.shields.io/dotnet.myget/uwpcommunitytoolkit/vpre/Microsoft.Toolkit.Graph.svg)](https://dotnet.myget.org/gallery/uwpcommunitytoolkit) |
 
 ## Feedback and Requests
 Please use [GitHub Issues](https://github.com/CommunityToolkit/Graph-Controls/issues) for bug reports and feature requests.
