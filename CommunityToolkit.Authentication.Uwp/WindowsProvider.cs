@@ -31,6 +31,7 @@ namespace CommunityToolkit.Authentication
         private const string MicrosoftProviderId = "https://login.microsoft.com";
         private const string SettingsKeyAccountId = "WindowsProvider_AccountId";
         private const string SettingsKeyProviderId = "WindowsProvider_ProviderId";
+        private const string SettingsKeyProviderAuthority = "WindowsProvider_Authority";
 
         private static readonly SemaphoreSlim SemaphoreSlim = new (1);
 
@@ -355,6 +356,7 @@ namespace CommunityToolkit.Authentication
             _webAccount = account;
             Settings[SettingsKeyAccountId] = account.Id;
             Settings[SettingsKeyProviderId] = account.WebAccountProvider.Id;
+            Settings[SettingsKeyProviderAuthority] = account.WebAccountProvider.Authority;
 
             State = ProviderState.SignedIn;
         }
@@ -370,9 +372,10 @@ namespace CommunityToolkit.Authentication
                 {
                     // Check the cache for an existing user
                     if (Settings[SettingsKeyAccountId] is string savedAccountId &&
-                        Settings[SettingsKeyProviderId] is string savedProviderId)
+                        Settings[SettingsKeyProviderId] is string savedProviderId &&
+                        Settings[SettingsKeyProviderAuthority] is string savedProviderAuthority)
                     {
-                        var savedProvider = await WebAuthenticationCoreManager.FindAccountProviderAsync(savedProviderId);
+                        var savedProvider = await WebAuthenticationCoreManager.FindAccountProviderAsync(savedProviderId, savedProviderAuthority);
                         account = await WebAuthenticationCoreManager.FindAccountAsync(savedProvider, savedAccountId);
                     }
                 }
