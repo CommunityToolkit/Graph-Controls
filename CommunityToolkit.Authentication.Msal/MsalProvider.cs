@@ -186,16 +186,20 @@ namespace CommunityToolkit.Authentication
         /// <returns>A new instance of <see cref="PublicClientApplication"/>.</returns>
         protected IPublicClientApplication CreatePublicClientApplication(string clientId, string tenantId, string redirectUri, bool listWindowsWorkAndSchoolAccounts)
         {
-            var authority = listWindowsWorkAndSchoolAccounts ? AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount : AadAuthorityAudience.PersonalMicrosoftAccount;
-
             var clientBuilder = PublicClientApplicationBuilder.Create(clientId)
-                .WithAuthority(AzureCloudInstance.AzurePublic, authority)
                 .WithClientName(ProviderManager.ClientName)
                 .WithClientVersion(Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
             if (tenantId != null)
             {
                 clientBuilder = clientBuilder.WithTenantId(tenantId);
+            }
+
+            // If the TenantId is not provided, use WithAuthority
+            else
+            {
+                var authority = listWindowsWorkAndSchoolAccounts ? AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount : AadAuthorityAudience.PersonalMicrosoftAccount;
+                clientBuilder = clientBuilder.WithAuthority(AzureCloudInstance.AzurePublic, authority);
             }
 
 #if WINDOWS_UWP || NET5_0_WINDOWS10_0_17763_0
