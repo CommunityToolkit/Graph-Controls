@@ -6,6 +6,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using CommunityToolkit.Authentication.Extensions;
+using CommunityToolkit.Authentication.Logging;
 
 namespace CommunityToolkit.Authentication
 {
@@ -33,6 +34,11 @@ namespace CommunityToolkit.Authentication
                 }
             }
         }
+
+        /// <summary>
+        /// Gets or sets the logger used to log exceptions and event messages.
+        /// </summary>
+        public ILogger EventLogger { get; set; } = DebugLogger.Instance;
 
         /// <inheritdoc />
         public abstract string CurrentAccountId { get; }
