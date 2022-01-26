@@ -172,9 +172,10 @@ namespace CommunityToolkit.Authentication
         }
 
         /// <inheritdoc/>
-        public override Task<string> GetTokenAsync(bool silentOnly = false)
+        public override Task<string> GetTokenAsync(bool silentOnly = false, string[] scopes = null)
         {
-            return this.GetTokenWithScopesAsync(Scopes, silentOnly);
+            var withScopes = scopes ?? this.Scopes;
+            return this.GetTokenWithScopesAsync(withScopes, silentOnly);
         }
 
         /// <summary>
@@ -188,10 +189,7 @@ namespace CommunityToolkit.Authentication
         /// <returns>A new instance of <see cref="PublicClientApplication"/>.</returns>
         protected IPublicClientApplication CreatePublicClientApplication(string clientId, string tenantId, string redirectUri, bool listWindowsWorkAndSchoolAccounts, bool withLogging)
         {
-            var authority = listWindowsWorkAndSchoolAccounts ? AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount : AadAuthorityAudience.PersonalMicrosoftAccount;
-
             var clientBuilder = PublicClientApplicationBuilder.Create(clientId)
-                .WithAuthority(AzureCloudInstance.AzurePublic, authority)
                 .WithClientName(ProviderManager.ClientName)
                 .WithClientVersion(Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
@@ -212,6 +210,13 @@ namespace CommunityToolkit.Authentication
             if (tenantId != null)
             {
                 clientBuilder = clientBuilder.WithTenantId(tenantId);
+            }
+
+            // If the TenantId is not provided, use WithAuthority
+            else
+            {
+                var authority = listWindowsWorkAndSchoolAccounts ? AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount : AadAuthorityAudience.PersonalMicrosoftAccount;
+                clientBuilder = clientBuilder.WithAuthority(AzureCloudInstance.AzurePublic, authority);
             }
 
 #if WINDOWS_UWP || NET5_0_WINDOWS10_0_17763_0
