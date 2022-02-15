@@ -184,17 +184,16 @@ namespace CommunityToolkit.Authentication
         }
 
         /// <inheritdoc />
-        public override async Task<string> GetTokenAsync(bool silentOnly = false, string[] scopes = null)
+        public override async Task<string> GetTokenAsync(bool silentOnly = false)
         {
             await SemaphoreSlim.WaitAsync();
 
             try
             {
-                // use request specific scopes if not null, otherwise use class scopes
-                var authenticationScopes = scopes ?? this._scopes;
+                var scopes = _scopes;
 
                 // Attempt to authenticate silently.
-                var authResult = await AuthenticateSilentAsync(authenticationScopes);
+                var authResult = await AuthenticateSilentAsync(scopes);
 
                 // Authenticate with user interaction as appropriate.
                 if (authResult?.ResponseStatus != WebTokenRequestStatus.Success)
