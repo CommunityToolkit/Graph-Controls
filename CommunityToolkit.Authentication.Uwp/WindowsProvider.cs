@@ -33,7 +33,7 @@ namespace CommunityToolkit.Authentication
         private const string SettingsKeyProviderId = "WindowsProvider_ProviderId";
         private const string SettingsKeyProviderAuthority = "WindowsProvider_Authority";
 
-        private static readonly SemaphoreSlim SemaphoreSlim = new(1);
+        private static readonly SemaphoreSlim SemaphoreSlim = new (1);
 
         // Default/minimal scopes for authentication, if none are provided.
         private static readonly string[] DefaultScopes = { "User.Read" };
