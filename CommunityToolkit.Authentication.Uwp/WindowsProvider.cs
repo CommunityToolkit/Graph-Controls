@@ -33,7 +33,7 @@ namespace CommunityToolkit.Authentication
         private const string SettingsKeyProviderId = "WindowsProvider_ProviderId";
         private const string SettingsKeyProviderAuthority = "WindowsProvider_Authority";
 
-        private static readonly SemaphoreSlim SemaphoreSlim = new (1);
+        private static readonly SemaphoreSlim SemaphoreSlim = new(1);
 
         // Default/minimal scopes for authentication, if none are provided.
         private static readonly string[] DefaultScopes = { "User.Read" };
@@ -562,24 +562,37 @@ namespace CommunityToolkit.Authentication
             if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Any ||
                 _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Msa)
             {
-                providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority));
+                await FindAndAddProviderAsync(MicrosoftProviderId, MicrosoftAccountAuthority);
             }
 
             // AAD
             if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Any ||
                 _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Aad)
             {
-                providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(MicrosoftProviderId, AadAuthority));
+                await FindAndAddProviderAsync(MicrosoftProviderId, AadAuthority);
             }
 
             // Local
             if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Any ||
                 _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Local)
             {
-                providers.Add(await WebAuthenticationCoreManager.FindAccountProviderAsync(LocalProviderId));
+                await FindAndAddProviderAsync(LocalProviderId);
             }
 
             return providers;
+
+            async Task FindAndAddProviderAsync(
+                string webAccountProviderId,
+                string authority = default)
+            {
+                var provider = string.IsNullOrEmpty(authority)
+                    ? await WebAuthenticationCoreManager.FindAccountProviderAsync(webAccountProviderId)
+                    : await WebAuthenticationCoreManager.FindAccountProviderAsync(webAccountProviderId, authority);
+                if (provider != null)
+                {
+                    providers.Add(provider);
+                }
+            }
         }
     }
 }
