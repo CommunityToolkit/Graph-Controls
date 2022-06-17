@@ -543,7 +543,7 @@ namespace CommunityToolkit.Authentication
 
         private WebTokenRequest GetWebTokenRequest(WebAccountProvider provider, string clientId, string[] scopes)
         {
-            string scopesString = string.Join(',', scopes);
+            string scopesString = string.Join(' ', scopes);
 
             WebTokenRequest webTokenRequest = string.IsNullOrWhiteSpace(clientId)
                 ? new WebTokenRequest(provider, scopesString)
