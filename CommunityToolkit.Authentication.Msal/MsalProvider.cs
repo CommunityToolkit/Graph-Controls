@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Graph;
@@ -106,7 +107,11 @@ namespace CommunityToolkit.Authentication
                 options.AuthenticationProviderOption?.Scopes != null && options.AuthenticationProviderOption.Scopes.Length > 0)
             {
                 var withScopes = options.AuthenticationProviderOption.Scopes;
-                token = await this.GetTokenWithScopesAsync(withScopes);
+                token = await this.GetTokenWithScopesAsync(withScopes, out var exception);
+                if (exception != null)
+                {
+                    ExceptionDispatchInfo.Capture(exception).Throw();
+                }
             }
             else
             {
@@ -170,10 +175,15 @@ namespace CommunityToolkit.Authentication
             State = ProviderState.SignedOut;
         }
 
+        public Task<string> GetTokenAsync(out Exception exception, bool silentOnly = false)
+        {
+            return this.GetTokenWithScopesAsync(Scopes, silentOnly, out exception);
+        }
+
         /// <inheritdoc/>
         public override Task<string> GetTokenAsync(bool silentOnly = false)
         {
-            return this.GetTokenWithScopesAsync(Scopes, silentOnly);
+            return this.GetTokenWithScopesAsync(Scopes, silentOnly, out _);
         }
 
         /// <summary>
@@ -221,7 +231,7 @@ namespace CommunityToolkit.Authentication
         /// <param name="scopes">An array of scopes to pass along with the Graph request.</param>
         /// <param name="silentOnly">A value to determine whether account broker UI should be shown, if required by MSAL.</param>
         /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        protected async Task<string> GetTokenWithScopesAsync(string[] scopes, bool silentOnly = false)
+        protected async Task<string> GetTokenWithScopesAsync(string[] scopes, bool silentOnly = false, out Exception exception)
         {
             await SemaphoreSlim.WaitAsync();
 
@@ -239,10 +249,9 @@ namespace CommunityToolkit.Authentication
                 catch (MsalUiRequiredException)
                 {
                 }
-                catch
+                catch (Exception e)
                 {
-                    // Unexpected exception
-                    // TODO: Send exception to a logger.
+                    exception = e;
                 }
 
                 if (authResult == null && !silentOnly)
@@ -269,11 +278,11 @@ namespace CommunityToolkit.Authentication
 #endif
 
                         authResult = await paramBuilder.ExecuteAsync();
+                        exception = null; // if we succeeded in a retry, clear the exception. 
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        // Unexpected exception
-                        // TODO: Send exception to a logger.
+                        exception = e;
                     }
                 }
 
