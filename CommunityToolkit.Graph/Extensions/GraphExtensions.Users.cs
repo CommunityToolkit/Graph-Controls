@@ -14,7 +14,7 @@ namespace CommunityToolkit.Graph.Extensions
     public static partial class GraphExtensions
     {
         /// <summary>
-        /// Retrieve the curernt user.
+        /// Retrieve the current user.
         /// </summary>
         /// <param name="graph">Instance of the <see cref="GraphServiceClient"/>.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
