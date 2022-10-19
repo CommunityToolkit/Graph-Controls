@@ -28,9 +28,9 @@ steps:
 
   # Install Nuget Tool Installer
   - task: NuGetToolInstaller@0
-    displayName: Use NuGet 5.0.0
+    displayName: Use NuGet 5.11.x
     inputs:
-      versionSpec: 5.0.0
+      versionSpec: 5.11.x
 
   # Install NBGV Tool
   - task: DotNetCoreCLI@2
