@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -34,7 +33,7 @@ namespace CommunityToolkit.Authentication
         private const string SettingsKeyProviderId = "WindowsProvider_ProviderId";
         private const string SettingsKeyProviderAuthority = "WindowsProvider_Authority";
 
-        private static readonly SemaphoreSlim SemaphoreSlim = new(1);
+        private static readonly SemaphoreSlim SemaphoreSlim = new (1);
 
         // Default/minimal scopes for authentication, if none are provided.
         private static readonly string[] DefaultScopes = { "User.Read" };
@@ -503,7 +502,6 @@ namespace CommunityToolkit.Authentication
                         }
                     }
                 }
-                catch (Exception ex)
                 {
                     webAccountProviderTaskCompletionSource.SetException(ex);
                 }
@@ -571,6 +569,11 @@ namespace CommunityToolkit.Authentication
                 _webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Aad)
             {
                 await FindAndAddProviderAsync(MicrosoftProviderId, AadAuthority);
+            }
+
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Local)
+            {
+                await FindAndAddProviderAsync(LocalProviderId);
             }
 
             return providers;
