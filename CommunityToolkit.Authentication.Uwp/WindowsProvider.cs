@@ -572,7 +572,7 @@ namespace CommunityToolkit.Authentication
                 await FindAndAddProviderAsync(MicrosoftProviderId, AadAuthority);
             }
 
-            if(_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Local)
+            if (_webAccountProviderConfig.WebAccountProviderType == WebAccountProviderType.Local)
             {
                 await FindAndAddProviderAsync(LocalProviderId);
             }
