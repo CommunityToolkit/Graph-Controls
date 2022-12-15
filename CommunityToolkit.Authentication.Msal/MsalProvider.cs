@@ -202,7 +202,7 @@ namespace CommunityToolkit.Authentication
                 clientBuilder = clientBuilder.WithAuthority(AzureCloudInstance.AzurePublic, authority);
             }
 
-#if WINDOWS_UWP || NET5_0_WINDOWS10_0_17763_0
+#if WINDOWS_UWP || NET6_0_WINDOWS10_0_17763_0
             clientBuilder = clientBuilder.WithBroker();
 #elif NETCOREAPP3_1
             clientBuilder = clientBuilder.WithWindowsBroker();

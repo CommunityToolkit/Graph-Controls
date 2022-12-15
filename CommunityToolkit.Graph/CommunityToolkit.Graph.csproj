@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -16,7 +16,7 @@
         - UserExtensionStorageHelper: A helper for interacting with open extensions on the Graph User to store data in key/value pairs.
     </Description>
     <PackageTags>Windows Community Toolkit Microsoft Graph Provider Extensions Helpers Roaming Settings</PackageTags>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
