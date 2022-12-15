@@ -1,4 +1,4 @@
-# MsalProvider Authentication Sample for .NET 5.0 WPF apps
+# MsalProvider Authentication Sample for .NET 6.0 WPF apps
 
 This sample demonstrates how to configure the MsalProvider to authenticate consumer MSA and organizational AAD accounts in your apps.
 

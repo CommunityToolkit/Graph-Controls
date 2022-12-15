@@ -5,7 +5,7 @@
 using System.Collections.Generic;
 using Microsoft.Identity.Client.Extensions.Msal;
 
-namespace WpfNet5WindowsMsalProviderSample
+namespace WpfNetWindowsMsalProviderSample
 {
     /// <summary>
     /// https://github.com/AzureAD/microsoft-authentication-extensions-for-dotnet/wiki/Cross-platform-Token-Cache

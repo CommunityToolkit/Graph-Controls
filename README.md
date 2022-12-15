@@ -11,7 +11,7 @@ If you need similar controls for the Web, please use the [Microsoft Graph Toolki
 | Package | Min Supported |
 |--|--|
 | `CommunityToolkit.Authentication` | NetStandard 2.0 |
-| `CommunityToolkit.Authentication.Msal` | NetStandard 2.0, UWP, .NET 5, .NET 5 Windows 10.0.17763.0, .NET Core 3.1 |
+| `CommunityToolkit.Authentication.Msal` | NetStandard 2.0, UWP, .NET 6, .NET 6 Windows 10.0.17763.0, .NET Core 3.1 |
 | `CommunityToolkit.Authentication.Uwp` | UWP Windows 10.0.17134.0 |
 | `CommunityTookit.Graph` | NetStandard 2.0 |
 | `CommunityToolkit.Graph.Uwp` | UWP Windows 10.0.17763.0 |
@@ -23,7 +23,7 @@ Check out our samples for getting started with authentication providers and maki
 - [UwpWindowsProviderSample](./Samples/UwpWindowsProviderSample)
 - [UwpMsalProviderSample](./Samples/UwpMsalProviderSample)
 - [WpfNetCoreMsalProviderSample](./Samples/WpfNetCoreMsalProviderSample)
-- [WpfNetMsalProviderSample](./Samples/WpfNet5WindowsMsalProviderSample)
+- [WpfNetMsalProviderSample](./Samples/WpfNetWindowsMsalProviderSample)
 - [ManualGraphRequestSample](./Samples/ManualGraphRequestSample)
 
 ### Contoso Notes Sample

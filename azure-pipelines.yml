@@ -10,18 +10,15 @@ pr:
   - dev/*
   - rel/*
 
-# Microsoft-hosted agent pool for Visual Studio 2019
+# Microsoft-hosted agent pool for Visual Studio 2022
 pool:
-  vmImage: windows-2019
-
-variables:
-  BuildConfiguration: CI
+  vmImage: windows-2022
 
 steps:
   # Setup Environment Variables
   - task: BatchScript@1
     inputs:
-      filename: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\Common7\\Tools\\VsDevCmd.bat"
+      filename: "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\Common7\\Tools\\VsDevCmd.bat"
       arguments: -no_logo
       modifyEnvironment: true
     displayName: Setup Environment Variables
@@ -45,13 +42,30 @@ steps:
     displayName: Set Version
 
   # Install Windows SDK 18362 (minimum compatible sdk)
-  - powershell: .\build\Install-WindowsSdkISO.ps1 18362
+  - powershell: .\build\Install-WindowsSdkISO.ps1 22621
     displayName: Insider SDK
 
-  # Run cake build
-  - powershell: .\build.ps1 -target=Package
-    displayName: Build
-    workingDirectory: .\build
+  # restore & build solution
+  - script: msbuild -r -target:Build -p:Configuration=CI -p:GenerateLibraryLayout=true
+    displayName: Restore & Build solution
+
+  # run tests
+  ### Tests require logging in, so aren't achievable in CI with current setup. Should ask MSAL/Graph team how they mock in future.
+  ### Leaving this here as if UnitTests.Uwp area built, this should run them.
+  #- script: vstest.console.exe ./UnitTests/**/*.appxrecipe /Framework:FrameworkUap10 /logger:"trx;LogFileName=VsTestResultsUwp.trx"
+  #  displayName: Unit Tests
+
+  # publish results
+  #- task: PublishTestResults@2
+  #  inputs:
+  #    testResultsFormat: 'VSTest'
+  #    testResultsFiles: '**/VsTestResults*.trx'
+  #  displayName: Publish Test Results
+  #  condition: always()
+
+  # pack solution
+  - script: msbuild -target:Pack -p:Configuration=CI -p:GenerateLibraryLayout=true -p:PackageOutputPath=..\bin\nupkg
+    displayName: Pack solution
 
   # Sign Nuget package
   - task: PowerShell@2
@@ -69,5 +83,4 @@ steps:
     displayName: Publish Package Artifacts
     inputs:
       pathToPublish: .\bin\nupkg
-      artifactType: container
       artifactName: Packages

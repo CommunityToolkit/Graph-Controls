@@ -6,7 +6,7 @@ using CommunityToolkit.Authentication;
 using CommunityToolkit.Graph.Extensions;
 using System.Windows;
 
-namespace WpfNet5WindowsMsalProviderSample
+namespace WpfNetWindowsMsalProviderSample
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

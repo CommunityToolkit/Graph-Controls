@@ -9,7 +9,7 @@ using CommunityToolkit.Authentication;
 using CommunityToolkit.Authentication.Extensions;
 using Microsoft.Identity.Client.Extensions.Msal;
 
-namespace WpfNet5WindowsMsalProviderSample
+namespace WpfNetWindowsMsalProviderSample
 {
     public partial class App : Application
     {

@@ -1,7 +1,9 @@
-#module nuget:?package=Cake.LongPath.Module&version=0.7.0
+#module nuget:?package=Cake.LongPath.Module&version=1.0.1
 
-#addin nuget:?package=Cake.FileHelpers&version=3.3.0
-#addin nuget:?package=Cake.Powershell&version=0.4.8
+#addin nuget:?package=Cake.FileHelpers&version=4.0.1
+#addin nuget:?package=Cake.Powershell&version=1.0.1
+#load nuget:?package=System.Buffers&version=4.0.0
+#addin nuget:?package=Cake.GitVersioning&version=3.5.119
 
 using System;
 using System.Linq;
@@ -17,7 +19,6 @@ var target = Argument("target", "Default");
 // VERSIONS
 //////////////////////////////////////////////////////////////////////
 
-var gitVersioningVersion = "3.3.37";
 var inheritDocVersion = "2.5.2";
 
 //////////////////////////////////////////////////////////////////////
@@ -35,7 +36,6 @@ var nupkgDir = binDir + "/nupkg";
 var styler = toolsDir + "/XamlStyler.Console/tools/xstyler.exe";
 var stylerFile = baseDir + "/settings.xamlstyler";
 
-var versionClient = toolsDir + "/nerdbank.gitversioning/tools/Get-Version.ps1";
 string Version = null;
 
 var inheritDoc = toolsDir + "/InheritDoc/tools/InheritDoc.exe";
@@ -56,7 +56,12 @@ void VerifyHeaders(bool Replace)
     Func<IFileSystemInfo, bool> exclude_objDir =
         fileSystemInfo => !fileSystemInfo.Path.Segments.Contains("obj");
 
-    var files = GetFiles(baseDir + "/**/*.cs", exclude_objDir).Where(file =>
+    var globberSettings = new GlobberSettings
+    {
+        Predicate = exclude_objDir
+    };
+
+    var files = GetFiles(baseDir + "/**/*.cs", globberSettings).Where(file =>
     {
         var path = file.ToString();
         return !(path.EndsWith(".g.cs") || path.EndsWith(".i.cs") || System.IO.Path.GetFileName(path).Contains("TemporaryGeneratedFile"));
@@ -94,6 +99,13 @@ void VerifyHeaders(bool Replace)
     }
 }
 
+void RetrieveVersion()
+{
+    Information("\nRetrieving version...");
+    Version = GitVersioningGetVersion().NuGetPackageVersion;
+    Information("\nBuild Version: " + Version);
+}
+
 //////////////////////////////////////////////////////////////////////
 // DEFAULT TASK
 //////////////////////////////////////////////////////////////////////
@@ -128,19 +140,7 @@ Task("Version")
     .IsDependentOn("Verify")
     .Does(() =>
 {
-    Information("\nDownloading NerdBank GitVersioning...");
-    var installSettings = new NuGetInstallSettings {
-        ExcludeVersion  = true,
-        Version = gitVersioningVersion,
-        OutputDirectory = toolsDir
-    };
-
-    NuGetInstall(new []{"nerdbank.gitversioning"}, installSettings);
-
-    Information("\nRetrieving version...");
-    var results = StartPowershellFile(versionClient);
-    Version = results[1].Properties["NuGetPackageVersion"].Value.ToString();
-    Information("\nBuild Version: " + Version);
+    RetrieveVersion();
 });
 
 Task("Build")
@@ -151,7 +151,8 @@ Task("Build")
     Information("\nBuilding Solution");
     var buildSettings = new MSBuildSettings
     {
-        MaxCpuCount = 0
+        MaxCpuCount = 0,
+        ToolVersion = MSBuildToolVersion.VS2022
     }
     .SetConfiguration("CI")
     .WithTarget("Restore");
@@ -163,7 +164,8 @@ Task("Build")
 	// Build once with normal dependency ordering
     buildSettings = new MSBuildSettings
     {
-        MaxCpuCount = 0
+        MaxCpuCount = 0,
+        ToolVersion = MSBuildToolVersion.VS2022
     }
     .SetConfiguration("CI")
     .WithTarget("Build")
@@ -208,7 +210,8 @@ Task("Package")
 {
 	// Invoke the pack target in the end
     var buildSettings = new MSBuildSettings {
-        MaxCpuCount = 0
+        MaxCpuCount = 0,
+        ToolVersion = MSBuildToolVersion.VS2022
     }
     .SetConfiguration("CI")
     .WithTarget("Pack")
@@ -249,7 +252,12 @@ Task("StyleXaml")
     Func<IFileSystemInfo, bool> exclude_objDir =
         fileSystemInfo => !fileSystemInfo.Path.Segments.Contains("obj");
 
-    var files = GetFiles(baseDir + "/**/*.xaml", exclude_objDir);
+    var globberSettings = new GlobberSettings
+    {
+        Predicate = exclude_objDir
+    };
+
+    var files = GetFiles(baseDir + "/**/*.xaml", globberSettings);
     Information("\nChecking " + files.Count() + " file(s) for XAML Structure");
     foreach(var file in files)
     {

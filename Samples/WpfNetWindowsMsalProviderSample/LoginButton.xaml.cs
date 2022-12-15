@@ -7,7 +7,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace WpfNet5WindowsMsalProviderSample
+namespace WpfNetWindowsMsalProviderSample
 {
     /// <summary>
     /// A simple button for triggering the globally configured IProvider to sign in and out.

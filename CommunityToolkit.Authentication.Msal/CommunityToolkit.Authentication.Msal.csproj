@@ -1,7 +1,7 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
+<Project Sdk="MSBuild.Sdk.Extras">
     
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;uap10.0;net5.0-windows10.0.17763.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;uap10.0.17763;net6.0-windows10.0.17763.0;netcoreapp3.1</TargetFrameworks>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <SupportedOSPlatformVersion>7</SupportedOSPlatformVersion>
       
@@ -16,12 +16,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Graph.Core" Version="2.0.5" />
-    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="2.19.1" />
+    <PackageReference Include="Microsoft.Graph.Core" Version="2.0.14" />
+    <PackageReference Include="Microsoft.Identity.Client.Extensions.Msal" Version="2.25.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-      <PackageReference Include="Microsoft.Identity.Client.Desktop" Version="4.37.0" />
+      <PackageReference Include="Microsoft.Identity.Client.Desktop" Version="4.48.1" />
   </ItemGroup>
 
   <ItemGroup>
