@@ -22,12 +22,12 @@ namespace CommunityToolkit.Authentication
         public WebAccountProviderType WebAccountProviderType { get; set; }
 
         /// <summary>
-        /// Gets or sets the properties that need to be added when constructing WebTokenRequest (for MSA).
+        /// Gets or sets the properties that need to be added when constructing <see cref="Windows.Security.Authentication.Web.Core.WebTokenRequest"/> (for MSA).
         /// </summary>
         public IDictionary<string, string> MSATokenRequestProperties { get; set; }
 
         /// <summary>
-        /// Gets or sets the properties that need to be added when constructing WebTokenRequest (for AAD).
+        /// Gets or sets the properties that need to be added when constructing <see cref="Windows.Security.Authentication.Web.Core.WebTokenRequest"/> (for AAD).
         /// </summary>
         public IDictionary<string, string> AADTokenRequestProperties { get; set; }
 
