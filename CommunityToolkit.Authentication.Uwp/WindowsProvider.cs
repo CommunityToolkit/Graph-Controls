@@ -550,6 +550,10 @@ namespace CommunityToolkit.Authentication
                 : new WebTokenRequest(provider, scopesString, clientId);
 
             webTokenRequest.Properties.Add(GraphResourcePropertyKey, GraphResourcePropertyValue);
+            if (_webAccountProviderConfig.UseApiVersion2)
+            {
+                webTokenRequest.Properties.Add("api-version", "2.0");
+            }
 
             return webTokenRequest;
         }

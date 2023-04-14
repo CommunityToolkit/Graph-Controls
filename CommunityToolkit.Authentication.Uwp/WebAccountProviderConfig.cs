@@ -20,14 +20,26 @@ namespace CommunityToolkit.Authentication
         public WebAccountProviderType WebAccountProviderType { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether to use Version 2 model, the default value is <c>False</c>.
+        /// </summary>
+        /// <remarks>
+        /// This option is configured for pre-authorization applications.
+        /// If the application is configured with pre-authorization,
+        /// this option can be set to <c>True</c> to skip consent page.
+        /// </remarks>
+        public bool UseApiVersion2 { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="WebAccountProviderConfig"/> struct.
         /// </summary>
         /// <param name="webAccountProviderType">The types of accounts providers that should be available to the user.</param>
         /// <param name="clientId">The registered ClientId. Required for AAD login and admin consent.</param>
-        public WebAccountProviderConfig(WebAccountProviderType webAccountProviderType, string clientId = null)
+        /// <param name="useApiVersion2">Whether to enable the version 2 model for the application.</param>
+        public WebAccountProviderConfig(WebAccountProviderType webAccountProviderType, string clientId = null, bool useApiVersion2 = false)
         {
             WebAccountProviderType = webAccountProviderType;
             ClientId = clientId;
+            UseApiVersion2 = useApiVersion2;
         }
     }
 }
