@@ -550,14 +550,14 @@ namespace CommunityToolkit.Authentication
                 : new WebTokenRequest(provider, scopesString, clientId);
 
             webTokenRequest.Properties.Add(GraphResourcePropertyKey, GraphResourcePropertyValue);
-            if (provider.Authority == MicrosoftAccountAuthority && _webAccountProviderConfig.MSATokenRequestProperties != null)
+            if (provider.Authority == MicrosoftAccountAuthority)
             {
                 foreach (var property in _webAccountProviderConfig.MSATokenRequestProperties)
                 {
                     webTokenRequest.Properties.Add(property);
                 }
             }
-            else if (provider.Authority == AadAuthority && _webAccountProviderConfig.AADTokenRequestProperties != null)
+            else if (provider.Authority == AadAuthority)
             {
                 foreach (var property in _webAccountProviderConfig.AADTokenRequestProperties)
                 {

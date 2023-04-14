@@ -36,18 +36,12 @@ namespace CommunityToolkit.Authentication
         /// </summary>
         /// <param name="webAccountProviderType">The types of accounts providers that should be available to the user.</param>
         /// <param name="clientId">The registered ClientId. Required for AAD login and admin consent.</param>
-        /// <param name="msaTokenRequestProperties">Request properties for MSA.</param>
-        /// <param name="aadTokenRequestProperties">Request properties for AAD.</param>
-        public WebAccountProviderConfig(
-            WebAccountProviderType webAccountProviderType,
-            string clientId = null,
-            IDictionary<string, string> msaTokenRequestProperties = null,
-            IDictionary<string, string> aadTokenRequestProperties = null)
+        public WebAccountProviderConfig(WebAccountProviderType webAccountProviderType, string clientId = null)
         {
             WebAccountProviderType = webAccountProviderType;
             ClientId = clientId;
-            MSATokenRequestProperties = msaTokenRequestProperties;
-            AADTokenRequestProperties = aadTokenRequestProperties;
+            MSATokenRequestProperties = new Dictionary<string, string>();
+            AADTokenRequestProperties = new Dictionary<string, string>();
         }
     }
 }
