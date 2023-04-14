@@ -20,11 +20,11 @@ namespace CommunityToolkit.Authentication
         public WebAccountProviderType WebAccountProviderType { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to use Version 2 model, the default value is <c>False</c>.
+        /// Gets or sets a value indicating whether to use Version 2 model, only for MSA, the default value is <c>False</c>.
         /// </summary>
         /// <remarks>
         /// This option is configured for pre-authorization applications.
-        /// If the application is configured with pre-authorization,
+        /// If the application is configured with MSA pre-authorization,
         /// this option can be set to <c>True</c> to skip consent page.
         /// </remarks>
         public bool UseApiVersion2 { get; set; }
@@ -34,7 +34,7 @@ namespace CommunityToolkit.Authentication
         /// </summary>
         /// <param name="webAccountProviderType">The types of accounts providers that should be available to the user.</param>
         /// <param name="clientId">The registered ClientId. Required for AAD login and admin consent.</param>
-        /// <param name="useApiVersion2">Whether to enable the version 2 model for the application.</param>
+        /// <param name="useApiVersion2">Whether to enable the version 2 model for the MSA validate.</param>
         public WebAccountProviderConfig(WebAccountProviderType webAccountProviderType, string clientId = null, bool useApiVersion2 = false)
         {
             WebAccountProviderType = webAccountProviderType;
