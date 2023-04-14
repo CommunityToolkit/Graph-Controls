@@ -550,9 +550,19 @@ namespace CommunityToolkit.Authentication
                 : new WebTokenRequest(provider, scopesString, clientId);
 
             webTokenRequest.Properties.Add(GraphResourcePropertyKey, GraphResourcePropertyValue);
-            if (_webAccountProviderConfig.UseApiVersion2 && provider.Authority == MicrosoftAccountAuthority)
+            if (provider.Authority == MicrosoftAccountAuthority && _webAccountProviderConfig.MSATokenRequestProperties != null)
             {
-                webTokenRequest.Properties.Add("api-version", "2.0");
+                foreach (var property in _webAccountProviderConfig.MSATokenRequestProperties)
+                {
+                    webTokenRequest.Properties.Add(property);
+                }
+            }
+            else if (provider.Authority == AadAuthority && _webAccountProviderConfig.AADTokenRequestProperties != null)
+            {
+                foreach (var property in _webAccountProviderConfig.AADTokenRequestProperties)
+                {
+                    webTokenRequest.Properties.Add(property);
+                }
             }
 
             return webTokenRequest;

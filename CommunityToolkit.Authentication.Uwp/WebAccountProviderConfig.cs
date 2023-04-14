@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Collections.Generic;
+
 namespace CommunityToolkit.Authentication
 {
     /// <summary>
@@ -20,26 +22,32 @@ namespace CommunityToolkit.Authentication
         public WebAccountProviderType WebAccountProviderType { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to use Version 2 model, only for MSA, the default value is <c>False</c>.
+        /// Gets or sets the properties that need to be added when constructing WebTokenRequest (for MSA).
         /// </summary>
-        /// <remarks>
-        /// This option is configured for pre-authorization applications.
-        /// If the application is configured with MSA pre-authorization,
-        /// this option can be set to <c>True</c> to skip consent page.
-        /// </remarks>
-        public bool UseApiVersion2 { get; set; }
+        public IDictionary<string, string> MSATokenRequestProperties { get; set; }
+
+        /// <summary>
+        /// Gets or sets the properties that need to be added when constructing WebTokenRequest (for AAD).
+        /// </summary>
+        public IDictionary<string, string> AADTokenRequestProperties { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebAccountProviderConfig"/> struct.
         /// </summary>
         /// <param name="webAccountProviderType">The types of accounts providers that should be available to the user.</param>
         /// <param name="clientId">The registered ClientId. Required for AAD login and admin consent.</param>
-        /// <param name="useApiVersion2">Whether to enable the version 2 model for the MSA validate.</param>
-        public WebAccountProviderConfig(WebAccountProviderType webAccountProviderType, string clientId = null, bool useApiVersion2 = false)
+        /// <param name="msaTokenRequestProperties">Request properties for MSA.</param>
+        /// <param name="aadTokenRequestProperties">Request properties for AAD.</param>
+        public WebAccountProviderConfig(
+            WebAccountProviderType webAccountProviderType,
+            string clientId = null,
+            IDictionary<string, string> msaTokenRequestProperties = null,
+            IDictionary<string, string> aadTokenRequestProperties = null)
         {
             WebAccountProviderType = webAccountProviderType;
             ClientId = clientId;
-            UseApiVersion2 = useApiVersion2;
+            MSATokenRequestProperties = msaTokenRequestProperties;
+            AADTokenRequestProperties = aadTokenRequestProperties;
         }
     }
 }
