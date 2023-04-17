@@ -33,7 +33,7 @@ namespace CommunityToolkit.Authentication
         private const string SettingsKeyProviderId = "WindowsProvider_ProviderId";
         private const string SettingsKeyProviderAuthority = "WindowsProvider_Authority";
 
-        private static readonly SemaphoreSlim SemaphoreSlim = new (1);
+        private static readonly SemaphoreSlim SemaphoreSlim = new(1);
 
         // Default/minimal scopes for authentication, if none are provided.
         private static readonly string[] DefaultScopes = { "User.Read" };
@@ -550,6 +550,20 @@ namespace CommunityToolkit.Authentication
                 : new WebTokenRequest(provider, scopesString, clientId);
 
             webTokenRequest.Properties.Add(GraphResourcePropertyKey, GraphResourcePropertyValue);
+            if (provider.Authority == MicrosoftAccountAuthority)
+            {
+                foreach (var property in _webAccountProviderConfig.MSATokenRequestProperties)
+                {
+                    webTokenRequest.Properties.Add(property);
+                }
+            }
+            else if (provider.Authority == AadAuthority)
+            {
+                foreach (var property in _webAccountProviderConfig.AADTokenRequestProperties)
+                {
+                    webTokenRequest.Properties.Add(property);
+                }
+            }
 
             return webTokenRequest;
         }

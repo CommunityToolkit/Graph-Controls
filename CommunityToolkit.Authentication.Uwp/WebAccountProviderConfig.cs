@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Collections.Generic;
+
 namespace CommunityToolkit.Authentication
 {
     /// <summary>
@@ -20,6 +22,16 @@ namespace CommunityToolkit.Authentication
         public WebAccountProviderType WebAccountProviderType { get; set; }
 
         /// <summary>
+        /// Gets or sets the properties that need to be added when constructing <see cref="Windows.Security.Authentication.Web.Core.WebTokenRequest"/> (for MSA).
+        /// </summary>
+        public IDictionary<string, string> MSATokenRequestProperties { get; set; }
+
+        /// <summary>
+        /// Gets or sets the properties that need to be added when constructing <see cref="Windows.Security.Authentication.Web.Core.WebTokenRequest"/> (for AAD).
+        /// </summary>
+        public IDictionary<string, string> AADTokenRequestProperties { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="WebAccountProviderConfig"/> struct.
         /// </summary>
         /// <param name="webAccountProviderType">The types of accounts providers that should be available to the user.</param>
@@ -28,6 +40,8 @@ namespace CommunityToolkit.Authentication
         {
             WebAccountProviderType = webAccountProviderType;
             ClientId = clientId;
+            MSATokenRequestProperties = new Dictionary<string, string>();
+            AADTokenRequestProperties = new Dictionary<string, string>();
         }
     }
 }
