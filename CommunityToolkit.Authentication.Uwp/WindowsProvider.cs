@@ -172,9 +172,11 @@ namespace CommunityToolkit.Authentication
                 {
                     await _webAccount.SignOutAsync();
                 }
-                catch
+                catch (Exception e)
                 {
                     // Failed to remove an account.
+                    EventLogger.Log(e.Message);
+                    EventLogger.Log(e.StackTrace);
                 }
 
                 _webAccount = null;
@@ -232,7 +234,8 @@ namespace CommunityToolkit.Authentication
             }
             catch (Exception e)
             {
-                // TODO: Log failure
+                EventLogger.Log(e.Message);
+                EventLogger.Log(e.StackTrace);
                 throw e;
             }
             finally
@@ -363,36 +366,29 @@ namespace CommunityToolkit.Authentication
 
         private async Task<WebTokenRequestResult> AuthenticateSilentAsync(string[] scopes)
         {
-            try
+            WebTokenRequestResult authResult = null;
+
+            var account = _webAccount;
+            if (account == null)
             {
-                WebTokenRequestResult authResult = null;
-
-                var account = _webAccount;
-                if (account == null)
+                // Check the cache for an existing user
+                if (Settings[SettingsKeyAccountId] is string savedAccountId &&
+                    Settings[SettingsKeyProviderId] is string savedProviderId &&
+                    Settings[SettingsKeyProviderAuthority] is string savedProviderAuthority)
                 {
-                    // Check the cache for an existing user
-                    if (Settings[SettingsKeyAccountId] is string savedAccountId &&
-                        Settings[SettingsKeyProviderId] is string savedProviderId &&
-                        Settings[SettingsKeyProviderAuthority] is string savedProviderAuthority)
-                    {
-                        var savedProvider = await WebAuthenticationCoreManager.FindAccountProviderAsync(savedProviderId, savedProviderAuthority);
-                        account = await WebAuthenticationCoreManager.FindAccountAsync(savedProvider, savedAccountId);
-                    }
+                    var savedProvider = await WebAuthenticationCoreManager.FindAccountProviderAsync(savedProviderId, savedProviderAuthority);
+                    account = await WebAuthenticationCoreManager.FindAccountAsync(savedProvider, savedAccountId);
                 }
-
-                if (account != null)
-                {
-                    // Prepare a request to get a token.
-                    var webTokenRequest = GetWebTokenRequest(account.WebAccountProvider, _webAccountProviderConfig.ClientId, scopes);
-                    authResult = await WebAuthenticationCoreManager.GetTokenSilentlyAsync(webTokenRequest, account);
-                }
-
-                return authResult;
             }
-            catch (HttpRequestException)
+
+            if (account != null)
             {
-                throw; /* probably offline, no point continuing to interactive auth */
+                // Prepare a request to get a token.
+                var webTokenRequest = GetWebTokenRequest(account.WebAccountProvider, _webAccountProviderConfig.ClientId, scopes);
+                authResult = await WebAuthenticationCoreManager.GetTokenSilentlyAsync(webTokenRequest, account);
             }
+
+            return authResult;
         }
 
         private Task<WebTokenRequestResult> AuthenticateInteractiveAsync(string[] scopes)
@@ -527,9 +523,10 @@ namespace CommunityToolkit.Authentication
                 var webAccountProvider = webAccountProviderCommandWasInvoked ? await webAccountProviderTaskCompletionSource.Task : null;
                 return webAccountProvider;
             }
-            catch (TaskCanceledException)
+            catch (TaskCanceledException e)
             {
                 // The task was cancelled. No provider was chosen.
+                EventLogger.Log(e.Message);
                 return null;
             }
             finally

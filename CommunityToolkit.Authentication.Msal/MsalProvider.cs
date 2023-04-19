@@ -80,9 +80,10 @@ namespace CommunityToolkit.Authentication
         /// <param name="autoSignIn">Determines whether the provider attempts to silently log in upon creation.</param>
         /// <param name="listWindowsWorkAndSchoolAccounts">Determines if organizational accounts should be enabled/disabled.</param>
         /// <param name="tenantId">Registered tenant id in Azure Active Directory.</param>
-        public MsalProvider(string clientId, string[] scopes = null, string redirectUri = null, bool autoSignIn = true, bool listWindowsWorkAndSchoolAccounts = true, string tenantId = null)
+        /// <param name="withLogging">Output logs.</param>
+        public MsalProvider(string clientId, string[] scopes = null, string redirectUri = null, bool autoSignIn = true, bool listWindowsWorkAndSchoolAccounts = true, string tenantId = null, bool withLogging = false)
         {
-            Client = CreatePublicClientApplication(clientId, tenantId, redirectUri, listWindowsWorkAndSchoolAccounts);
+            Client = CreatePublicClientApplication(clientId, tenantId, redirectUri, listWindowsWorkAndSchoolAccounts, withLogging);
             Scopes = scopes.Select(s => s.ToLower()).ToArray() ?? new string[] { string.Empty };
 
             if (autoSignIn)
@@ -183,12 +184,27 @@ namespace CommunityToolkit.Authentication
         /// <param name="tenantId">An optional tenant id.</param>
         /// <param name="redirectUri">Redirect uri for auth response.</param>
         /// <param name="listWindowsWorkAndSchoolAccounts">Determines if organizational accounts should be supported.</param>
+        /// <param name="withLogging">Output logs.</param>
         /// <returns>A new instance of <see cref="PublicClientApplication"/>.</returns>
-        protected IPublicClientApplication CreatePublicClientApplication(string clientId, string tenantId, string redirectUri, bool listWindowsWorkAndSchoolAccounts)
+        protected IPublicClientApplication CreatePublicClientApplication(string clientId, string tenantId, string redirectUri, bool listWindowsWorkAndSchoolAccounts, bool withLogging)
         {
             var clientBuilder = PublicClientApplicationBuilder.Create(clientId)
                 .WithClientName(ProviderManager.ClientName)
                 .WithClientVersion(Assembly.GetExecutingAssembly().GetName().Version.ToString());
+
+            if (withLogging)
+            {
+                clientBuilder = clientBuilder.WithLogging((level, message, containsPii) =>
+                {
+                    if (containsPii)
+                    {
+                        // Add a PII warning to messages containing any.
+                        message = $"[CONTAINS PII] {message}";
+                    }
+
+                    EventLogger.Log($"{level}: {message}");
+                });
+            }
 
             if (tenantId != null)
             {
@@ -236,13 +252,15 @@ namespace CommunityToolkit.Authentication
                         authResult = await Client.AcquireTokenSilent(scopes, account).ExecuteAsync();
                     }
                 }
-                catch (MsalUiRequiredException)
+                catch (MsalUiRequiredException e)
                 {
+                    EventLogger.Log(e.Message);
                 }
-                catch
+                catch (Exception e)
                 {
                     // Unexpected exception
-                    // TODO: Send exception to a logger.
+                    EventLogger.Log(e.Message);
+                    EventLogger.Log(e.StackTrace);
                 }
 
                 if (authResult == null && !silentOnly)
@@ -270,10 +288,11 @@ namespace CommunityToolkit.Authentication
 
                         authResult = await paramBuilder.ExecuteAsync();
                     }
-                    catch
+                    catch (Exception e)
                     {
                         // Unexpected exception
-                        // TODO: Send exception to a logger.
+                        EventLogger.Log(e.Message);
+                        EventLogger.Log(e.StackTrace);
                     }
                 }
 
